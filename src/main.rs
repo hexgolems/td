@@ -44,7 +44,7 @@ impl event::EventHandler for MainState {
         const DESIRED_FPS: u32 = 60;
 
         while timer::check_update_time(ctx, DESIRED_FPS) {
-            //self.zoomlevel += 0.01;
+            self.enemies.tick();
         }
         Ok(())
     }
