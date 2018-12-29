@@ -14,6 +14,7 @@ mod enemies;
 mod game_state;
 mod gui;
 mod map;
+mod wave;
 mod towers;
 
 use crate::enemies::Enemies;

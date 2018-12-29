@@ -15,12 +15,14 @@ use crate::gui::Gui;
 use crate::map::GameMap;
 use crate::towers::Tower;
 use crate::towers::Towers;
+use crate::wave::Wave;
 
 pub struct GameState {
     pub imgs: Imgs,
     pub map: GameMap,
     pub enemies: Enemies,
     pub towers: Towers,
+    pub wave: Wave,
     pub gui: Gui,
 }
 
@@ -31,6 +33,7 @@ impl GameState {
         let map = GameMap::new();
         let enemies = Enemies::new();
         let towers = Towers::new();
+        let wave = Wave::new(60, 10);
         let gui = Gui::new();
 
         let s = Self {
@@ -38,12 +41,15 @@ impl GameState {
             map,
             enemies,
             towers,
+            wave,
             gui,
         };
         Ok(s)
     }
 
     pub fn spawn(&mut self) {
+        self.enemies
+            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
         self.enemies
             .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
         self.towers
@@ -56,6 +62,7 @@ impl event::EventHandler for GameState {
         const DESIRED_FPS: u32 = 60;
 
         while timer::check_update_time(ctx, DESIRED_FPS) {
+            Wave::tick(self);
             Enemies::tick(self);
         }
         Ok(())
