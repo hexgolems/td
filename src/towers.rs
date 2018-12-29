@@ -20,15 +20,17 @@ pub struct Tower {
     position: graphics::Point2,
     damage: f32,
     range: f32,
+    sps: f32,
 }
 
 impl Tower {
-    pub fn new(position: graphics::Point2, damage: f32, range: f32) -> Self {
+    pub fn new(position: graphics::Point2, damage: f32, range: f32, sps: f32) -> Self {
         return Self {
             disp: Cannon,
             position,
             damage,
             range,
+            sps,
         };
     }
 }
@@ -38,7 +40,7 @@ pub struct Towers {
     images: HashMap<Display, graphics::Image>,
 }
 
-impl Enemies {
+impl Towers {
     fn load_img(&mut self, ctx: &mut Context, disp: Display, path: &str) -> GameResult<()> {
         let mut img = graphics::Image::new(ctx, path)?;
         img.set_filter(graphics::FilterMode::Nearest);

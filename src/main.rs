@@ -11,13 +11,17 @@ use std::path;
 
 mod enemies;
 mod map;
+mod towers;
 use self::enemies::Enemies;
 use self::enemies::Enemy;
 use self::map::GameMap;
+use self::towers::Tower;
+use self::towers::Towers;
 
 struct MainState {
     map: GameMap,
     enemies: Enemies,
+    towers: Towers,
 }
 
 impl MainState {
@@ -26,13 +30,21 @@ impl MainState {
         map.init(ctx);
         let mut enemies = Enemies::new();
         enemies.init(ctx);
-        let s = MainState { map, enemies };
+        let mut towers = Towers::new();
+        towers.init(ctx);
+        let s = MainState {
+            map,
+            enemies,
+            towers,
+        };
         Ok(s)
     }
 
     pub fn spawn(&mut self) {
         self.enemies
-            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0))
+            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0));
+        self.towers
+            .spawn(Tower::new(self.map.tile_pos(2, 2), 1.0, 1.0, 0.5));
     }
 }
 
@@ -51,6 +63,7 @@ impl event::EventHandler for MainState {
         graphics::set_color(ctx, graphics::WHITE)?;
         self.map.draw(ctx);
         self.enemies.draw(ctx);
+        self.towers.draw(ctx);
 
         graphics::present(ctx);
         Ok(())
