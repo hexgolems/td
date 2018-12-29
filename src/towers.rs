@@ -8,15 +8,10 @@ use std::collections::HashMap;
 use std::env;
 use std::path;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum Display {
-    Cannon,
-}
-
-use self::Display::*;
+use crate::assets::{ImgID, Imgs};
 
 pub struct Tower {
-    disp: Display,
+    disp: ImgID,
     position: graphics::Point2,
     damage: f32,
     range: f32,
@@ -26,7 +21,7 @@ pub struct Tower {
 impl Tower {
     pub fn new(position: graphics::Point2, damage: f32, range: f32, sps: f32) -> Self {
         return Self {
-            disp: Cannon,
+            disp: ImgID::Cannon,
             position,
             damage,
             range,
@@ -37,37 +32,23 @@ impl Tower {
 
 pub struct Towers {
     towers: Vec<Tower>,
-    images: HashMap<Display, graphics::Image>,
 }
 
 impl Towers {
-    fn load_img(&mut self, ctx: &mut Context, disp: Display, path: &str) -> GameResult<()> {
-        let mut img = graphics::Image::new(ctx, path)?;
-        img.set_filter(graphics::FilterMode::Nearest);
-        self.images.insert(disp, img);
-        return Ok(());
-    }
-
     pub fn new() -> Self {
         let towers = vec![];
-        let images = HashMap::new();
-        return Self { towers, images };
-    }
-
-    pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Cannon, "/cannon.png")?;
-        return Ok(());
+        return Self { towers };
     }
 
     pub fn spawn(&mut self, tower: Tower) {
         self.towers.push(tower);
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         for e in self.towers.iter() {
             graphics::draw_ex(
                 ctx,
-                &self.images[&e.disp],
+                imgs.get(&e.disp),
                 graphics::DrawParam {
                     // src: src,
                     dest: e.position,

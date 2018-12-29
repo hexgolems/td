@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::env;
 use std::path;
 
+mod assets;
 mod enemies;
 mod game_state;
 mod gui;
