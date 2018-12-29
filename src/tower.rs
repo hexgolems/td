@@ -10,28 +10,31 @@ use std::path;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 enum Display {
-    Zombie,
+    Cannon,
 }
+
 use self::Display::*;
 
-pub struct Enemy {
+pub struct Tower {
     disp: Display,
     position: graphics::Point2,
-    health: f32,
+    damage: f32,
+    range: f32,
 }
 
-impl Enemy {
-    pub fn new(position: graphics::Point2, health: f32) -> Self {
+impl Tower {
+    pub fn new(position: graphics::Point2, damage: f32, range: f32) -> Self {
         return Self {
-            disp: Zombie,
+            disp: Cannon,
             position,
-            health,
+            damage,
+            range,
         };
     }
 }
 
-pub struct Enemies {
-    enemies: Vec<Enemy>,
+pub struct Towers {
+    towers: Vec<Tower>,
     images: HashMap<Display, graphics::Image>,
 }
 
@@ -44,22 +47,22 @@ impl Enemies {
     }
 
     pub fn new() -> Self {
-        let enemies = vec![];
+        let towers = vec![];
         let images = HashMap::new();
-        return Self { enemies, images };
+        return Self { towers, images };
     }
 
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Zombie, "/enemy.png")?;
+        self.load_img(ctx, Cannon, "/cannon.png")?;
         return Ok(());
     }
 
-    pub fn spawn(&mut self, enemy: Enemy) {
-        self.enemies.push(enemy);
+    pub fn spawn(&mut self, tower: Tower) {
+        self.towers.push(tower);
     }
 
     pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
-        for e in self.enemies.iter() {
+        for e in self.towers.iter() {
             graphics::draw_ex(
                 ctx,
                 &self.images[&e.disp],

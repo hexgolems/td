@@ -5,15 +5,15 @@ use ggez::graphics;
 use ggez::graphics::{DrawMode, Point2};
 use ggez::timer;
 use ggez::{Context, GameResult};
+use std::collections::HashMap;
 use std::env;
 use std::path;
-use std::collections::HashMap;
 
 mod enemies;
 mod map;
-use self::map::GameMap;
 use self::enemies::Enemies;
 use self::enemies::Enemy;
+use self::map::GameMap;
 
 struct MainState {
     map: GameMap,
@@ -26,18 +26,15 @@ impl MainState {
         map.init(ctx);
         let mut enemies = Enemies::new();
         enemies.init(ctx);
-        let s = MainState {
-            map,
-            enemies,
-        };
+        let s = MainState { map, enemies };
         Ok(s)
     }
 
-    pub fn spawn(&mut self){
-        self.enemies.spawn( Enemy::new(self.map.tile_pos(0,3), 10.0) )
+    pub fn spawn(&mut self) {
+        self.enemies
+            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0))
     }
 }
-
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
