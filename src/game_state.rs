@@ -1,5 +1,5 @@
 use ggez::conf;
-use ggez::event;
+use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
 use ggez::graphics::{DrawMode, Point2};
 use ggez::timer;
@@ -70,5 +70,13 @@ impl event::EventHandler for GameState {
 
         graphics::present(ctx);
         Ok(())
+    }
+
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+        if keycode == Keycode::Escape {
+            ctx.quit().expect("Should never fail");
+        }
+
+        Gui::key_down(self, keycode, keymod, repeat);
     }
 }
