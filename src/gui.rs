@@ -46,7 +46,7 @@ impl Gui {
             &self.images[&Cursor],
             graphics::DrawParam {
                 // src: src,
-                dest: self.cursor_pos - 1,
+                dest: self.cursor_pos,
                 //rotation: self.zoomlevel,
                 // offset: Point2::new(-16.0, 0.0),
                 scale: Point2::new(4.0, 4.0),
