@@ -64,7 +64,7 @@ impl Enemies {
                     // src: src,
                     dest: e.position,
                     //rotation: self.zoomlevel,
-                    // offset: Point2::new(-16.0, 0.0),
+                    offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
                     // shear: shear,
                     ..Default::default()

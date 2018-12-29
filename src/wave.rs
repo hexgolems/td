@@ -23,8 +23,13 @@ impl Wave {
     pub fn tick(state: &mut GameState) {
         if state.wave.next_spawn == 0 {
             if state.wave.enemy_count != 0 {
-                state.enemies
-                    .spawn(Enemy::new(state.map.tile_pos(0, 3), 10.0, 0.25));
+                for x in state.map.xrange() {
+                    for y in state.map.yrange() {
+                        if state.map.is_spawn(x,y){
+                            state.enemies.spawn(Enemy::new(state.map.tile_pos(x, y), 10.0, 0.25));
+                        }
+                    }
+                }
                 state.wave.enemy_count -= 1;
             }
             state.wave.reset_spawn()

@@ -3,6 +3,7 @@ use ggez::graphics;
 use ggez::graphics::{Point2};
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
+use std::ops::Range;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum WalkDir {
@@ -23,6 +24,8 @@ pub enum MapTile {
 use self::MapTile::*;
 
 pub struct GameMap {
+    xrange: Range<usize>,
+    yrange: Range<usize>,
     data: Vec<Vec<MapTile>>,
     images: HashMap<MapTile, ImgID>,
 }
@@ -35,6 +38,8 @@ impl GameMap {
             vec![Build, Build, Build, Walk(Up)],
             vec![Spawn(Right), Walk(Right), Walk(Right), Walk(Up)],
         ];
+        let xrange = 0..4;
+        let yrange = 0..4;
         let mut images = HashMap::new();
         images.insert(Walk(Left), ImgID::FloorWalkLeft);
         images.insert(Walk(Right), ImgID::FloorWalkRight);
@@ -46,7 +51,7 @@ impl GameMap {
         images.insert(Spawn(Right), ImgID::FloorSpawnRight);
         images.insert(Spawn(Up), ImgID::FloorSpawnUp);
         images.insert(Spawn(Down), ImgID::FloorSpawnDown);
-        return Self { data, images };
+        return Self { data, xrange, yrange, images };
     }
 
     pub fn tile_pos(&self, x: usize, y: usize) -> graphics::Point2 {
@@ -57,9 +62,24 @@ impl GameMap {
         return self.data[(pos.y / 80.0) as usize][(pos.x / 80.0) as usize];
     }
 
+    pub fn xrange(&self) -> Range<usize>{
+        return self.xrange.clone();
+    }
+
+    pub fn yrange(&self) -> Range<usize>{
+        return self.yrange.clone();
+    }
+
+    pub fn is_spawn(&self, x: usize, y: usize) -> bool{
+        match self.data[y][x] {
+            Spawn(_) => return true,
+            _ => return false
+        }
+    }
+
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
-        for x in 0..4 {
-            for y in 0..4 {
+        for x in self.xrange() {
+            for y in self.yrange() {
                 graphics::draw_ex(
                     ctx,
                     imgs.get(&self.images[&self.data[y][x]]),
