@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use std::env;
 use std::path;
 
+use crate::game_state::GameState;
+
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 enum Display {
     Zombie,
@@ -77,5 +79,5 @@ impl Enemies {
         Ok(())
     }
 
-    pub fn tick(&mut self) {}
+    pub fn tick(state: &mut GameState) {}
 }
