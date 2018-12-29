@@ -76,4 +76,6 @@ impl Enemies {
         }
         Ok(())
     }
+
+    pub fn tick(&mut self) {}
 }
