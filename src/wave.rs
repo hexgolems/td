@@ -1,5 +1,6 @@
 use crate::game_state::GameState;
 use crate::enemies::Enemy;
+use crate::map::GameMap;
 
 pub struct Wave {
     spawn_delay: usize,
@@ -26,7 +27,7 @@ impl Wave {
                 for x in state.map.xrange() {
                     for y in state.map.yrange() {
                         if state.map.is_spawn(x,y){
-                            state.enemies.spawn(Enemy::new(state.map.tile_pos(x, y), 10.0, 0.25));
+                            state.enemies.spawn(Enemy::new(GameMap::tile_pos(x, y), 10.0, 0.25));
                         }
                     }
                 }

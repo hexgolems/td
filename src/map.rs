@@ -41,21 +41,29 @@ impl GameMap {
         let xrange = 0..4;
         let yrange = 0..4;
         let mut images = HashMap::new();
-        images.insert(Walk(Left), ImgID::FloorWalkLeft);
-        images.insert(Walk(Right), ImgID::FloorWalkRight);
-        images.insert(Walk(Up), ImgID::FloorWalkUp);
-        images.insert(Walk(Down), ImgID::FloorWalkDown);
-        images.insert(Build, ImgID::FloorBuild);
-        images.insert(Target, ImgID::FloorTarget);
-        images.insert(Spawn(Left), ImgID::FloorSpawnLeft);
+        images.insert(Walk(Left),   ImgID::FloorWalkLeft);
+        images.insert(Walk(Right),  ImgID::FloorWalkRight);
+        images.insert(Walk(Up),     ImgID::FloorWalkUp);
+        images.insert(Walk(Down),   ImgID::FloorWalkDown);
+        images.insert(Build,        ImgID::FloorBuild);
+        images.insert(Target,       ImgID::FloorTarget);
+        images.insert(Spawn(Left),  ImgID::FloorSpawnLeft);
         images.insert(Spawn(Right), ImgID::FloorSpawnRight);
-        images.insert(Spawn(Up), ImgID::FloorSpawnUp);
-        images.insert(Spawn(Down), ImgID::FloorSpawnDown);
+        images.insert(Spawn(Up),    ImgID::FloorSpawnUp);
+        images.insert(Spawn(Down),  ImgID::FloorSpawnDown);
         return Self { data, xrange, yrange, images };
     }
 
-    pub fn tile_pos(&self, x: usize, y: usize) -> graphics::Point2 {
+    pub fn tile_pos(x: usize, y: usize) -> graphics::Point2 {
         return graphics::Point2::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
+    }
+
+    pub fn tile_center(x: usize, y: usize) -> graphics::Point2 {
+        return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32+ 40.0);
+    }
+
+    pub fn inbounds(&self, x: usize, y: usize) -> bool {
+        return self.xrange.contains(&x) && self.yrange.contains(&y)
     }
 
     pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
@@ -68,6 +76,13 @@ impl GameMap {
 
     pub fn yrange(&self) -> Range<usize>{
         return self.yrange.clone();
+    }
+
+    pub fn is_buildable(&self, x: usize, y:usize) -> bool {
+        match self.data[y][x] {
+            Build => return true,
+            _ => return false
+        }
     }
 
     pub fn is_spawn(&self, x: usize, y: usize) -> bool{
@@ -85,7 +100,7 @@ impl GameMap {
                     imgs.get(&self.images[&self.data[y][x]]),
                     graphics::DrawParam {
                         // src: src,
-                        dest: self.tile_pos(x, y),
+                        dest: GameMap::tile_pos(x, y),
                         //rotation: self.zoomlevel,
                         // offset: Point2::new(-16.0, 0.0),
                         scale: Point2::new(4.0, 4.0),

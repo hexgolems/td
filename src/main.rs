@@ -1,3 +1,4 @@
+#![feature(range_contains)]
 extern crate ggez;
 use ggez::conf;
 use ggez::event;
@@ -30,7 +31,7 @@ pub fn main() {
 
     println!("{}", graphics::get_renderer_info(ctx).unwrap());
     let state = &mut GameState::new(ctx).unwrap();
-    state.spawn();
+
     if let Err(e) = event::run(ctx, state) {
         println!("Error encountered: {}", e);
     } else {

@@ -5,10 +5,8 @@ use ggez::{Context, GameResult};
 
 use crate::assets::{Imgs};
 use crate::enemies::Enemies;
-use crate::enemies::Enemy;
 use crate::gui::Gui;
 use crate::map::GameMap;
-use crate::towers::Tower;
 use crate::towers::Towers;
 use crate::wave::Wave;
 
@@ -40,15 +38,6 @@ impl GameState {
             gui,
         };
         Ok(s)
-    }
-
-    pub fn spawn(&mut self) {
-        self.enemies
-            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
-        self.enemies
-            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
-        self.towers
-            .spawn(Tower::new(self.map.tile_pos(2, 2), 1.0, 1.0, 0.5));
     }
 }
 
