@@ -2,10 +2,7 @@ extern crate ggez;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
-use ggez::{Context, GameResult};
-use std::collections::HashMap;
+use ggez::{Context};
 use std::env;
 use std::path;
 
@@ -16,12 +13,7 @@ mod gui;
 mod map;
 mod towers;
 
-use crate::enemies::Enemies;
-use crate::enemies::Enemy;
 use crate::game_state::GameState;
-use crate::map::GameMap;
-use crate::towers::Tower;
-use crate::towers::Towers;
 
 pub fn main() {
     let c = conf::Conf::new();

@@ -1,13 +1,8 @@
 use crate::assets::{ImgID, Imgs};
-use ggez::conf;
-use ggez::event;
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
+use ggez::graphics::{Point2};
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
-use std::env;
-use std::path;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum WalkDir {
@@ -63,8 +58,8 @@ impl GameMap {
     }
 
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
-        for x in (0..4) {
-            for y in (0..4) {
+        for x in 0..4 {
+            for y in 0..4 {
                 graphics::draw_ex(
                     ctx,
                     imgs.get(&self.images[&self.data[y][x]]),

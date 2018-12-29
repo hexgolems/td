@@ -1,12 +1,6 @@
-use ggez::conf;
-use ggez::event;
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
+use ggez::graphics::{Point2};
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::path;
 
 use crate::assets::{ImgID, Imgs};
 

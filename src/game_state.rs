@@ -1,14 +1,9 @@
-use ggez::conf;
 use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
 use ggez::timer;
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::path;
 
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{Imgs};
 use crate::enemies::Enemies;
 use crate::enemies::Enemy;
 use crate::gui::Gui;
@@ -64,10 +59,10 @@ impl event::EventHandler for GameState {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
         graphics::set_color(ctx, graphics::WHITE)?;
-        self.map.draw(&self.imgs, ctx);
-        self.enemies.draw(&self.imgs, ctx);
-        self.towers.draw(&self.imgs, ctx);
-        self.gui.draw(&self.imgs, ctx);
+        self.map.draw(&self.imgs, ctx)?;
+        self.enemies.draw(&self.imgs, ctx)?;
+        self.towers.draw(&self.imgs, ctx)?;
+        self.gui.draw(&self.imgs, ctx)?;
 
         graphics::present(ctx);
         Ok(())

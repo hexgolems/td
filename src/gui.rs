@@ -1,15 +1,10 @@
-use ggez::conf;
-use ggez::event::{self, Keycode, Mod};
-use ggez::graphics::{self, DrawMode, Point2};
-use ggez::timer;
+use ggez::event::{Keycode, Mod};
+use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::path;
 
 use crate::assets::{ImgID, Imgs};
 use crate::game_state::GameState;
-use crate::towers::{Tower, Towers};
+use crate::towers::{Tower};
 
 enum CursorMode {
     BuildCannon,
@@ -17,12 +12,14 @@ enum CursorMode {
 
 pub struct Gui {
     cursor_pos: graphics::Point2,
+    cursor_state: CursorMode,
 }
 
 impl Gui {
     pub fn new() -> Self {
         return Self {
             cursor_pos: graphics::Point2::new(0.0, 0.0),
+            cursor_state: CursorMode::BuildCannon,
         };
     }
 
@@ -57,11 +54,10 @@ impl Gui {
             state.gui.cursor_pos.x += 4.0 * 20.0;
         }
         if keycode == Keycode::Space {
-            state
-                .towers
-                .spawn(Tower::new(state.gui.cursor_pos, 1.0, 1.0, 0.5));
+            match state.gui.cursor_state {
+                CursorMode::BuildCannon => state.towers.spawn(Tower::new(state.gui.cursor_pos, 1.0, 1.0, 0.5)),
+            }
         }
     }
 
-    pub fn tick(&mut self) {}
 }
