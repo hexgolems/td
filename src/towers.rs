@@ -20,7 +20,7 @@ pub struct Tower {
     position: graphics::Point2,
     damage: f32,
     range: f32,
-    sps: f32,
+    sps: f32, // shots per second
 }
 
 impl Tower {

@@ -16,10 +16,10 @@ use crate::towers::Tower;
 use crate::towers::Towers;
 
 pub struct GameState {
-    map: GameMap,
-    enemies: Enemies,
-    towers: Towers,
-    gui: Gui,
+    pub map: GameMap,
+    pub enemies: Enemies,
+    pub towers: Towers,
+    pub gui: Gui,
 }
 
 impl GameState {
@@ -44,7 +44,7 @@ impl GameState {
 
     pub fn spawn(&mut self) {
         self.enemies
-            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0));
+            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
         self.towers
             .spawn(Tower::new(self.map.tile_pos(2, 2), 1.0, 1.0, 0.5));
     }

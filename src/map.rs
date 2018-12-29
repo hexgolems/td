@@ -8,8 +8,8 @@ use std::collections::HashMap;
 use std::env;
 use std::path;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum WalkDir {
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+pub enum WalkDir {
     Up,
     Down,
     Left,
@@ -17,8 +17,8 @@ enum WalkDir {
 }
 
 use self::WalkDir::*;
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum MapTile {
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+pub enum MapTile {
     Walk(WalkDir),
     Build,
     Spawn(WalkDir),
@@ -66,6 +66,10 @@ impl GameMap {
 
     pub fn tile_pos(&self, x: usize, y: usize) -> graphics::Point2 {
         return graphics::Point2::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
+    }
+
+    pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
+        return self.data[(pos.y / 80.0) as usize][(pos.x / 80.0) as usize];
     }
 
     pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
