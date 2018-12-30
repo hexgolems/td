@@ -79,7 +79,7 @@ impl Gui {
         if keycode == Keycode::Space {
             state
                 .towers
-                .spawn(Tower::new(state.gui.cursor_pos, 1.0, 1.0, 0.5));
+                .spawn(Tower::new(state.gui.cursor_pos, 100, 100.0, 0.5));
         }
     }
 

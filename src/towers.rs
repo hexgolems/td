@@ -1,3 +1,5 @@
+use crate::enemies::{Enemies, EnemyEvent};
+use crate::game_state::GameState;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
@@ -6,6 +8,7 @@ use ggez::timer;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 use std::env;
+use std::num;
 use std::path;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
@@ -18,13 +21,13 @@ use self::Display::*;
 pub struct Tower {
     disp: Display,
     position: graphics::Point2,
-    damage: f32,
+    damage: usize,
     range: f32,
     sps: f32, // shots per second
 }
 
 impl Tower {
-    pub fn new(position: graphics::Point2, damage: f32, range: f32, sps: f32) -> Self {
+    pub fn new(position: graphics::Point2, damage: usize, range: f32, sps: f32) -> Self {
         return Self {
             disp: Cannon,
             position,
@@ -32,6 +35,13 @@ impl Tower {
             range,
             sps,
         };
+    }
+
+    pub fn tick(&mut self, enemies: &mut Enemies) {
+        if let Some(id) = enemies.weakest_enemy_in_range(self.range, self.position) {
+            println!("shooting: {}", id);
+            enemies.send(id, EnemyEvent::Damage(self.damage));
+        }
     }
 }
 
@@ -80,5 +90,11 @@ impl Towers {
             )?;
         }
         Ok(())
+    }
+
+    pub fn tick(state: &mut GameState) {
+        for t in state.towers.towers.iter_mut() {
+            t.tick(&mut state.enemies)
+        }
     }
 }

@@ -44,9 +44,9 @@ impl GameState {
 
     pub fn spawn(&mut self) {
         self.enemies
-            .spawn(Enemy::new(self.map.tile_pos(0, 3), 10.0, 0.25));
+            .spawn(Enemy::new(self.map.tile_pos(0, 3), 100, 0.25));
         self.towers
-            .spawn(Tower::new(self.map.tile_pos(2, 2), 1.0, 1.0, 0.5));
+            .spawn(Tower::new(self.map.tile_pos(2, 2), 50, 100.0, 0.5));
     }
 }
 
@@ -56,6 +56,7 @@ impl event::EventHandler for GameState {
 
         while timer::check_update_time(ctx, DESIRED_FPS) {
             Enemies::tick(self);
+            Towers::tick(self);
         }
         Ok(())
     }
