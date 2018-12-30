@@ -1,5 +1,6 @@
 #![feature(range_contains)]
 extern crate ggez;
+extern crate rand;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
@@ -13,6 +14,7 @@ mod game_state;
 mod gui;
 mod map;
 mod towers;
+mod utils;
 mod wave;
 
 use crate::game_state::GameState;

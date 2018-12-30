@@ -71,8 +71,13 @@ impl GameMap {
         return self.xrange.contains(&x) && self.yrange.contains(&y);
     }
 
+    pub fn tile_index_at(pos: graphics::Point2) -> (usize, usize) {
+        return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
+    }
+
     pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
-        return self.data[(pos.y / 80.0) as usize][(pos.x / 80.0) as usize];
+        let (xi, yi) = GameMap::tile_index_at(pos);
+        return self.data[yi][xi];
     }
 
     pub fn xrange(&self) -> Range<usize> {
