@@ -29,7 +29,7 @@ impl Wave {
                         if state.map.is_spawn(x, y) {
                             state
                                 .enemies
-                                .spawn(Enemy::new(GameMap::tile_center(x, y), 10.0, 0.25));
+                                .spawn(Enemy::new(GameMap::tile_center(x, y), 100, 0.25));
                         }
                     }
                 }

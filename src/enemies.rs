@@ -1,28 +1,38 @@
 use crate::assets::{ImgID, Imgs};
 use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
+use crate::utils::distance;
 use crate::utils::move_to;
 use ggez::graphics;
 use ggez::graphics::{Point2, Vector2};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
+use std::collections::HashMap;
 
 pub struct Enemy {
+    id: usize,
     disp: ImgID,
     position: graphics::Point2,
-    health: f32,
+    health: usize,
     walk_speed: f32,
     next_walk_target: graphics::Point2,
 }
 
+pub enum EnemyEvent {
+    Die,
+    Damage(usize),
+    //Slow(f32),
+}
+
 impl Enemy {
-    pub fn new(position: graphics::Point2, health: f32, walk_speed: f32) -> Self {
+    pub fn new(position: graphics::Point2, health: usize, walk_speed: f32) -> Self {
         return Self {
+            id: 0,
             disp: ImgID::Zombie,
             position,
             health,
             next_walk_target: position,
-            walk_speed, // tiles per second
+            walk_speed,
         };
     }
 
@@ -60,21 +70,24 @@ impl Enemy {
 }
 
 pub struct Enemies {
-    enemies: Vec<Enemy>,
+    enemies: HashMap<usize, Enemy>,
+    id: usize,
 }
 
 impl Enemies {
     pub fn new() -> Self {
-        let enemies = vec![];
-        return Self { enemies };
+        let id = 0;
+        let enemies = HashMap::new();
+        return Self { enemies, id };
     }
 
     pub fn spawn(&mut self, enemy: Enemy) {
-        self.enemies.push(enemy);
+        self.enemies.insert(self.id, enemy);
+        self.id += 1;
     }
 
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
-        for e in self.enemies.iter() {
+        for e in self.enemies.values() {
             graphics::draw_ex(
                 ctx,
                 imgs.get(&e.disp),
@@ -92,9 +105,42 @@ impl Enemies {
         Ok(())
     }
 
+    pub fn in_range(&self, pos: graphics::Point2, range: f32) -> Vec<usize> {
+        self.enemies
+            .iter()
+            .filter(|(id, e)| distance(&pos, &e.position) <= range && e.health > 0)
+            .map(|(id, e)| *id)
+            .collect()
+    }
+
+    pub fn weakest_enemy_in_range(&self, range: f32, pos: graphics::Point2) -> Option<usize> {
+        self.in_range(pos, range)
+            .iter()
+            .min_by_key(|id| self.enemies.get(id).unwrap().health)
+            .cloned()
+    }
+
     pub fn tick(state: &mut GameState) {
-        for e in state.enemies.enemies.iter_mut() {
+        for e in state.enemies.enemies.values_mut() {
             e.tick(&state.map)
         }
+        state.enemies.enemies.retain(|id, e| e.health > 0);
+    }
+
+    pub fn send(&mut self, id: usize, event: EnemyEvent) {
+        match event {
+            EnemyEvent::Damage(a) => {
+                println!("got dmg: {}", a);
+                if let Some(e) = self.enemies.get_mut(&id) {
+                    e.health = e.health.saturating_sub(a);
+                    println!("health now: {}", e.health);
+                }
+            }
+            EnemyEvent::Die => {
+                if let Some(e) = self.enemies.get_mut(&id) {
+                    e.health = 0;
+                }
+            }
+        };
     }
 }

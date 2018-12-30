@@ -48,6 +48,7 @@ impl event::EventHandler for GameState {
         while timer::check_update_time(ctx, DESIRED_FPS) {
             Wave::tick(self);
             Enemies::tick(self);
+            Towers::tick(self);
         }
         Ok(())
     }

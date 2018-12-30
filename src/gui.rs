@@ -219,7 +219,7 @@ impl Gui {
                     y,
                     t,
                     valid: true,
-                } => state.towers.spawn(Tower::new(t, (x, y), 1.0, 1.0, 0.5)),
+                } => state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 0.5)),
                 _ => {}
             }
         }

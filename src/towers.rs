@@ -1,3 +1,5 @@
+use crate::enemies::{Enemies, EnemyEvent};
+use crate::game_state::GameState;
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
@@ -24,7 +26,7 @@ impl TowerType {
 pub struct Tower {
     kind: TowerType,
     map_position: (usize, usize),
-    damage: f32,
+    damage: usize,
     range: f32,
     sps: f32, // shots per second
 }
@@ -33,7 +35,7 @@ impl Tower {
     pub fn new(
         kind: TowerType,
         map_position: (usize, usize),
-        damage: f32,
+        damage: usize,
         range: f32,
         sps: f32,
     ) -> Self {
@@ -44,6 +46,16 @@ impl Tower {
             range,
             sps,
         };
+    }
+
+    pub fn tick(&mut self, enemies: &mut Enemies) {
+        if let Some(id) = enemies.weakest_enemy_in_range(
+            self.range,
+            GameMap::tile_center(self.map_position.0, self.map_position.1),
+        ) {
+            println!("shooting: {}", id);
+            enemies.send(id, EnemyEvent::Damage(self.damage));
+        }
     }
 }
 
@@ -88,5 +100,11 @@ impl Towers {
             )?;
         }
         Ok(())
+    }
+
+    pub fn tick(state: &mut GameState) {
+        for t in state.towers.towers.iter_mut() {
+            t.tick(&mut state.enemies)
+        }
     }
 }
