@@ -1,6 +1,6 @@
 use crate::assets::{ImgID, Imgs};
 use ggez::graphics;
-use ggez::graphics::{Point2};
+use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 use std::ops::Range;
@@ -41,17 +41,22 @@ impl GameMap {
         let xrange = 0..4;
         let yrange = 0..4;
         let mut images = HashMap::new();
-        images.insert(Walk(Left),   ImgID::FloorWalkLeft);
-        images.insert(Walk(Right),  ImgID::FloorWalkRight);
-        images.insert(Walk(Up),     ImgID::FloorWalkUp);
-        images.insert(Walk(Down),   ImgID::FloorWalkDown);
-        images.insert(Build,        ImgID::FloorBuild);
-        images.insert(Target,       ImgID::FloorTarget);
-        images.insert(Spawn(Left),  ImgID::FloorSpawnLeft);
+        images.insert(Walk(Left), ImgID::FloorWalkLeft);
+        images.insert(Walk(Right), ImgID::FloorWalkRight);
+        images.insert(Walk(Up), ImgID::FloorWalkUp);
+        images.insert(Walk(Down), ImgID::FloorWalkDown);
+        images.insert(Build, ImgID::FloorBuild);
+        images.insert(Target, ImgID::FloorTarget);
+        images.insert(Spawn(Left), ImgID::FloorSpawnLeft);
         images.insert(Spawn(Right), ImgID::FloorSpawnRight);
-        images.insert(Spawn(Up),    ImgID::FloorSpawnUp);
-        images.insert(Spawn(Down),  ImgID::FloorSpawnDown);
-        return Self { data, xrange, yrange, images };
+        images.insert(Spawn(Up), ImgID::FloorSpawnUp);
+        images.insert(Spawn(Down), ImgID::FloorSpawnDown);
+        return Self {
+            data,
+            xrange,
+            yrange,
+            images,
+        };
     }
 
     pub fn tile_pos(x: usize, y: usize) -> graphics::Point2 {
@@ -59,36 +64,36 @@ impl GameMap {
     }
 
     pub fn tile_center(x: usize, y: usize) -> graphics::Point2 {
-        return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32+ 40.0);
+        return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
     }
 
     pub fn inbounds(&self, x: usize, y: usize) -> bool {
-        return self.xrange.contains(&x) && self.yrange.contains(&y)
+        return self.xrange.contains(&x) && self.yrange.contains(&y);
     }
 
     pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
         return self.data[(pos.y / 80.0) as usize][(pos.x / 80.0) as usize];
     }
 
-    pub fn xrange(&self) -> Range<usize>{
+    pub fn xrange(&self) -> Range<usize> {
         return self.xrange.clone();
     }
 
-    pub fn yrange(&self) -> Range<usize>{
+    pub fn yrange(&self) -> Range<usize> {
         return self.yrange.clone();
     }
 
-    pub fn is_buildable(&self, x: usize, y:usize) -> bool {
+    pub fn is_buildable(&self, x: usize, y: usize) -> bool {
         match self.data[y][x] {
             Build => return true,
-            _ => return false
+            _ => return false,
         }
     }
 
-    pub fn is_spawn(&self, x: usize, y: usize) -> bool{
+    pub fn is_spawn(&self, x: usize, y: usize) -> bool {
         match self.data[y][x] {
             Spawn(_) => return true,
-            _ => return false
+            _ => return false,
         }
     }
 

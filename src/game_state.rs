@@ -3,7 +3,7 @@ use ggez::graphics;
 use ggez::timer;
 use ggez::{Context, GameResult};
 
-use crate::assets::{Imgs};
+use crate::assets::Imgs;
 use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;

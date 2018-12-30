@@ -3,7 +3,7 @@ extern crate ggez;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
-use ggez::{Context};
+use ggez::Context;
 use std::env;
 use std::path;
 
@@ -12,8 +12,8 @@ mod enemies;
 mod game_state;
 mod gui;
 mod map;
-mod wave;
 mod towers;
+mod wave;
 
 use crate::game_state::GameState;
 

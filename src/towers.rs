@@ -1,5 +1,5 @@
 use ggez::graphics;
-use ggez::graphics::{Point2};
+use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashSet;
 
@@ -7,29 +7,28 @@ use crate::assets::{ImgID, Imgs};
 use crate::map::GameMap;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
-pub enum TowerType{
+pub enum TowerType {
     Cannon,
 }
 
-impl TowerType{
-    pub fn get_image_id(&self)->ImgID{
-        match self{
+impl TowerType {
+    pub fn get_image_id(&self) -> ImgID {
+        match self {
             TowerType::Cannon => ImgID::Cannon,
         }
-
     }
 }
 
 pub struct Tower {
     kind: TowerType,
-    map_position: (usize,usize),
+    map_position: (usize, usize),
     damage: f32,
     range: f32,
     sps: f32, // shots per second
 }
 
 impl Tower {
-    pub fn new( map_position: (usize,usize), damage: f32, range: f32, sps: f32) -> Self {
+    pub fn new(map_position: (usize, usize), damage: f32, range: f32, sps: f32) -> Self {
         return Self {
             kind: TowerType::Cannon,
             map_position,
@@ -42,14 +41,17 @@ impl Tower {
 
 pub struct Towers {
     towers: Vec<Tower>,
-    blocked_positions: HashSet<(usize,usize)>,
+    blocked_positions: HashSet<(usize, usize)>,
 }
 
 impl Towers {
     pub fn new() -> Self {
         let towers = vec![];
         let blocked_positions = HashSet::new();
-        return Self { towers, blocked_positions};
+        return Self {
+            towers,
+            blocked_positions,
+        };
     }
 
     pub fn spawn(&mut self, tower: Tower) {
@@ -58,7 +60,7 @@ impl Towers {
     }
 
     pub fn is_buildable(&self, x: usize, y: usize) -> bool {
-        return !self.blocked_positions.contains(&(x,y))
+        return !self.blocked_positions.contains(&(x, y));
     }
 
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {

@@ -1,5 +1,5 @@
-use crate::game_state::GameState;
 use crate::enemies::Enemy;
+use crate::game_state::GameState;
 use crate::map::GameMap;
 
 pub struct Wave {
@@ -9,7 +9,7 @@ pub struct Wave {
 }
 
 impl Wave {
-    pub fn new(spawn_delay:usize, enemy_count: usize) -> Self {
+    pub fn new(spawn_delay: usize, enemy_count: usize) -> Self {
         return Self {
             spawn_delay,
             next_spawn: 0,
@@ -26,8 +26,10 @@ impl Wave {
             if state.wave.enemy_count != 0 {
                 for x in state.map.xrange() {
                     for y in state.map.yrange() {
-                        if state.map.is_spawn(x,y){
-                            state.enemies.spawn(Enemy::new(GameMap::tile_pos(x, y), 10.0, 0.25));
+                        if state.map.is_spawn(x, y) {
+                            state
+                                .enemies
+                                .spawn(Enemy::new(GameMap::tile_pos(x, y), 10.0, 0.25));
                         }
                     }
                 }
@@ -38,7 +40,4 @@ impl Wave {
             state.wave.next_spawn -= 1;
         }
     }
-
 }
-
-
