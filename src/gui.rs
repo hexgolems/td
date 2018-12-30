@@ -1,58 +1,115 @@
-use ggez::conf;
-use ggez::event::{self, Keycode, Mod};
-use ggez::graphics::{self, DrawMode, Point2};
-use ggez::timer;
+use ggez::event::{Keycode, Mod};
+use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::path;
 
+use crate::assets::{ImgID, Imgs};
 use crate::game_state::GameState;
-use crate::towers::{Tower, Towers};
+use crate::map::GameMap;
+use crate::towers::{Tower, TowerType};
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum Images {
-    Cursor,
-}
-use self::Images::*;
-
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 enum CursorMode {
-    BuildCannon,
+    Build {
+        x: usize,
+        y: usize,
+        t: TowerType,
+        valid: bool,
+    },
+}
+
+use self::CursorMode::*;
+
+impl CursorMode {
+    fn update(&mut self, state: &GameState) {
+        match self {
+            Build {
+                x,
+                y,
+                ref mut valid,
+                ..
+            } => *valid = state.map.is_buildable(*x, *y) && state.towers.is_buildable(*x, *y),
+        }
+    }
+
+    pub fn up(&self, state: &GameState) -> Self {
+        let mut res = self.clone();
+        match res {
+            Build { x, ref mut y, .. } => {
+                if *y > 0 && state.map.inbounds(x, *y - 1) {
+                    *y -= 1;
+                }
+            }
+        }
+        res.update(state);
+        return res;
+    }
+    pub fn down(&self, state: &GameState) -> Self {
+        let mut res = self.clone();
+        match res {
+            Build { x, ref mut y, .. } => {
+                if state.map.inbounds(x, *y + 1) {
+                    *y += 1;
+                }
+            }
+        }
+        res.update(state);
+        return res;
+    }
+    pub fn left(&self, state: &GameState) -> Self {
+        let mut res = self.clone();
+        match res {
+            Build { ref mut x, y, .. } => {
+                if *x > 0 && state.map.inbounds(*x - 1, y) {
+                    *x -= 1;
+                }
+            }
+        }
+        res.update(state);
+        return res;
+    }
+    pub fn right(&self, state: &GameState) -> Self {
+        let mut res = self.clone();
+        match res {
+            Build { ref mut x, y, .. } => {
+                if state.map.inbounds(*x + 1, y) {
+                    *x += 1;
+                }
+            }
+        }
+        res.update(state);
+        return res;
+    }
 }
 
 pub struct Gui {
-    cursor_pos: graphics::Point2,
-    images: HashMap<Images, graphics::Image>,
+    cursor_state: CursorMode,
 }
 
 impl Gui {
-    fn load_img(&mut self, ctx: &mut Context, disp: Images, path: &str) -> GameResult<()> {
-        let mut img = graphics::Image::new(ctx, path)?;
-        img.set_filter(graphics::FilterMode::Nearest);
-        self.images.insert(disp, img);
-        return Ok(());
-    }
-
     pub fn new() -> Self {
-        let images = HashMap::new();
         return Self {
-            cursor_pos: graphics::Point2::new(0.0, 0.0),
-            images,
+            cursor_state: CursorMode::Build {
+                x: 0,
+                y: 0,
+                t: TowerType::Archers,
+                valid: false,
+            },
         };
     }
 
-    pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Cursor, "/cursor.png")?;
-        return Ok(());
-    }
-
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+    fn draw_map_cursor(
+        &self,
+        x: usize,
+        y: usize,
+        imgs: &Imgs,
+        ctx: &mut Context,
+    ) -> GameResult<()> {
         graphics::draw_ex(
             ctx,
-            &self.images[&Cursor],
+            imgs.get(&ImgID::Cursor),
             graphics::DrawParam {
                 // src: src,
-                dest: self.cursor_pos,
+                dest: GameMap::tile_pos(x, y),
                 //rotation: self.zoomlevel,
                 offset: Point2::new(1.0 / 22.0, 1.0 / 22.0),
                 scale: Point2::new(4.0, 4.0),
@@ -63,25 +120,86 @@ impl Gui {
         Ok(())
     }
 
-    pub fn key_down(state: &mut GameState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        if keycode == Keycode::Up {
-            state.gui.cursor_pos.y -= 4.0 * 20.0;
-        }
-        if keycode == Keycode::Down {
-            state.gui.cursor_pos.y += 4.0 * 20.0;
-        }
-        if keycode == Keycode::Left {
-            state.gui.cursor_pos.x -= 4.0 * 20.0;
-        }
-        if keycode == Keycode::Right {
-            state.gui.cursor_pos.x += 4.0 * 20.0;
-        }
-        if keycode == Keycode::Space {
-            state
-                .towers
-                .spawn(Tower::new(state.gui.cursor_pos, 100, 100.0, 0.5));
-        }
+    fn draw_build_preview(
+        &self,
+        x: usize,
+        y: usize,
+        t: TowerType,
+        valid: bool,
+        imgs: &Imgs,
+        ctx: &mut Context,
+    ) -> GameResult<()> {
+        let color = if valid {
+            graphics::Color::new(0.2, 1.0, 0.2, 0.7)
+        } else {
+            graphics::Color::new(1.0, 0.2, 0.2, 0.7)
+        };
+        graphics::draw_ex(
+            ctx,
+            imgs.get(&t.get_image_id()),
+            graphics::DrawParam {
+                // src: src,
+                dest: GameMap::tile_center(x, y),
+                //rotation: self.zoomlevel,
+                offset: Point2::new(0.5, 0.5),
+                scale: Point2::new(4.0, 4.0),
+                // shear: shear,
+                color: Some(color),
+                ..Default::default()
+            },
+        )?;
+        Ok(())
     }
 
-    pub fn tick(&mut self) {}
+    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+        match self.cursor_state {
+            CursorMode::Build { x, y, t, valid } => {
+                self.draw_map_cursor(x, y, imgs, ctx)?;
+                self.draw_build_preview(x, y, t, valid, imgs, ctx)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn key_down(state: &mut GameState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        if keycode == Keycode::A {
+            state.gui.cursor_state = CursorMode::Build {
+                x: 0,
+                y: 0,
+                t: TowerType::Archers,
+                valid: false,
+            };
+        }
+        if keycode == Keycode::C {
+            state.gui.cursor_state = CursorMode::Build {
+                x: 0,
+                y: 0,
+                t: TowerType::Cannon,
+                valid: false,
+            };
+        }
+        if keycode == Keycode::Up {
+            state.gui.cursor_state = state.gui.cursor_state.up(state);
+        }
+        if keycode == Keycode::Down {
+            state.gui.cursor_state = state.gui.cursor_state.down(state);
+        }
+        if keycode == Keycode::Left {
+            state.gui.cursor_state = state.gui.cursor_state.left(state);
+        }
+        if keycode == Keycode::Right {
+            state.gui.cursor_state = state.gui.cursor_state.right(state);
+        }
+        if keycode == Keycode::Space {
+            match state.gui.cursor_state {
+                CursorMode::Build {
+                    x,
+                    y,
+                    t,
+                    valid: true,
+                } => state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 0.5)),
+                _ => {}
+            }
+        }
+    }
 }

@@ -1,36 +1,47 @@
 use crate::enemies::{Enemies, EnemyEvent};
 use crate::game_state::GameState;
-use ggez::conf;
-use ggez::event;
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
+use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::num;
-use std::path;
+use std::collections::HashSet;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum Display {
+use crate::assets::{ImgID, Imgs};
+use crate::map::GameMap;
+
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+pub enum TowerType {
     Cannon,
+    Archers,
 }
 
-use self::Display::*;
+impl TowerType {
+    pub fn get_image_id(&self) -> ImgID {
+        match self {
+            TowerType::Cannon => ImgID::Cannon,
+            TowerType::Archers => ImgID::Archers,
+        }
+    }
+}
 
 pub struct Tower {
-    disp: Display,
-    position: graphics::Point2,
+    kind: TowerType,
+    map_position: (usize, usize),
     damage: usize,
     range: f32,
     sps: f32, // shots per second
 }
 
 impl Tower {
-    pub fn new(position: graphics::Point2, damage: usize, range: f32, sps: f32) -> Self {
+    pub fn new(
+        kind: TowerType,
+        map_position: (usize, usize),
+        damage: usize,
+        range: f32,
+        sps: f32,
+    ) -> Self {
         return Self {
-            disp: Cannon,
-            position,
+            kind: kind,
+            map_position,
             damage,
             range,
             sps,
@@ -38,7 +49,10 @@ impl Tower {
     }
 
     pub fn tick(&mut self, enemies: &mut Enemies) {
-        if let Some(id) = enemies.weakest_enemy_in_range(self.range, self.position) {
+        if let Some(id) = enemies.weakest_enemy_in_range(
+            self.range,
+            GameMap::tile_center(self.map_position.0, self.map_position.1),
+        ) {
             println!("shooting: {}", id);
             enemies.send(id, EnemyEvent::Damage(self.damage));
         }
@@ -47,42 +61,38 @@ impl Tower {
 
 pub struct Towers {
     towers: Vec<Tower>,
-    images: HashMap<Display, graphics::Image>,
+    blocked_positions: HashSet<(usize, usize)>,
 }
 
 impl Towers {
-    fn load_img(&mut self, ctx: &mut Context, disp: Display, path: &str) -> GameResult<()> {
-        let mut img = graphics::Image::new(ctx, path)?;
-        img.set_filter(graphics::FilterMode::Nearest);
-        self.images.insert(disp, img);
-        return Ok(());
-    }
-
     pub fn new() -> Self {
         let towers = vec![];
-        let images = HashMap::new();
-        return Self { towers, images };
-    }
-
-    pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Cannon, "/cannon.png")?;
-        return Ok(());
+        let blocked_positions = HashSet::new();
+        return Self {
+            towers,
+            blocked_positions,
+        };
     }
 
     pub fn spawn(&mut self, tower: Tower) {
+        self.blocked_positions.insert(tower.map_position.clone());
         self.towers.push(tower);
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+    pub fn is_buildable(&self, x: usize, y: usize) -> bool {
+        return !self.blocked_positions.contains(&(x, y));
+    }
+
+    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         for e in self.towers.iter() {
             graphics::draw_ex(
                 ctx,
-                &self.images[&e.disp],
+                imgs.get(&e.kind.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
-                    dest: e.position,
+                    dest: GameMap::tile_center(e.map_position.0, e.map_position.1),
                     //rotation: self.zoomlevel,
-                    // offset: Point2::new(-16.0, 0.0),
+                    offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
                     // shear: shear,
                     ..Default::default()

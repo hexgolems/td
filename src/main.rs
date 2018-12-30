@@ -1,27 +1,23 @@
+#![feature(range_contains)]
 extern crate ggez;
+extern crate rand;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
-use ggez::{Context, GameResult};
-use std::collections::HashMap;
+use ggez::Context;
 use std::env;
 use std::path;
 
+mod assets;
 mod enemies;
 mod game_state;
 mod gui;
 mod map;
 mod towers;
 mod utils;
+mod wave;
 
-use crate::enemies::Enemies;
-use crate::enemies::Enemy;
 use crate::game_state::GameState;
-use crate::map::GameMap;
-use crate::towers::Tower;
-use crate::towers::Towers;
 
 pub fn main() {
     let c = conf::Conf::new();
@@ -37,7 +33,7 @@ pub fn main() {
 
     println!("{}", graphics::get_renderer_info(ctx).unwrap());
     let state = &mut GameState::new(ctx).unwrap();
-    state.spawn();
+
     if let Err(e) = event::run(ctx, state) {
         println!("Error encountered: {}", e);
     } else {

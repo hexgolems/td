@@ -1,29 +1,21 @@
-use ggez::conf;
-use ggez::event;
-use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
-use ggez::{Context, GameResult};
-use std::collections::HashMap;
-use std::env;
-use std::path;
-
+use crate::assets::{ImgID, Imgs};
 use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::distance;
-
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum Display {
-    Zombie,
-}
-use self::Display::*;
+use crate::utils::move_to;
+use ggez::graphics;
+use ggez::graphics::{Point2, Vector2};
+use ggez::{Context, GameResult};
+use rand::prelude::*;
+use std::collections::HashMap;
 
 pub struct Enemy {
     id: usize,
-    disp: Display,
+    disp: ImgID,
     position: graphics::Point2,
     health: usize,
-    tps: f32,
+    walk_speed: f32,
+    next_walk_target: graphics::Point2,
 }
 
 pub enum EnemyEvent {
@@ -33,63 +25,60 @@ pub enum EnemyEvent {
 }
 
 impl Enemy {
-    pub fn new(position: graphics::Point2, health: usize, tps: f32) -> Self {
+    pub fn new(position: graphics::Point2, health: usize, walk_speed: f32) -> Self {
         return Self {
             id: 0,
-            disp: Zombie,
+            disp: ImgID::Zombie,
             position,
             health,
-            tps, // tiles per second
+            next_walk_target: position,
+            walk_speed,
         };
     }
 
     pub fn tick(&mut self, map: &GameMap) {
-        println!("Zombie hp: {}", self.health);
-        match map.tile_at(self.position) {
-            MapTile::Walk(a) => self.walk(a),
-            MapTile::Spawn(a) => self.walk(a),
-            _ => (),
+        let (new_pos, finished) = move_to(self.position, self.next_walk_target, self.walk_speed);
+        self.position = new_pos;
+        if finished {
+            let offset = (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
+                - Vector2::new(30.0, 30.0);
+            self.next_walk_target = match map.tile_at(self.position) {
+                MapTile::Walk(a) => self.walk_target(a) + offset,
+                MapTile::Spawn(a) => self.walk_target(a) + offset,
+                MapTile::Target => {
+                    self.reached_goal();
+                    self.position
+                }
+                _ => self.position,
+            };
         }
     }
 
-    fn walk(&mut self, dir: WalkDir) {
+    fn reached_goal(&mut self) {
+        println!("ZOMBIE reached goal");
+    }
+
+    fn walk_target(&mut self, dir: WalkDir) -> Point2 {
+        let (x, y) = GameMap::tile_index_at(self.position);
         return match dir {
-            WalkDir::Up => self.position.y -= self.tps,
-            WalkDir::Down => self.position.y += self.tps,
-            WalkDir::Left => self.position.x -= self.tps,
-            WalkDir::Right => self.position.x += self.tps,
+            WalkDir::Up => GameMap::tile_center(x, y - 1),
+            WalkDir::Down => GameMap::tile_center(x, y + 1),
+            WalkDir::Left => GameMap::tile_center(x - 1, y),
+            WalkDir::Right => GameMap::tile_center(x + 1, y),
         };
     }
 }
 
 pub struct Enemies {
     enemies: HashMap<usize, Enemy>,
-    images: HashMap<Display, graphics::Image>,
     id: usize,
 }
 
 impl Enemies {
-    fn load_img(&mut self, ctx: &mut Context, disp: Display, path: &str) -> GameResult<()> {
-        let mut img = graphics::Image::new(ctx, path)?;
-        img.set_filter(graphics::FilterMode::Nearest);
-        self.images.insert(disp, img);
-        return Ok(());
-    }
-
     pub fn new() -> Self {
-        let enemies = HashMap::new();
-        let images = HashMap::new();
         let id = 0;
-        return Self {
-            enemies,
-            images,
-            id,
-        };
-    }
-
-    pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Zombie, "/enemy.png")?;
-        return Ok(());
+        let enemies = HashMap::new();
+        return Self { enemies, id };
     }
 
     pub fn spawn(&mut self, enemy: Enemy) {
@@ -97,16 +86,16 @@ impl Enemies {
         self.id += 1;
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         for e in self.enemies.values() {
             graphics::draw_ex(
                 ctx,
-                &self.images[&e.disp],
+                imgs.get(&e.disp),
                 graphics::DrawParam {
                     // src: src,
-                    dest: e.position,
+                    dest: e.position, //+e.offset_in_tile,
                     //rotation: self.zoomlevel,
-                    // offset: Point2::new(-16.0, 0.0),
+                    offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
                     // shear: shear,
                     ..Default::default()

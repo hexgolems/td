@@ -1,12 +1,9 @@
-use ggez::conf;
-use ggez::event;
+use crate::assets::{ImgID, Imgs};
 use ggez::graphics;
-use ggez::graphics::{DrawMode, Point2};
-use ggez::timer;
+use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
-use std::env;
-use std::path;
+use std::ops::Range;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum WalkDir {
@@ -27,18 +24,13 @@ pub enum MapTile {
 use self::MapTile::*;
 
 pub struct GameMap {
+    xrange: Range<usize>,
+    yrange: Range<usize>,
     data: Vec<Vec<MapTile>>,
-    images: HashMap<MapTile, graphics::Image>,
+    images: HashMap<MapTile, ImgID>,
 }
 
 impl GameMap {
-    fn load_img(&mut self, ctx: &mut Context, map: MapTile, path: &str) -> GameResult<()> {
-        let mut img = graphics::Image::new(ctx, path)?;
-        img.set_filter(graphics::FilterMode::Nearest);
-        self.images.insert(map, img);
-        return Ok(());
-    }
-
     pub fn new() -> Self {
         let data = vec![
             vec![Target, Build, Build, Build],
@@ -46,41 +38,79 @@ impl GameMap {
             vec![Build, Build, Build, Walk(Up)],
             vec![Spawn(Right), Walk(Right), Walk(Right), Walk(Up)],
         ];
+        let xrange = 0..4;
+        let yrange = 0..4;
         let mut images = HashMap::new();
-        return Self { data, images };
+        images.insert(Walk(Left), ImgID::FloorWalkLeft);
+        images.insert(Walk(Right), ImgID::FloorWalkRight);
+        images.insert(Walk(Up), ImgID::FloorWalkUp);
+        images.insert(Walk(Down), ImgID::FloorWalkDown);
+        images.insert(Build, ImgID::FloorBuild);
+        images.insert(Target, ImgID::FloorTarget);
+        images.insert(Spawn(Left), ImgID::FloorSpawnLeft);
+        images.insert(Spawn(Right), ImgID::FloorSpawnRight);
+        images.insert(Spawn(Up), ImgID::FloorSpawnUp);
+        images.insert(Spawn(Down), ImgID::FloorSpawnDown);
+        return Self {
+            data,
+            xrange,
+            yrange,
+            images,
+        };
     }
 
-    pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, Walk(Left), "/floor_walk_left.png")?;
-        self.load_img(ctx, Walk(Right), "/floor_walk_right.png")?;
-        self.load_img(ctx, Walk(Up), "/floor_walk_up.png")?;
-        self.load_img(ctx, Walk(Down), "/floor_walk_down.png")?;
-        self.load_img(ctx, Build, "/floor_build.png")?;
-        self.load_img(ctx, Target, "/floor_target.png")?;
-        self.load_img(ctx, Spawn(Left), "/floor_spawn_left.png")?;
-        self.load_img(ctx, Spawn(Right), "/floor_spawn_right.png")?;
-        self.load_img(ctx, Spawn(Up), "/floor_spawn_up.png")?;
-        self.load_img(ctx, Spawn(Down), "/floor_spawn_down.png")?;
-        return Ok(());
-    }
-
-    pub fn tile_pos(&self, x: usize, y: usize) -> graphics::Point2 {
+    pub fn tile_pos(x: usize, y: usize) -> graphics::Point2 {
         return graphics::Point2::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
     }
 
-    pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
-        return self.data[(pos.y / 80.0) as usize][(pos.x / 80.0) as usize];
+    pub fn tile_center(x: usize, y: usize) -> graphics::Point2 {
+        return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
-        for x in (0..4) {
-            for y in (0..4) {
+    pub fn inbounds(&self, x: usize, y: usize) -> bool {
+        return self.xrange.contains(&x) && self.yrange.contains(&y);
+    }
+
+    pub fn tile_index_at(pos: graphics::Point2) -> (usize, usize) {
+        return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
+    }
+
+    pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
+        let (xi, yi) = GameMap::tile_index_at(pos);
+        return self.data[yi][xi];
+    }
+
+    pub fn xrange(&self) -> Range<usize> {
+        return self.xrange.clone();
+    }
+
+    pub fn yrange(&self) -> Range<usize> {
+        return self.yrange.clone();
+    }
+
+    pub fn is_buildable(&self, x: usize, y: usize) -> bool {
+        match self.data[y][x] {
+            Build => return true,
+            _ => return false,
+        }
+    }
+
+    pub fn is_spawn(&self, x: usize, y: usize) -> bool {
+        match self.data[y][x] {
+            Spawn(_) => return true,
+            _ => return false,
+        }
+    }
+
+    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+        for x in self.xrange() {
+            for y in self.yrange() {
                 graphics::draw_ex(
                     ctx,
-                    &self.images[&self.data[y][x]],
+                    imgs.get(&self.images[&self.data[y][x]]),
                     graphics::DrawParam {
                         // src: src,
-                        dest: self.tile_pos(x, y),
+                        dest: GameMap::tile_pos(x, y),
                         //rotation: self.zoomlevel,
                         // offset: Point2::new(-16.0, 0.0),
                         scale: Point2::new(4.0, 4.0),
