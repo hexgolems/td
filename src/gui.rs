@@ -3,6 +3,7 @@ use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
 
 use crate::assets::{ImgID, Imgs};
+use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::map::GameMap;
 use crate::towers::{Tower, TowerType};
@@ -14,6 +15,9 @@ enum CursorMode {
         y: usize,
         t: TowerType,
         valid: bool,
+    },
+    Select {
+        slot: usize,
     },
 }
 
@@ -28,6 +32,7 @@ impl CursorMode {
                 ref mut valid,
                 ..
             } => *valid = state.map.is_buildable(*x, *y) && state.towers.is_buildable(*x, *y),
+            Select { .. } => {}
         }
     }
 
@@ -39,10 +44,12 @@ impl CursorMode {
                     *y -= 1;
                 }
             }
+            Select { .. } => {}
         }
         res.update(state);
         return res;
     }
+
     pub fn down(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -51,10 +58,12 @@ impl CursorMode {
                     *y += 1;
                 }
             }
+            Select { .. } => {}
         }
         res.update(state);
         return res;
     }
+
     pub fn left(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -63,10 +72,12 @@ impl CursorMode {
                     *x -= 1;
                 }
             }
+            Select { slot: ref mut x } => *x = *x + 1 % state.gui.cards.len(),
         }
         res.update(state);
         return res;
     }
+
     pub fn right(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -75,6 +86,7 @@ impl CursorMode {
                     *x += 1;
                 }
             }
+            Select { slot: ref mut x } => *x = *x + 1 % state.gui.cards.len(),
         }
         res.update(state);
         return res;
@@ -83,17 +95,21 @@ impl CursorMode {
 
 pub struct Gui {
     cursor_state: CursorMode,
+    cards: Vec<CardType>,
 }
 
 impl Gui {
     pub fn new() -> Self {
+        let cursor_state = CursorMode::Build {
+            x: 0,
+            y: 0,
+            t: TowerType::Archers,
+            valid: false,
+        };
+        let cards = vec![];
         return Self {
-            cursor_state: CursorMode::Build {
-                x: 0,
-                y: 0,
-                t: TowerType::Archers,
-                valid: false,
-            },
+            cursor_state,
+            cards,
         };
     }
 
@@ -151,13 +167,19 @@ impl Gui {
         Ok(())
     }
 
+    fn draw_cards(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+        return Ok(());
+    }
+
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         match self.cursor_state {
             CursorMode::Build { x, y, t, valid } => {
                 self.draw_map_cursor(x, y, imgs, ctx)?;
                 self.draw_build_preview(x, y, t, valid, imgs, ctx)?;
             }
+            CursorMode::Select { slot } => {}
         }
+        self.draw_cards(imgs, ctx)?;
         Ok(())
     }
 
