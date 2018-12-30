@@ -91,7 +91,7 @@ impl Gui {
             cursor_state: CursorMode::Build {
                 x: 0,
                 y: 0,
-                t: TowerType::Cannon,
+                t: TowerType::Archers,
                 valid: false,
             },
         };
@@ -162,6 +162,22 @@ impl Gui {
     }
 
     pub fn key_down(state: &mut GameState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        if keycode == Keycode::A {
+            state.gui.cursor_state = CursorMode::Build {
+                x: 0,
+                y: 0,
+                t: TowerType::Archers,
+                valid: false,
+            };
+        }
+        if keycode == Keycode::C {
+            state.gui.cursor_state = CursorMode::Build {
+                x: 0,
+                y: 0,
+                t: TowerType::Cannon,
+                valid: false,
+            };
+        }
         if keycode == Keycode::Up {
             state.gui.cursor_state = state.gui.cursor_state.up(state);
         }
@@ -179,9 +195,9 @@ impl Gui {
                 CursorMode::Build {
                     x,
                     y,
-                    t: TowerType::Cannon,
+                    t,
                     valid: true,
-                } => state.towers.spawn(Tower::new((x, y), 1.0, 1.0, 0.5)),
+                } => state.towers.spawn(Tower::new(t, (x, y), 1.0, 1.0, 0.5)),
                 _ => {}
             }
         }

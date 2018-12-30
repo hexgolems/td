@@ -9,12 +9,14 @@ use crate::map::GameMap;
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum TowerType {
     Cannon,
+    Archers,
 }
 
 impl TowerType {
     pub fn get_image_id(&self) -> ImgID {
         match self {
             TowerType::Cannon => ImgID::Cannon,
+            TowerType::Archers => ImgID::Archers,
         }
     }
 }
@@ -28,9 +30,15 @@ pub struct Tower {
 }
 
 impl Tower {
-    pub fn new(map_position: (usize, usize), damage: f32, range: f32, sps: f32) -> Self {
+    pub fn new(
+        kind: TowerType,
+        map_position: (usize, usize),
+        damage: f32,
+        range: f32,
+        sps: f32,
+    ) -> Self {
         return Self {
-            kind: TowerType::Cannon,
+            kind: kind,
             map_position,
             damage,
             range,

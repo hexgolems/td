@@ -9,6 +9,7 @@ pub enum ImgID {
     Zombie,
 
     Cannon,
+    Archers,
     CannonBall,
     Explosion,
 
@@ -48,6 +49,7 @@ impl Imgs {
         self.load_img(ctx, Cursor, "/cursor.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Cannon, "/cannon.png")?;
+        self.load_img(ctx, Archers, "/tower.png")?;
         self.load_img(ctx, CannonBall, "/cannon_ball.png")?;
         self.load_img(ctx, Explosion, "/explosion.png")?;
 
