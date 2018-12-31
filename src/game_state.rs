@@ -1,6 +1,6 @@
 use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
-use ggez::timer;
+//use ggez::timer;
 use ggez::{Context, GameResult};
 
 use crate::assets::Imgs;
@@ -17,6 +17,7 @@ pub struct GameState {
     pub towers: Towers,
     pub wave: Wave,
     pub gui: Gui,
+    pub hp: usize,
 }
 
 impl GameState {
@@ -28,6 +29,7 @@ impl GameState {
         let towers = Towers::new();
         let wave = Wave::new(60, 10);
         let gui = Gui::new();
+        let hp = 10;
 
         let s = Self {
             imgs,
@@ -36,6 +38,7 @@ impl GameState {
             towers,
             wave,
             gui,
+            hp,
         };
         Ok(s)
     }
@@ -44,12 +47,12 @@ impl GameState {
 impl event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         const DESIRED_FPS: u32 = 60;
-
-        while timer::check_update_time(ctx, DESIRED_FPS) {
-            Wave::tick(self);
-            Enemies::tick(self);
-            Towers::tick(self);
-        }
+        assert!(self.hp > 0, "0xDEAD");
+        //while timer::check_update_time(ctx, DESIRED_FPS) {
+        Wave::tick(self);
+        Enemies::tick(self);
+        Towers::tick(self);
+        //}
         Ok(())
     }
 
