@@ -50,6 +50,7 @@ impl CursorMode {
         }
         return res.update(state);
     }
+
     pub fn down(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -62,6 +63,7 @@ impl CursorMode {
         }
         return res.update(state);
     }
+
     pub fn left(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -74,6 +76,7 @@ impl CursorMode {
         }
         return res.update(state);
     }
+
     pub fn right(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
@@ -111,6 +114,7 @@ impl Gui {
     pub fn set_cursor(&mut self, c: CursorMode) {
         self.cursor_state = c;
     }
+
     fn draw_map_cursor(
         &self,
         x: usize,
@@ -197,6 +201,7 @@ impl Gui {
         )?;
         Ok(())
     }
+
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         match self.cursor_state {
             CursorMode::Build { x, y, t, valid } => {
@@ -241,7 +246,7 @@ impl Gui {
     }
 
     fn event_build(state: &mut GameState, x: usize, y: usize, t: TowerType) {
-        state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 30));
+        state.towers.spawn(Tower::new(t, (x, y)));
         state.gui.cursor_state = CursorMode::Select { slot: 0 };
     }
 
