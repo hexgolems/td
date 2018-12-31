@@ -16,6 +16,7 @@ pub struct Enemy {
     health: usize,
     walk_speed: f32,
     next_walk_target: graphics::Point2,
+    reached_goal: bool,
 }
 
 pub enum EnemyEvent {
@@ -33,6 +34,7 @@ impl Enemy {
             health,
             next_walk_target: position,
             walk_speed,
+            reached_goal: false,
         };
     }
 
@@ -46,16 +48,12 @@ impl Enemy {
                 MapTile::Walk(a) => self.walk_target(a) + offset,
                 MapTile::Spawn(a) => self.walk_target(a) + offset,
                 MapTile::Target => {
-                    self.reached_goal();
+                    self.reached_goal = true;
                     self.position
                 }
                 _ => self.position,
             };
         }
-    }
-
-    fn reached_goal(&mut self) {
-        println!("ZOMBIE reached goal");
     }
 
     fn walk_target(&mut self, dir: WalkDir) -> Point2 {
@@ -125,6 +123,16 @@ impl Enemies {
             e.tick(&state.map)
         }
         state.enemies.enemies.retain(|id, e| e.health > 0);
+        state.hp -= state
+            .enemies
+            .enemies
+            .iter()
+            .filter(|(id, e)| e.reached_goal)
+            .count();
+        state
+            .enemies
+            .enemies
+            .retain(|id, e| e.reached_goal == false);
     }
 
     pub fn send(&mut self, id: usize, event: EnemyEvent) {
