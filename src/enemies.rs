@@ -10,7 +10,6 @@ use rand::prelude::*;
 use std::collections::HashMap;
 
 pub struct Enemy {
-    id: usize,
     disp: ImgID,
     position: graphics::Point2,
     health: usize,
@@ -19,16 +18,9 @@ pub struct Enemy {
     reached_goal: bool,
 }
 
-pub enum EnemyEvent {
-    Die,
-    Damage(usize),
-    //Slow(f32),
-}
-
 impl Enemy {
     pub fn new(position: graphics::Point2, health: usize, walk_speed: f32) -> Self {
         return Self {
-            id: 0,
             disp: ImgID::Zombie,
             position,
             health,
@@ -106,8 +98,8 @@ impl Enemies {
     pub fn in_range(&self, pos: graphics::Point2, range: f32) -> Vec<usize> {
         self.enemies
             .iter()
-            .filter(|(id, e)| distance(&pos, &e.position) <= range && e.health > 0)
-            .map(|(id, e)| *id)
+            .filter(|(_id, e)| distance(&pos, &e.position) <= range && e.health > 0)
+            .map(|(id, _e)| *id)
             .collect()
     }
 
@@ -122,33 +114,22 @@ impl Enemies {
         for e in state.enemies.enemies.values_mut() {
             e.tick(&state.map)
         }
-        state.enemies.enemies.retain(|id, e| e.health > 0);
+        state.enemies.enemies.retain(|_id, e| e.health > 0);
         state.hp -= state
             .enemies
             .enemies
             .iter()
-            .filter(|(id, e)| e.reached_goal)
+            .filter(|(_id, e)| e.reached_goal)
             .count();
         state
             .enemies
             .enemies
-            .retain(|id, e| e.reached_goal == false);
+            .retain(|_id, e| e.reached_goal == false);
     }
 
-    pub fn send(&mut self, id: usize, event: EnemyEvent) {
-        match event {
-            EnemyEvent::Damage(a) => {
-                println!("got dmg: {}", a);
-                if let Some(e) = self.enemies.get_mut(&id) {
-                    e.health = e.health.saturating_sub(a);
-                    println!("health now: {}", e.health);
-                }
-            }
-            EnemyEvent::Die => {
-                if let Some(e) = self.enemies.get_mut(&id) {
-                    e.health = 0;
-                }
-            }
-        };
+    pub fn damage(&mut self, id: usize, damage: usize) {
+        if let Some(e) = self.enemies.get_mut(&id) {
+            e.health = e.health.saturating_sub(damage);
+        }
     }
 }

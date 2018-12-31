@@ -45,8 +45,8 @@ impl GameState {
 }
 
 impl event::EventHandler for GameState {
-    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        const DESIRED_FPS: u32 = 60;
+    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+        const _DESIRED_FPS: u32 = 60;
         assert!(self.hp > 0, "0xDEAD");
         //while timer::check_update_time(ctx, DESIRED_FPS) {
         Wave::tick(self);

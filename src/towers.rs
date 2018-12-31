@@ -1,4 +1,4 @@
-use crate::enemies::{Enemies, EnemyEvent};
+use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use ggez::graphics;
 use ggez::graphics::Point2;
@@ -57,7 +57,7 @@ impl Tower {
             GameMap::tile_center(self.map_position.0, self.map_position.1),
         ) {
             if self.cooldown == 0 {
-                enemies.send(id, EnemyEvent::Damage(self.damage));
+                enemies.damage(id, self.damage);
                 // 60 sec per minute / rpm * 60 ticks per second
                 self.cooldown = 3600 / self.rpm;
             }
