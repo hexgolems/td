@@ -1,6 +1,6 @@
 use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
-use ggez::timer;
+//use ggez::timer;
 use ggez::{Context, GameResult};
 
 use crate::assets::Imgs;
@@ -45,11 +45,11 @@ impl event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         const DESIRED_FPS: u32 = 60;
 
-        while timer::check_update_time(ctx, DESIRED_FPS) {
-            Wave::tick(self);
-            Enemies::tick(self);
-            Towers::tick(self);
-        }
+        //while timer::check_update_time(ctx, DESIRED_FPS) {
+        Wave::tick(self);
+        Enemies::tick(self);
+        Towers::tick(self);
+        //}
         Ok(())
     }
 

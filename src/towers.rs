@@ -28,7 +28,8 @@ pub struct Tower {
     map_position: (usize, usize),
     damage: usize,
     range: f32,
-    sps: f32, // shots per second
+    rpm: usize,
+    cooldown: usize,
 }
 
 impl Tower {
@@ -37,24 +38,29 @@ impl Tower {
         map_position: (usize, usize),
         damage: usize,
         range: f32,
-        sps: f32,
+        rpm: usize,
     ) -> Self {
         return Self {
             kind: kind,
             map_position,
             damage,
             range,
-            sps,
+            rpm,
+            cooldown: 0,
         };
     }
 
     pub fn tick(&mut self, enemies: &mut Enemies) {
+        self.cooldown = self.cooldown.saturating_sub(1);
         if let Some(id) = enemies.weakest_enemy_in_range(
             self.range,
             GameMap::tile_center(self.map_position.0, self.map_position.1),
         ) {
-            println!("shooting: {}", id);
-            enemies.send(id, EnemyEvent::Damage(self.damage));
+            if self.cooldown == 0 {
+                enemies.send(id, EnemyEvent::Damage(self.damage));
+                // 60 sec per minute / rpm * 60 ticks per second
+                self.cooldown = 3600 / self.rpm;
+            }
         }
     }
 }
