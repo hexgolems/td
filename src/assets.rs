@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum ImgID {
+    EmptySlot,
     Cursor,
 
     Zombie,
@@ -46,6 +47,7 @@ impl Imgs {
     }
 
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Cursor, "/cursor.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Cannon, "/cannon.png")?;
