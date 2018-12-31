@@ -9,6 +9,7 @@ use crate::gui::Gui;
 use crate::map::GameMap;
 use crate::towers::Towers;
 use crate::wave::Wave;
+use crate::card::CardDeck;
 
 pub struct GameState {
     pub imgs: Imgs,
@@ -17,6 +18,7 @@ pub struct GameState {
     pub towers: Towers,
     pub wave: Wave,
     pub gui: Gui,
+    pub deck: CardDeck,
     pub hp: usize,
 }
 
@@ -29,6 +31,9 @@ impl GameState {
         let towers = Towers::new();
         let wave = Wave::new(60, 10);
         let gui = Gui::new();
+        let mut deck = CardDeck::new();
+        deck.shuffle();
+        deck.draw(3);
         let hp = 10;
 
         let s = Self {
@@ -38,6 +43,7 @@ impl GameState {
             towers,
             wave,
             gui,
+            deck,
             hp,
         };
         Ok(s)
@@ -62,17 +68,14 @@ impl event::EventHandler for GameState {
         self.map.draw(&self.imgs, ctx)?;
         self.enemies.draw(&self.imgs, ctx)?;
         self.towers.draw(&self.imgs, ctx)?;
-        self.gui.draw(&self.imgs, ctx)?;
+        //self.gui.draw(&self.imgs, ctx)?;
+        Gui::draw(self, ctx)?;
 
         graphics::present(ctx);
         Ok(())
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
-        if keycode == Keycode::Escape {
-            ctx.quit().expect("Should never fail");
-        }
-
+    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         Gui::key_down(self, keycode, keymod, repeat);
     }
 }

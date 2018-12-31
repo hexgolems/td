@@ -24,8 +24,8 @@ pub enum MapTile {
 use self::MapTile::*;
 
 pub struct GameMap {
-    xrange: Range<usize>,
-    yrange: Range<usize>,
+    pub xsize: usize,
+    pub ysize: usize,
     data: Vec<Vec<MapTile>>,
     images: HashMap<MapTile, ImgID>,
 }
@@ -38,8 +38,8 @@ impl GameMap {
             vec![Build, Build, Build, Walk(Up)],
             vec![Spawn(Right), Walk(Right), Walk(Right), Walk(Up)],
         ];
-        let xrange = 0..4;
-        let yrange = 0..4;
+        let xsize = 4;
+        let ysize = 4;
         let mut images = HashMap::new();
         images.insert(Walk(Left), ImgID::FloorWalkLeft);
         images.insert(Walk(Right), ImgID::FloorWalkRight);
@@ -53,8 +53,8 @@ impl GameMap {
         images.insert(Spawn(Down), ImgID::FloorSpawnDown);
         return Self {
             data,
-            xrange,
-            yrange,
+            xsize,
+            ysize,
             images,
         };
     }
@@ -67,10 +67,6 @@ impl GameMap {
         return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
     }
 
-    pub fn inbounds(&self, x: usize, y: usize) -> bool {
-        return self.xrange.contains(&x) && self.yrange.contains(&y);
-    }
-
     pub fn tile_index_at(pos: graphics::Point2) -> (usize, usize) {
         return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
     }
@@ -81,11 +77,11 @@ impl GameMap {
     }
 
     pub fn xrange(&self) -> Range<usize> {
-        return self.xrange.clone();
+        return 0..self.xsize
     }
 
     pub fn yrange(&self) -> Range<usize> {
-        return self.yrange.clone();
+        return 0..self.ysize
     }
 
     pub fn is_buildable(&self, x: usize, y: usize) -> bool {

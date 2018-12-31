@@ -6,6 +6,8 @@ use std::collections::HashMap;
 pub enum ImgID {
     EmptySlot,
     Cursor,
+    SellTower,
+    DamageEnemy,
 
     Zombie,
 
@@ -49,6 +51,8 @@ impl Imgs {
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Cursor, "/cursor.png")?;
+        self.load_img(ctx, SellTower, "/sell_tower.png")?;
+        self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Cannon, "/cannon.png")?;
         self.load_img(ctx, Archers, "/tower.png")?;
