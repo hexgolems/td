@@ -95,12 +95,6 @@ pub struct Gui {
 
 impl Gui {
     pub fn new() -> Self {
-        let cursor_state = CursorMode::Build {
-            x: 0,
-            y: 0,
-            t: TowerType::Archers,
-            valid: false,
-        };
         let cursor_state = CursorMode::Select { slot: 0 };
         let cards = vec![
             CardType::BuildCannon,
@@ -252,6 +246,8 @@ impl Gui {
     }
 
     fn event_activate(state: &mut GameState, slot: usize) {
-        state.gui.cards[slot].clone().activate(state);
+        let card = state.gui.cards[slot].clone();
+        state.gui.cards[slot] = CardType::Empty;
+        card.activate(state);
     }
 }
