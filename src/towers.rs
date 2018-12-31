@@ -21,6 +21,13 @@ impl TowerType {
             TowerType::Archers => ImgID::Archers,
         }
     }
+
+    pub fn get_base_stats(&self) -> (usize, f32, usize) {
+        match self {
+            TowerType::Cannon => (50, 200.0, 30),
+            TowerType::Archers => (10, 100.0, 120),
+        }
+    }
 }
 
 pub struct Tower {
@@ -33,13 +40,8 @@ pub struct Tower {
 }
 
 impl Tower {
-    pub fn new(
-        kind: TowerType,
-        map_position: (usize, usize),
-        damage: usize,
-        range: f32,
-        rpm: usize,
-    ) -> Self {
+    pub fn new(kind: TowerType, map_position: (usize, usize)) -> Self {
+        let (damage, range, rpm) = kind.get_base_stats();
         return Self {
             kind: kind,
             map_position,

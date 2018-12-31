@@ -4,12 +4,12 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 
 use crate::assets::Imgs;
+use crate::card::CardDeck;
 use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;
 use crate::towers::Towers;
 use crate::wave::Wave;
-use crate::card::CardDeck;
 
 pub struct GameState {
     pub imgs: Imgs,

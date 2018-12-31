@@ -29,25 +29,21 @@ impl CardType {
         match self {
             CardType::Empty => {}
             CardType::BuildCannon => {
-                state.gui.set_cursor(
-                    CursorMode::Build {
-                        x: 0,
-                        y: 0,
-                        t: TowerType::Cannon,
-                    }
-                );
+                state.gui.set_cursor(CursorMode::Build {
+                    x: 0,
+                    y: 0,
+                    t: TowerType::Cannon,
+                });
             }
             CardType::BuildArchers => {
-                state.gui.set_cursor(
-                    CursorMode::Build {
-                        x: 0,
-                        y: 0,
-                        t: TowerType::Archers,
-                    }
-                );
-            },
-            CardType::SellTower => { }
-            CardType::DamageEnemy => { }
+                state.gui.set_cursor(CursorMode::Build {
+                    x: 0,
+                    y: 0,
+                    t: TowerType::Archers,
+                });
+            }
+            CardType::SellTower => {}
+            CardType::DamageEnemy => {}
         }
     }
 }
@@ -60,17 +56,28 @@ pub struct CardDeck {
 
 impl CardDeck {
     pub fn new() -> Self {
-        let hand = vec!();
-        let deck = vec!(BuildCannon, BuildArchers, SellTower, DamageEnemy, DamageEnemy, DamageEnemy);
-        let discard = vec!();
-        Self{hand, deck, discard}
+        let hand = vec![];
+        let deck = vec![
+            BuildCannon,
+            BuildArchers,
+            SellTower,
+            DamageEnemy,
+            DamageEnemy,
+            DamageEnemy,
+        ];
+        let discard = vec![];
+        Self {
+            hand,
+            deck,
+            discard,
+        }
     }
 
-    pub fn shuffle(&mut self){
+    pub fn shuffle(&mut self) {
         thread_rng().shuffle(self.deck.as_mut_slice());
     }
 
-    pub fn draw(&mut self, n: usize){
+    pub fn draw(&mut self, n: usize) {
         for _ in 0..n {
             if let Some(card) = self.draw_one() {
                 self.hand.push(card);
@@ -78,7 +85,7 @@ impl CardDeck {
         }
     }
 
-    pub fn draw_one(&mut self) -> Option<CardType>{
+    pub fn draw_one(&mut self) -> Option<CardType> {
         if self.deck.is_empty() {
             self.deck.append(&mut self.discard);
             self.shuffle()

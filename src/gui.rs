@@ -11,20 +11,13 @@ use crate::utils::add_mod;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CursorMode {
-    Build {
-        x: usize,
-        y: usize,
-        t: TowerType,
-    },
-    Select {
-        slot: usize,
-    },
+    Build { x: usize, y: usize, t: TowerType },
+    Select { slot: usize },
 }
 
 use self::CursorMode::*;
 
 impl CursorMode {
-
     pub fn chancel(&self, _state: &GameState) -> Self {
         return self.clone();
     }
@@ -32,7 +25,7 @@ impl CursorMode {
     pub fn up(&self, state: &GameState) -> Self {
         let mut res = self.clone();
         match res {
-            Build { ref mut y, .. } => *y = add_mod(*y,-1, state.map.ysize),
+            Build { ref mut y, .. } => *y = add_mod(*y, -1, state.map.ysize),
             Select { slot: ref mut x } => *x = add_mod(*x, -1, state.deck.hand.len()),
         }
         return res;
@@ -70,9 +63,7 @@ pub struct Gui {
 impl Gui {
     pub fn new() -> Self {
         let cursor_state = CursorMode::Select { slot: 0 };
-        return Self {
-            cursor_state,
-        };
+        return Self { cursor_state };
     }
 
     pub fn set_cursor(&mut self, c: CursorMode) {
@@ -189,18 +180,12 @@ impl Gui {
         if keycode == Keycode::Right {
             state.gui.cursor_state = state.gui.cursor_state.right(state);
         }
-
         if keycode == Keycode::Escape {
             state.gui.cursor_state = state.gui.cursor_state.chancel(state);
         }
-
         if keycode == Keycode::Space {
             match state.gui.cursor_state {
-                CursorMode::Build {
-                    x,
-                    y,
-                    t,
-                } => Gui::event_build(state, x, y, t),
+                CursorMode::Build { x, y, t } => Gui::event_build(state, x, y, t),
                 CursorMode::Select { slot } => Gui::event_activate(state, slot),
             }
         }
@@ -208,7 +193,7 @@ impl Gui {
 
     fn event_build(state: &mut GameState, x: usize, y: usize, t: TowerType) {
         if state.map.is_buildable(x, y) && state.towers.is_buildable(x, y) {
-            state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 30));
+            state.towers.spawn(Tower::new(t, (x, y)));
             state.gui.cursor_state = CursorMode::Select { slot: 0 };
         }
     }

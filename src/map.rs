@@ -77,11 +77,11 @@ impl GameMap {
     }
 
     pub fn xrange(&self) -> Range<usize> {
-        return 0..self.xsize
+        return 0..self.xsize;
     }
 
     pub fn yrange(&self) -> Range<usize> {
-        return 0..self.ysize
+        return 0..self.ysize;
     }
 
     pub fn is_buildable(&self, x: usize, y: usize) -> bool {
