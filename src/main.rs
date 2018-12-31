@@ -9,6 +9,7 @@ use std::env;
 use std::path;
 
 mod assets;
+mod card;
 mod enemies;
 mod game_state;
 mod gui;

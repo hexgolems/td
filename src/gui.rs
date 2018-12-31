@@ -3,32 +3,39 @@ use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
 
 use crate::assets::{ImgID, Imgs};
+use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::map::GameMap;
 use crate::towers::{Tower, TowerType};
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
-enum CursorMode {
+pub enum CursorMode {
     Build {
         x: usize,
         y: usize,
         t: TowerType,
         valid: bool,
     },
+    Select {
+        slot: usize,
+    },
 }
 
 use self::CursorMode::*;
 
 impl CursorMode {
-    fn update(&mut self, state: &GameState) {
-        match self {
+    pub fn update(&self, state: &GameState) -> Self {
+        let mut res = self.clone();
+        match res {
             Build {
                 x,
                 y,
                 ref mut valid,
                 ..
-            } => *valid = state.map.is_buildable(*x, *y) && state.towers.is_buildable(*x, *y),
+            } => *valid = state.map.is_buildable(x, y) && state.towers.is_buildable(x, y),
+            Select { .. } => {}
         }
+        return res;
     }
 
     pub fn up(&self, state: &GameState) -> Self {
@@ -39,9 +46,9 @@ impl CursorMode {
                     *y -= 1;
                 }
             }
+            Select { slot: ref mut x } => *x = x.saturating_sub(1) % state.gui.cards.len(),
         }
-        res.update(state);
-        return res;
+        return res.update(state);
     }
     pub fn down(&self, state: &GameState) -> Self {
         let mut res = self.clone();
@@ -51,9 +58,9 @@ impl CursorMode {
                     *y += 1;
                 }
             }
+            Select { slot: ref mut x } => *x = (*x + 1) % state.gui.cards.len(),
         }
-        res.update(state);
-        return res;
+        return res.update(state);
     }
     pub fn left(&self, state: &GameState) -> Self {
         let mut res = self.clone();
@@ -63,9 +70,9 @@ impl CursorMode {
                     *x -= 1;
                 }
             }
+            Select { .. } => {}
         }
-        res.update(state);
-        return res;
+        return res.update(state);
     }
     pub fn right(&self, state: &GameState) -> Self {
         let mut res = self.clone();
@@ -75,28 +82,35 @@ impl CursorMode {
                     *x += 1;
                 }
             }
+            Select { .. } => {}
         }
-        res.update(state);
-        return res;
+        return res.update(state);
     }
 }
 
 pub struct Gui {
     cursor_state: CursorMode,
+    cards: Vec<CardType>,
 }
 
 impl Gui {
     pub fn new() -> Self {
+        let cursor_state = CursorMode::Select { slot: 0 };
+        let cards = vec![
+            CardType::BuildCannon,
+            CardType::BuildArchers,
+            CardType::Empty,
+            CardType::Empty,
+        ];
         return Self {
-            cursor_state: CursorMode::Build {
-                x: 0,
-                y: 0,
-                t: TowerType::Archers,
-                valid: false,
-            },
+            cursor_state,
+            cards,
         };
     }
 
+    pub fn set_cursor(&mut self, c: CursorMode) {
+        self.cursor_state = c;
+    }
     fn draw_map_cursor(
         &self,
         x: usize,
@@ -151,33 +165,53 @@ impl Gui {
         Ok(())
     }
 
+    fn draw_cards(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+        for (i, card) in self.cards.iter().enumerate() {
+            graphics::draw_ex(
+                ctx,
+                imgs.get(&card.get_image_id()),
+                graphics::DrawParam {
+                    // src: src,
+                    dest: Point2::new(500.0, 40.0 + (i as f32) * 80.0),
+                    //rotation: self.zoomlevel,
+                    offset: Point2::new(0.5, 0.5),
+                    scale: Point2::new(4.0, 4.0),
+                    // shear: shear,
+                    ..Default::default()
+                },
+            )?;
+        }
+        Ok(())
+    }
+
+    fn draw_cards_cursor(&self, slot: usize, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+        graphics::draw_ex(
+            ctx,
+            imgs.get(&ImgID::Cursor),
+            graphics::DrawParam {
+                dest: Point2::new(500.0, 40.0 + (slot as f32) * 80.0),
+                offset: Point2::new(0.5, 0.5),
+                scale: Point2::new(4.0, 4.0),
+                ..Default::default()
+            },
+        )?;
+        Ok(())
+    }
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         match self.cursor_state {
             CursorMode::Build { x, y, t, valid } => {
                 self.draw_map_cursor(x, y, imgs, ctx)?;
                 self.draw_build_preview(x, y, t, valid, imgs, ctx)?;
             }
+            CursorMode::Select { slot } => {
+                self.draw_cards_cursor(slot, imgs, ctx)?;
+            }
         }
+        self.draw_cards(imgs, ctx)?;
         Ok(())
     }
 
     pub fn key_down(state: &mut GameState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        if keycode == Keycode::A {
-            state.gui.cursor_state = CursorMode::Build {
-                x: 0,
-                y: 0,
-                t: TowerType::Archers,
-                valid: false,
-            };
-        }
-        if keycode == Keycode::C {
-            state.gui.cursor_state = CursorMode::Build {
-                x: 0,
-                y: 0,
-                t: TowerType::Cannon,
-                valid: false,
-            };
-        }
         if keycode == Keycode::Up {
             state.gui.cursor_state = state.gui.cursor_state.up(state);
         }
@@ -197,9 +231,23 @@ impl Gui {
                     y,
                     t,
                     valid: true,
-                } => state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 30)),
+                } => {
+                    Gui::event_build(state, x, y, t);
+                }
+                CursorMode::Select { slot } => Gui::event_activate(state, slot),
                 _ => {}
             }
         }
+    }
+
+    fn event_build(state: &mut GameState, x: usize, y: usize, t: TowerType) {
+        state.towers.spawn(Tower::new(t, (x, y), 100, 100.0, 30));
+        state.gui.cursor_state = CursorMode::Select { slot: 0 };
+    }
+
+    fn event_activate(state: &mut GameState, slot: usize) {
+        let card = state.gui.cards[slot].clone();
+        state.gui.cards[slot] = CardType::Empty;
+        card.activate(state);
     }
 }
