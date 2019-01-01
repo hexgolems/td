@@ -1,14 +1,15 @@
 use crate::assets::ImgID;
 use crate::game_state::GameState;
 use crate::gui::CursorMode;
-use crate::towers::TowerType;
-use rand::prelude::*;
+use crate::map::GameMap;
+use crate::towers::{Tower, TowerType};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CardType {
     Empty,
-    BuildCannon,
-    BuildArchers,
+    Build(TowerType),
     SellTower,
     DamageEnemy,
 }
@@ -18,32 +19,58 @@ impl CardType {
     pub fn get_image_id(&self) -> ImgID {
         match self {
             CardType::Empty => ImgID::EmptySlot,
-            CardType::BuildCannon => ImgID::Cannon,
-            CardType::BuildArchers => ImgID::Archers,
+            CardType::Build(TowerType::Cannon) => ImgID::Cannon,
+            CardType::Build(TowerType::Archers) => ImgID::Archers,
             CardType::SellTower => ImgID::SellTower,
             CardType::DamageEnemy => ImgID::DamageEnemy,
         }
     }
+    pub fn get_preview_image_id(&self) -> ImgID {
+        return self.get_image_id();
+    }
 
-    pub fn activate(&self, state: &mut GameState) {
+    pub fn select(&self, state: &mut GameState, slot: usize) {
         match self {
             CardType::Empty => {}
-            CardType::BuildCannon => {
-                state.gui.set_cursor(CursorMode::Build {
-                    x: 0,
-                    y: 0,
-                    t: TowerType::Cannon,
-                });
+            CardType::Build(_) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::SellTower => state.gui.set_cursor_card_effect(slot, self),
+            CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
+        }
+    }
+    pub fn is_applicable(&self, state: &GameState, x: usize, y: usize) -> bool {
+        match self {
+            CardType::Empty => return false,
+            CardType::Build(_) => {
+                return state.map.is_buildable(x, y) && !state.towers.has_building(x, y);
             }
-            CardType::BuildArchers => {
-                state.gui.set_cursor(CursorMode::Build {
-                    x: 0,
-                    y: 0,
-                    t: TowerType::Archers,
-                });
+            CardType::SellTower => return state.towers.has_building(x, y),
+            CardType::DamageEnemy => {
+                return state
+                    .enemies
+                    .in_range(GameMap::tile_center(x, y), 80.0)
+                    .len()
+                    > 0;
             }
-            CardType::SellTower => {}
-            CardType::DamageEnemy => {}
+        }
+    }
+
+    pub fn activate(&self, state: &mut GameState, x: usize, y: usize) {
+        match self {
+            CardType::Empty => {}
+            CardType::Build(t) => {
+                state.towers.spawn(Tower::new(*t, (x, y)));
+                state.gui.set_cursor(CursorMode::Hand(0));
+            }
+            CardType::SellTower => {
+                state.towers.remove_tower(x, y);
+                state.gui.set_cursor(CursorMode::Hand(0));
+            }
+            CardType::DamageEnemy => {
+                for e in state.enemies.in_range(GameMap::tile_center(x, y), 80.0) {
+                    state.enemies.damage(e, 150);
+                }
+                state.gui.set_cursor(CursorMode::Hand(0));
+            }
         }
     }
 }
@@ -57,7 +84,12 @@ pub struct CardDeck {
 impl CardDeck {
     pub fn new() -> Self {
         let hand = vec![];
-        let deck = vec![BuildCannon, BuildArchers, DamageEnemy];
+        let deck = vec![
+            Build(TowerType::Cannon),
+            Build(TowerType::Archers),
+            DamageEnemy,
+            SellTower,
+        ];
         let discard = vec![];
         Self {
             hand,
@@ -67,7 +99,7 @@ impl CardDeck {
     }
 
     pub fn shuffle(&mut self) {
-        thread_rng().shuffle(self.deck.as_mut_slice());
+        self.deck.as_mut_slice().shuffle(&mut thread_rng());
     }
 
     pub fn draw(&mut self, n: usize) {

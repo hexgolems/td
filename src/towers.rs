@@ -1,7 +1,7 @@
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use crate::assets::{ImgID, Imgs};
 use crate::enemies::Enemies;
@@ -77,31 +77,42 @@ impl Tower {
 }
 
 pub struct Towers {
-    towers: Vec<Tower>,
-    blocked_positions: HashSet<(usize, usize)>,
+    towers: HashMap<usize, Tower>,
+    position_to_towerid: HashMap<(usize, usize), usize>,
+    next_tower_id: usize,
 }
 
 impl Towers {
     pub fn new() -> Self {
-        let towers = vec![];
-        let blocked_positions = HashSet::new();
+        let towers = HashMap::new();
+        let position_to_towerid = HashMap::new();
         return Self {
             towers,
-            blocked_positions,
+            position_to_towerid,
+            next_tower_id: 0,
         };
     }
 
     pub fn spawn(&mut self, tower: Tower) {
-        self.blocked_positions.insert(tower.map_position.clone());
-        self.towers.push(tower);
+        self.position_to_towerid
+            .insert(tower.map_position.clone(), self.next_tower_id);
+        self.towers.insert(self.next_tower_id, tower);
+        self.next_tower_id += 1;
     }
 
-    pub fn is_buildable(&self, x: usize, y: usize) -> bool {
-        return !self.blocked_positions.contains(&(x, y));
+    pub fn has_building(&self, x: usize, y: usize) -> bool {
+        return self.position_to_towerid.contains_key(&(x, y));
+    }
+
+    pub fn remove_tower(&mut self, x: usize, y: usize) {
+        if let Some(id) = self.position_to_towerid.get(&(x, y)) {
+            self.towers.remove(id);
+            self.position_to_towerid.remove(&(x, y));
+        }
     }
 
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
-        for t in self.towers.iter() {
+        for (_id, t) in self.towers.iter() {
             graphics::draw_ex(
                 ctx,
                 imgs.get(&t.kind.get_image_id()),
@@ -120,7 +131,7 @@ impl Towers {
     }
 
     pub fn tick(state: &mut GameState) {
-        for t in state.towers.towers.iter_mut() {
+        for (_id, t) in state.towers.towers.iter_mut() {
             t.tick(&state.enemies, &mut state.projectiles)
         }
     }
