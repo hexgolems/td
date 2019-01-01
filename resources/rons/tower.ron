@@ -1,0 +1,18 @@
+[
+    (
+        kind: Cannon,
+        damage: 50,
+        range: 200.0,
+        rpm: 30,
+        projectile_speed: 5.0,
+        price: 75,
+    ),
+    (
+        kind: Archer,
+        damage: 10,
+        range: 100.0,
+        rpm: 120,
+        projectile_speed: 2.5,
+        price: 50,
+    ),
+]

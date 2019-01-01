@@ -15,7 +15,7 @@ pub enum ImgID {
     Cannon,
     CannonBall,
     Explosion,
-    Archers,
+    Archer,
     Arrow,
 
     FloorWalkLeft,
@@ -47,7 +47,7 @@ impl Data {
     pub fn new() -> Self {
         let images = HashMap::new();
         let fonts = HashMap::new();
-        return Self { images, fonts};
+        return Self { images, fonts };
     }
 
     fn load_img(&mut self, ctx: &mut Context, map: ImgID, path: &str) -> GameResult<()> {
@@ -57,11 +57,11 @@ impl Data {
         return Ok(());
     }
 
-    fn load_font(&mut self,  ctx: &mut Context, map: FontID, path:&str ) -> GameResult<()>{
-        let mut fnt = graphics::Font::new(ctx, path, 16)?;
+    fn load_font(&mut self, ctx: &mut Context, map: FontID, path: &str) -> GameResult<()> {
+        let fnt = graphics::Font::new(ctx, path, 16)?;
         //let mut fnt = graphics::Font::default_font()?;
         self.fonts.insert(map, fnt);
-        return Ok(())
+        return Ok(());
     }
 
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
@@ -74,7 +74,7 @@ impl Data {
         self.load_img(ctx, Cannon, "/cannon.png")?;
         self.load_img(ctx, CannonBall, "/cannon_ball.png")?;
         self.load_img(ctx, Explosion, "/explosion.png")?;
-        self.load_img(ctx, Archers, "/tower.png")?;
+        self.load_img(ctx, Archer, "/archer.png")?;
         self.load_img(ctx, Arrow, "/arrow.png")?;
 
         self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;

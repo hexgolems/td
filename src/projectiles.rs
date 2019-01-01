@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Data};
+use crate::assets::{Data, ImgID};
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::towers::TowerType;
@@ -31,7 +31,7 @@ impl Projectile {
         return Self {
             disp: match kind {
                 TowerType::Cannon => ImgID::CannonBall,
-                TowerType::Archers => ImgID::Arrow,
+                TowerType::Archer => ImgID::Arrow,
             },
             enemy_id,
             position,
