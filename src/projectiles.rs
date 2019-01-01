@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{ImgID, Data};
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::towers::TowerType;
@@ -74,13 +74,13 @@ impl Projectiles {
         self.id = self.id.wrapping_add(1);
     }
 
-    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for p in self.projectiles.values() {
             let dir = p.next_walk_target - p.position;
             let rot = dir.y.atan2(dir.x);
             graphics::draw_ex(
                 ctx,
-                imgs.get(&p.disp),
+                data.get_i(&p.disp),
                 graphics::DrawParam {
                     // src: src,
                     dest: p.position, //+p.offset_in_tile,

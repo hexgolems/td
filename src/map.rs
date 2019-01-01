@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{ImgID, Data};
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
@@ -109,13 +109,12 @@ impl GameMap {
         }
         return spawns;
     }
-
-    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for x in self.xrange() {
             for y in self.yrange() {
                 graphics::draw_ex(
                     ctx,
-                    imgs.get(&self.images[&self.data[y][x]]),
+                    data.get_i(&self.images[&self.data[y][x]]),
                     graphics::DrawParam {
                         // src: src,
                         dest: GameMap::tile_pos(x, y),

@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{ImgID, Data};
 use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::distance;
@@ -76,11 +76,11 @@ impl Enemies {
         self.id += 1;
     }
 
-    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for e in self.enemies.values() {
             graphics::draw_ex(
                 ctx,
-                imgs.get(&e.disp),
+                data.get_i(&e.disp),
                 graphics::DrawParam {
                     // src: src,
                     dest: e.position, //+e.offset_in_tile,

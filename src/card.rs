@@ -2,6 +2,7 @@ use crate::assets::ImgID;
 use crate::game_state::GameState;
 use crate::gui::CursorMode;
 use crate::map::GameMap;
+use crate::shop_overlay::ShopOverlay;
 use crate::towers::{Tower, TowerType};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -12,6 +13,7 @@ pub enum CardType {
     Build(TowerType),
     SellTower,
     DamageEnemy,
+    Shop,
 }
 use self::CardType::*;
 
@@ -23,10 +25,23 @@ impl CardType {
             CardType::Build(TowerType::Archers) => ImgID::Archers,
             CardType::SellTower => ImgID::SellTower,
             CardType::DamageEnemy => ImgID::DamageEnemy,
+            CardType::Shop => ImgID::Shop,
         }
     }
+
     pub fn get_preview_image_id(&self) -> ImgID {
         return self.get_image_id();
+    }
+
+    pub fn get_description(&self) -> &'static str {
+        match self{
+            CardType::Empty => "",
+            CardType::Build(TowerType::Cannon) => "Builds a cannon tower",
+            CardType::Build(TowerType::Archers) => "Builds an archer tower",
+            CardType::SellTower => "Allows you to destroy a tower",
+            CardType::DamageEnemy => "Damages all enemies in a given range",
+            CardType::Shop => "Allows you to buy one card",
+        }
     }
 
     pub fn select(&self, state: &mut GameState, slot: usize) {
@@ -35,8 +50,10 @@ impl CardType {
             CardType::Build(_) => state.gui.set_cursor_card_effect(slot, self),
             CardType::SellTower => state.gui.set_cursor_card_effect(slot, self),
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
         }
     }
+
     pub fn is_applicable(&self, state: &GameState, x: usize, y: usize) -> bool {
         match self {
             CardType::Empty => return false,
@@ -51,6 +68,7 @@ impl CardType {
                     .len()
                     > 0;
             }
+            CardType::Shop => return false,
         }
     }
 
@@ -71,6 +89,7 @@ impl CardType {
                 }
                 state.gui.set_cursor(CursorMode::Hand(0));
             }
+            CardType::Shop => {}
         }
     }
 }
@@ -89,6 +108,7 @@ impl CardDeck {
             Build(TowerType::Archers),
             DamageEnemy,
             SellTower,
+            Shop,
         ];
         let discard = vec![];
         Self {
@@ -96,6 +116,11 @@ impl CardDeck {
             deck,
             discard,
         }
+    }
+
+    pub fn card_used(&mut self, slot: usize) {
+        self.discard.push(self.hand[slot]);
+        self.hand[slot] = CardType::Empty;
     }
 
     pub fn shuffle(&mut self) {

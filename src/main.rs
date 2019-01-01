@@ -18,6 +18,8 @@ mod enemies;
 mod game_state;
 mod gui;
 mod map;
+mod overlay_state;
+mod shop_overlay;
 mod projectiles;
 mod towers;
 mod utils;

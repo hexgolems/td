@@ -7,6 +7,7 @@ pub enum ImgID {
     EmptySlot,
     Cursor,
     SellTower,
+    Shop,
     DamageEnemy,
 
     Zombie,
@@ -32,14 +33,21 @@ pub enum ImgID {
 }
 use self::ImgID::*;
 
-pub struct Imgs {
-    images: HashMap<ImgID, graphics::Image>,
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+pub enum FontID {
+    Std,
 }
 
-impl Imgs {
+pub struct Data {
+    images: HashMap<ImgID, graphics::Image>,
+    fonts: HashMap<FontID, graphics::Font>,
+}
+
+impl Data {
     pub fn new() -> Self {
         let images = HashMap::new();
-        return Self { images };
+        let fonts = HashMap::new();
+        return Self { images, fonts};
     }
 
     fn load_img(&mut self, ctx: &mut Context, map: ImgID, path: &str) -> GameResult<()> {
@@ -49,10 +57,18 @@ impl Imgs {
         return Ok(());
     }
 
+    fn load_font(&mut self,  ctx: &mut Context, map: FontID, path:&str ) -> GameResult<()>{
+        let mut fnt = graphics::Font::new(ctx, path, 16)?;
+        //let mut fnt = graphics::Font::default_font()?;
+        self.fonts.insert(map, fnt);
+        return Ok(())
+    }
+
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Cursor, "/cursor.png")?;
         self.load_img(ctx, SellTower, "/sell_tower.png")?;
+        self.load_img(ctx, Shop, "/shop.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Cannon, "/cannon.png")?;
@@ -73,10 +89,17 @@ impl Imgs {
 
         self.load_img(ctx, FloorTarget, "/floor_target.png")?;
         self.load_img(ctx, FloorBuild, "/floor_build.png")?;
+
+        //self.load_font(ctx, FontID::Std, "/Tangerine_Regular.ttf")?;
+        self.load_font(ctx, FontID::Std, "/Typecast.ttf")?;
         return Ok(());
     }
 
-    pub fn get(&self, id: &ImgID) -> &graphics::Image {
+    pub fn get_i(&self, id: &ImgID) -> &graphics::Image {
         return &self.images[id];
+    }
+
+    pub fn get_font(&self) -> &graphics::Font {
+        return &self.fonts[&FontID::Std];
     }
 }

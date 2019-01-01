@@ -2,7 +2,7 @@ use ggez::event::{Keycode, Mod};
 use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
 
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{ImgID, Data};
 use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::map::GameMap;
@@ -66,12 +66,12 @@ impl Gui {
         &self,
         x: usize,
         y: usize,
-        imgs: &Imgs,
+        data: &Data,
         ctx: &mut Context,
     ) -> GameResult<()> {
         graphics::draw_ex(
             ctx,
-            imgs.get(&ImgID::Cursor),
+            data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
                 // src: src,
                 dest: GameMap::tile_pos(x, y),
@@ -99,7 +99,7 @@ impl Gui {
         };
         graphics::draw_ex(
             ctx,
-            state.imgs.get(&card.get_preview_image_id()),
+            state.data.get_i(&card.get_preview_image_id()),
             graphics::DrawParam {
                 // src: src,
                 dest: GameMap::tile_center(x, y),
@@ -118,7 +118,7 @@ impl Gui {
         for (i, card) in state.deck.hand.iter().enumerate() {
             graphics::draw_ex(
                 ctx,
-                state.imgs.get(&card.get_image_id()),
+                state.data.get_i(&card.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
                     dest: Point2::new(500.0, 40.0 + (i as f32) * 80.0),
@@ -133,10 +133,10 @@ impl Gui {
         Ok(())
     }
 
-    fn draw_cards_cursor(&self, slot: usize, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+    fn draw_cards_cursor(&self, slot: usize, data: &Data, ctx: &mut Context) -> GameResult<()> {
         graphics::draw_ex(
             ctx,
-            imgs.get(&ImgID::Cursor),
+            data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
                 dest: Point2::new(500.0, 40.0 + (slot as f32) * 80.0),
                 offset: Point2::new(0.5, 0.5),
@@ -150,11 +150,11 @@ impl Gui {
         Gui::draw_cards(state, ctx)?;
         match state.gui.cursor_state {
             CursorMode::Map { x, y, card, .. } => {
-                state.gui.draw_map_cursor(x, y, &state.imgs, ctx)?;
+                state.gui.draw_map_cursor(x, y, &state.data, ctx)?;
                 Gui::draw_effect_preview(state, x, y, card, ctx)?;
             }
             CursorMode::Hand(slot) => {
-                state.gui.draw_cards_cursor(slot, &state.imgs, ctx)?;
+                state.gui.draw_cards_cursor(slot, &state.data, ctx)?;
             }
         }
         Ok(())
@@ -180,8 +180,7 @@ impl Gui {
     fn event_activate(state: &mut GameState, x: usize, y: usize, slot: usize, card: CardType) {
         if card.is_applicable(state, x, y) {
             card.activate(state, x, y);
-            state.deck.discard.push(state.deck.hand[slot]);
-            state.deck.hand[slot] = CardType::Empty;
+            state.deck.card_used(slot);
         }
     }
 

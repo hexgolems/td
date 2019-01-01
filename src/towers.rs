@@ -3,7 +3,7 @@ use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 
-use crate::assets::{ImgID, Imgs};
+use crate::assets::{ImgID, Data};
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::map::GameMap;
@@ -111,11 +111,11 @@ impl Towers {
         }
     }
 
-    pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for (_id, t) in self.towers.iter() {
             graphics::draw_ex(
                 ctx,
-                imgs.get(&t.kind.get_image_id()),
+                data.get_i(&t.kind.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
                     dest: GameMap::tile_center(t.map_position.0, t.map_position.1),
