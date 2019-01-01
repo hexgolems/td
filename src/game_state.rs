@@ -8,6 +8,7 @@ use crate::card::CardDeck;
 use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;
+use crate::projectiles::Projectiles;
 use crate::towers::Towers;
 use crate::wave::Wave;
 
@@ -20,6 +21,7 @@ pub struct GameState {
     pub gui: Gui,
     pub deck: CardDeck,
     pub hp: usize,
+    pub projectiles: Projectiles,
 }
 
 impl GameState {
@@ -35,6 +37,7 @@ impl GameState {
         deck.shuffle();
         deck.draw(3);
         let hp = 10;
+        let projectiles = Projectiles::new();
 
         let s = Self {
             imgs,
@@ -45,6 +48,7 @@ impl GameState {
             gui,
             deck,
             hp,
+            projectiles,
         };
         Ok(s)
     }
@@ -58,6 +62,7 @@ impl event::EventHandler for GameState {
         Wave::tick(self);
         Enemies::tick(self);
         Towers::tick(self);
+        Projectiles::tick(self);
         //}
         Ok(())
     }
@@ -70,6 +75,7 @@ impl event::EventHandler for GameState {
         self.towers.draw(&self.imgs, ctx)?;
         //self.gui.draw(&self.imgs, ctx)?;
         Gui::draw(self, ctx)?;
+        self.projectiles.draw(&self.imgs, ctx)?;
 
         graphics::present(ctx);
         Ok(())

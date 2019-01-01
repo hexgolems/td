@@ -57,14 +57,7 @@ pub struct CardDeck {
 impl CardDeck {
     pub fn new() -> Self {
         let hand = vec![];
-        let deck = vec![
-            BuildCannon,
-            BuildArchers,
-            SellTower,
-            DamageEnemy,
-            DamageEnemy,
-            DamageEnemy,
-        ];
+        let deck = vec![BuildCannon, BuildArchers, DamageEnemy];
         let discard = vec![];
         Self {
             hand,
