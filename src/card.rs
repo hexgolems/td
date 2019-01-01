@@ -1,6 +1,6 @@
 use crate::assets::ImgID;
 use crate::game_state::GameState;
-use crate::gui::CursorMode;
+use crate::gui::{CursorMode, CursorOp};
 use crate::towers::TowerType;
 use rand::prelude::*;
 
@@ -29,17 +29,17 @@ impl CardType {
         match self {
             CardType::Empty => {}
             CardType::BuildCannon => {
-                state.gui.set_cursor(CursorMode::Build {
+                state.gui.set_cursor(CursorMode::Map {
                     x: 0,
                     y: 0,
-                    t: TowerType::Cannon,
+                    op: CursorOp::Build(TowerType::Cannon),
                 });
             }
             CardType::BuildArchers => {
-                state.gui.set_cursor(CursorMode::Build {
+                state.gui.set_cursor(CursorMode::Map {
                     x: 0,
                     y: 0,
-                    t: TowerType::Archers,
+                    op: CursorOp::Build(TowerType::Archers),
                 });
             }
             CardType::SellTower => {}
