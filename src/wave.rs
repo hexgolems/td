@@ -20,8 +20,17 @@ pub struct Wave {
 pub struct Waves {
     pub id: usize,
     pub waves: Vec<Wave>,
+    pub status: WaveStatus,
     pub next_spawn: usize,
     pub enemy_count: usize,
+}
+
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+pub enum WaveStatus {
+    Finished,
+    Ongoing,
+    Waiting(usize),
+    Ready,
 }
 
 impl Waves {
@@ -29,6 +38,7 @@ impl Waves {
         return Self {
             id: 0,
             waves: Waves::init_waves(),
+            status: WaveStatus::Waiting(5 * 60),
             next_spawn: 0,
             enemy_count: 0,
         };
@@ -59,6 +69,21 @@ impl Waves {
 
     pub fn tick(state: &mut GameState) {
         let wave = state.waves.current_wave();
+        match state.waves.status {
+            WaveStatus::Waiting(ref mut a) => {
+                if *a > 0 {
+                    *a -= 1;
+                    return;
+                } else {
+                    state.waves.status = WaveStatus::Ready;
+                    return;
+                }
+            }
+            WaveStatus::Finished | WaveStatus::Ready => {
+                return;
+            }
+            WaveStatus::Ongoing => {}
+        }
         println!("alive? {}", state.enemies.any_alive());
         if state.waves.enemy_count < wave.enemy_count {
             if state.waves.next_spawn == 0 {
@@ -84,6 +109,7 @@ impl Waves {
                 state.waves.id += 1;
                 state.waves.next_spawn = 0;
                 state.waves.enemy_count = 0;
+                state.waves.status = WaveStatus::Finished;
             }
         }
     }

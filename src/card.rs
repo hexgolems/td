@@ -130,7 +130,13 @@ impl CardDeck {
         }
     }
 
+    pub fn discard_all(&mut self) {
+        self.discard
+            .extend(self.hand.drain(..).filter(|c| c != &CardType::Empty));
+    }
+
     pub fn card_used(&mut self, slot: usize) {
+        assert!(self.hand[slot] != CardType::Empty);
         self.discard.push(self.hand[slot]);
         self.hand[slot] = CardType::Empty;
     }

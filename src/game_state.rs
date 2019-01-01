@@ -11,7 +11,7 @@ use crate::map::GameMap;
 use crate::overlay_state::{OverlayState, StateTransition};
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
-use crate::wave::Waves;
+use crate::wave::{WaveStatus, Waves};
 
 pub struct GameState {
     pub data: Data,
@@ -76,6 +76,16 @@ impl event::EventHandler for GameState {
         Enemies::tick(self);
         Towers::tick(self);
         Projectiles::tick(self);
+        //Wait for
+        if self.waves.status == WaveStatus::Finished {
+            self.waves.status = WaveStatus::Waiting(5 * 60);
+        }
+        if self.waves.status == WaveStatus::Ready {
+            self.deck.discard_all();
+            self.deck.draw(5);
+            self.waves.status = WaveStatus::Ongoing;
+        }
+
         //}
         Ok(())
     }
