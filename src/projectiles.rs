@@ -31,7 +31,7 @@ impl Projectile {
         return Self {
             disp: match kind {
                 TowerType::Cannon => ImgID::CannonBall,
-                TowerType::Archers => ImgID::Arrow,
+                TowerType::Archer => ImgID::Arrow,
             },
             enemy_id,
             position,

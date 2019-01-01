@@ -23,7 +23,7 @@ impl CardType {
         match self {
             CardType::Empty => ImgID::EmptySlot,
             CardType::Build(TowerType::Cannon) => ImgID::Cannon,
-            CardType::Build(TowerType::Archers) => ImgID::Archers,
+            CardType::Build(TowerType::Archer) => ImgID::Archer,
             CardType::SellTower => ImgID::SellTower,
             CardType::DamageEnemy => ImgID::DamageEnemy,
             CardType::Shop => ImgID::Shop,
@@ -39,7 +39,7 @@ impl CardType {
         match self {
             CardType::Empty => "",
             CardType::Build(TowerType::Cannon) => "Builds a cannon tower",
-            CardType::Build(TowerType::Archers) => "Builds an archer tower",
+            CardType::Build(TowerType::Archer) => "Builds an archer tower",
             CardType::SellTower => "Allows you to destroy a tower",
             CardType::DamageEnemy => "Damages all enemies in a given range",
             CardType::Shop => "Allows you to buy one card",
@@ -101,7 +101,7 @@ impl CardType {
                 state.gui.set_cursor(CursorMode::Hand(0));
             }
             CardType::Shop => {}
-            CardType::Coin(a) => {}
+            CardType::Coin(_) => {}
         }
     }
 }
@@ -117,7 +117,7 @@ impl CardDeck {
         let hand = vec![];
         let deck = vec![
             Build(TowerType::Cannon),
-            Build(TowerType::Archers),
+            Build(TowerType::Archer),
             DamageEnemy,
             Coin(1),
             Coin(1),

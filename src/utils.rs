@@ -1,4 +1,8 @@
 use ggez::graphics::Point2;
+use ron;
+use ron::de::from_reader;
+use serde;
+use std::fs::File;
 
 pub fn distance(p1: &Point2, p2: &Point2) -> f32 {
     (p1 - p2).norm()
@@ -21,4 +25,20 @@ pub fn add_mod(value: usize, op: isize, modulus: usize) -> usize {
         return (value + (modulus as isize + (op % modulus as isize)) as usize) % modulus;
     }
     return (value + op as usize) % modulus;
+}
+
+pub fn load_specs<T>(name: &str) -> Vec<T>
+where
+    for<'de> T: serde::Deserialize<'de>,
+{
+    let spec_path = format!("resources/rons/{}.ron", name);
+    let f = File::open(&spec_path).expect(&format!("Failed opening {}.ron", name));
+    let specs = match from_reader(f) {
+        Ok(x) => x,
+        Err(e) => {
+            println!("Failed to load {}.ron: {}", name, e);
+            ::std::process::exit(1);
+        }
+    };
+    return specs;
 }

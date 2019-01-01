@@ -1,16 +1,10 @@
 use crate::enemies::Enemy;
 use crate::game_state::GameState;
 use crate::map::GameMap;
-use ron;
-use ron::de::from_reader;
-#[macro_use]
-use serde;
-use serde_derive;
-use std::collections::HashMap;
-use std::fs::File;
+use crate::utils::load_specs;
 
 #[derive(Debug, Deserialize, Clone)]
-pub struct Wave {
+pub struct WaveSpec {
     speed: f32,
     health: usize,
     enemy_count: usize,
@@ -19,7 +13,7 @@ pub struct Wave {
 
 pub struct Waves {
     pub id: usize,
-    pub waves: Vec<Wave>,
+    pub waves: Vec<WaveSpec>,
     pub status: WaveStatus,
     pub next_spawn: usize,
     pub enemy_count: usize,
@@ -32,35 +26,18 @@ pub enum WaveStatus {
     Waiting(usize),
     Ready,
 }
-
 impl Waves {
     pub fn new() -> Self {
         return Self {
             id: 0,
-            waves: Waves::init_waves(),
+            waves: load_specs("waves"),
             status: WaveStatus::Waiting(5 * 60),
             next_spawn: 0,
             enemy_count: 0,
         };
     }
 
-    fn init_waves() -> Vec<Wave> {
-        let waves_path = "resources/rons/waves.ron";
-        let mut waves = Vec::new();
-        let f = File::open(&waves_path).expect("Failed opening waves.ron");
-        waves = match from_reader(f) {
-            Ok(x) => x,
-            Err(e) => {
-                println!("Failed to load waves: {}", e);
-                ::std::process::exit(1);
-            }
-        };
-        return waves;
-    }
-
-    fn current_wave(&self) -> Wave {
-        println!("in current_wave: \nwaves: {:?}", self.waves);
-        println!("id: {:?}", self.id);
+    fn current_wave(&self) -> WaveSpec {
         self.waves
             .get(self.id)
             .expect("All your base belongs to you!")
@@ -84,7 +61,6 @@ impl Waves {
             }
             WaveStatus::Ongoing => {}
         }
-        println!("alive? {}", state.enemies.any_alive());
         if state.waves.enemy_count < wave.enemy_count {
             if state.waves.next_spawn == 0 {
                 if state.waves.enemy_count < wave.enemy_count {

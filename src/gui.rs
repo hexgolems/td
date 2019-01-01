@@ -188,7 +188,7 @@ impl Gui {
                 state.gui.draw_cards_cursor(slot, &state.data, ctx)?;
             }
         }
-        Gui::draw_description(state, ctx);
+        Gui::draw_description(state, ctx)?;
         Ok(())
     }
 
