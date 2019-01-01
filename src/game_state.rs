@@ -10,14 +10,14 @@ use crate::gui::Gui;
 use crate::map::GameMap;
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
-use crate::wave::Wave;
+use crate::wave::Waves;
 
 pub struct GameState {
     pub imgs: Imgs,
     pub map: GameMap,
     pub enemies: Enemies,
     pub towers: Towers,
-    pub wave: Wave,
+    pub waves: Waves,
     pub gui: Gui,
     pub deck: CardDeck,
     pub hp: usize,
@@ -31,12 +31,12 @@ impl GameState {
         let map = GameMap::new();
         let enemies = Enemies::new();
         let towers = Towers::new();
-        let wave = Wave::new(60, 10);
+        let waves = Waves::new();
         let gui = Gui::new();
         let mut deck = CardDeck::new();
         deck.shuffle();
         deck.draw(3);
-        let hp = 10;
+        let hp = 1000000;
         let projectiles = Projectiles::new();
 
         let s = Self {
@@ -44,7 +44,7 @@ impl GameState {
             map,
             enemies,
             towers,
-            wave,
+            waves,
             gui,
             deck,
             hp,
@@ -59,7 +59,7 @@ impl event::EventHandler for GameState {
         const _DESIRED_FPS: u32 = 60;
         assert!(self.hp > 0, "0xDEAD");
         //while timer::check_update_time(ctx, DESIRED_FPS) {
-        Wave::tick(self);
+        Waves::tick(self);
         Enemies::tick(self);
         Towers::tick(self);
         Projectiles::tick(self);

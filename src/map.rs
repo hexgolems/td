@@ -98,6 +98,18 @@ impl GameMap {
         }
     }
 
+    pub fn get_spawn_points(&self) -> Vec<(usize, usize)> {
+        let mut spawns = Vec::new();
+        for x in self.xrange() {
+            for y in self.yrange() {
+                if self.is_spawn(x, y) {
+                    spawns.push((x, y))
+                }
+            }
+        }
+        return spawns;
+    }
+
     pub fn draw(&self, imgs: &Imgs, ctx: &mut Context) -> GameResult<()> {
         for x in self.xrange() {
             for y in self.yrange() {

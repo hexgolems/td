@@ -1,6 +1,10 @@
 #![feature(range_contains)]
 extern crate ggez;
 extern crate rand;
+extern crate ron;
+#[macro_use]
+extern crate serde;
+extern crate serde_derive;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;

@@ -132,4 +132,12 @@ impl Enemies {
             e.health = e.health.saturating_sub(damage);
         }
     }
+
+    pub fn any_alive(&self) -> bool {
+        println!(
+            "number of enemies: {}",
+            self.enemies.iter().filter(|(_id, e)| e.health > 0).count()
+        );
+        self.enemies.iter().filter(|(_id, e)| e.health > 0).count() > 0
+    }
 }

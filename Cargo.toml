@@ -7,3 +7,6 @@ edition = "2018"
 [dependencies]
 ggez = "0.4"
 rand = "0.6"
+ron = "*"
+serde = "*"
+serde_derive = "*"
