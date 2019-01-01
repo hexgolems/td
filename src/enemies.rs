@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 pub struct Enemy {
     disp: ImgID,
-    position: graphics::Point2,
+    pub position: graphics::Point2,
     health: usize,
     walk_speed: f32,
     next_walk_target: graphics::Point2,
@@ -60,7 +60,7 @@ impl Enemy {
 }
 
 pub struct Enemies {
-    enemies: HashMap<usize, Enemy>,
+    pub enemies: HashMap<usize, Enemy>,
     id: usize,
 }
 
