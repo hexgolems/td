@@ -35,7 +35,7 @@ impl GameState {
         let gui = Gui::new();
         let mut deck = CardDeck::new();
         deck.shuffle();
-        deck.draw(3);
+        deck.draw(4);
         let hp = 10;
         let projectiles = Projectiles::new();
 
