@@ -26,7 +26,12 @@ impl CursorOp {
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CursorMode {
-    Map { x: usize, y: usize, op: CursorOp },
+    Map {
+        x: usize,
+        y: usize,
+        op: CursorOp,
+        slot: usize,
+    },
     Hand(usize),
 }
 
@@ -34,7 +39,7 @@ use self::CursorMode::*;
 
 impl CursorMode {
     pub fn chancel(&self, _state: &GameState) -> Self {
-        return self.clone();
+        return CursorMode::Hand(0);
     }
 
     pub fn up(&self, state: &GameState) -> Self {
@@ -170,7 +175,7 @@ impl Gui {
     }
     pub fn draw(state: &GameState, ctx: &mut Context) -> GameResult<()> {
         match state.gui.cursor_state {
-            CursorMode::Map { x, y, op } => {
+            CursorMode::Map { x, y, op, .. } => {
                 state.gui.draw_map_cursor(x, y, &state.imgs, ctx)?;
                 Gui::draw_effect_preview(state, x, y, op, ctx)?;
             }
@@ -200,29 +205,34 @@ impl Gui {
         }
         if keycode == Keycode::Space {
             match state.gui.cursor_state {
-                CursorMode::Map { x, y, op } => Gui::event_activate(state, x, y, op),
+                CursorMode::Map { x, y, slot, op } => Gui::event_activate(state, x, y, slot, op),
                 CursorMode::Hand(slot) => Gui::event_select(state, slot),
             }
         }
     }
 
-    fn event_build(state: &mut GameState, x: usize, y: usize, t: TowerType) {
+    fn event_build(state: &mut GameState, x: usize, y: usize, t: TowerType) -> bool {
         if state.map.is_buildable(x, y) && state.towers.is_buildable(x, y) {
             state.towers.spawn(Tower::new(t, (x, y)));
             state.gui.cursor_state = CursorMode::Hand(0);
+            return true;
         }
+        return false;
     }
 
-    fn event_activate(state: &mut GameState, x: usize, y: usize, op: CursorOp) {
-        match op {
+    fn event_activate(state: &mut GameState, x: usize, y: usize, slot: usize, op: CursorOp) {
+        let activated = match op {
             CursorOp::Build(t) => Gui::event_build(state, x, y, t),
-            CursorOp::BuffTower => {}
+            CursorOp::BuffTower => false,
+        };
+        if activated {
+            state.deck.discard.push(state.deck.hand[slot]);
+            state.deck.hand[slot] = CardType::Empty;
         }
     }
 
     fn event_select(state: &mut GameState, slot: usize) {
         let card = state.deck.hand[slot].clone();
-        state.deck.hand[slot] = CardType::Empty;
-        card.activate(state);
+        card.activate(state, slot);
     }
 }

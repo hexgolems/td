@@ -25,13 +25,14 @@ impl CardType {
         }
     }
 
-    pub fn activate(&self, state: &mut GameState) {
+    pub fn activate(&self, state: &mut GameState, slot: usize) {
         match self {
             CardType::Empty => {}
             CardType::BuildCannon => {
                 state.gui.set_cursor(CursorMode::Map {
                     x: 0,
                     y: 0,
+                    slot,
                     op: CursorOp::Build(TowerType::Cannon),
                 });
             }
@@ -39,6 +40,7 @@ impl CardType {
                 state.gui.set_cursor(CursorMode::Map {
                     x: 0,
                     y: 0,
+                    slot,
                     op: CursorOp::Build(TowerType::Archers),
                 });
             }
