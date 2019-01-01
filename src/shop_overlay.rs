@@ -2,7 +2,7 @@ use ggez::event::{Keycode, Mod};
 use ggez::graphics::{self, Point2, Text};
 use ggez::{Context, GameResult};
 
-use crate::assets::{ImgID};
+use crate::assets::ImgID;
 use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::overlay_state::{OverlayState, StateTransition};
