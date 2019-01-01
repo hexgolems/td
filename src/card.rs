@@ -34,7 +34,7 @@ impl CardType {
     }
 
     pub fn get_description(&self) -> &'static str {
-        match self{
+        match self {
             CardType::Empty => "",
             CardType::Build(TowerType::Cannon) => "Builds a cannon tower",
             CardType::Build(TowerType::Archers) => "Builds an archer tower",

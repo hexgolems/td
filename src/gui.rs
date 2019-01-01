@@ -2,7 +2,7 @@ use ggez::event::{Keycode, Mod};
 use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
 
-use crate::assets::{ImgID, Data};
+use crate::assets::{Data, ImgID};
 use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::map::GameMap;
