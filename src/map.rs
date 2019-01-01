@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Data};
+use crate::assets::{Data, ImgID};
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};

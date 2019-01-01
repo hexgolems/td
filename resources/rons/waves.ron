@@ -1,20 +1,20 @@
 [
     (
-        speed: 2.0,
-        health: 10,
-        enemy_count: 50,
-        spawn_delay: 5,
-    ),
-    (
-        spawn_delay: 10,
-        enemy_count: 20,
-        speed: 1.5,
-        health: 100,
-    ),
-    (
-        spawn_delay: 25,
-        enemy_count: 10,
         speed: 1.0,
+        health: 10,
+        enemy_count: 5,
+        spawn_delay: 20,
+    ),
+    (
+        spawn_delay: 40,
+        enemy_count: 8,
+        speed: 0.75,
+        health: 90,
+    ),
+    (
+        spawn_delay: 140,
+        enemy_count: 10,
+        speed: 0.5,
         health: 150,
     ),
 ]

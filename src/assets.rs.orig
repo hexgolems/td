@@ -59,7 +59,11 @@ impl Data {
     }
 
     fn load_font(&mut self, ctx: &mut Context, map: FontID, path: &str) -> GameResult<()> {
+<<<<<<< HEAD
         let fnt = graphics::Font::new(ctx, path, 16)?;
+=======
+        let mut fnt = graphics::Font::new(ctx, path, 16)?;
+>>>>>>> 2f866f40c850baa5828af52b89212370821dec88
         //let mut fnt = graphics::Font::default_font()?;
         self.fonts.insert(map, fnt);
         return Ok(());

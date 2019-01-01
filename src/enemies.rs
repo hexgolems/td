@@ -1,4 +1,4 @@
-use crate::assets::{ImgID, Data};
+use crate::assets::{Data, ImgID};
 use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::distance;

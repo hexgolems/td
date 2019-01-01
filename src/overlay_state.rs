@@ -20,4 +20,3 @@ pub enum StateTransition {
     Stay,
     Return,
 }
-
