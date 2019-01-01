@@ -174,6 +174,7 @@ impl Gui {
         Ok(())
     }
     pub fn draw(state: &GameState, ctx: &mut Context) -> GameResult<()> {
+        Gui::draw_cards(state, ctx)?;
         match state.gui.cursor_state {
             CursorMode::Map { x, y, op, .. } => {
                 state.gui.draw_map_cursor(x, y, &state.imgs, ctx)?;
@@ -183,7 +184,6 @@ impl Gui {
                 state.gui.draw_cards_cursor(slot, &state.imgs, ctx)?;
             }
         }
-        Gui::draw_cards(state, ctx)?;
         Ok(())
     }
 
