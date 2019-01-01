@@ -14,6 +14,7 @@ pub enum CardType {
     SellTower,
     DamageEnemy,
     Shop,
+    Coin(usize),
 }
 use self::CardType::*;
 
@@ -26,6 +27,7 @@ impl CardType {
             CardType::SellTower => ImgID::SellTower,
             CardType::DamageEnemy => ImgID::DamageEnemy,
             CardType::Shop => ImgID::Shop,
+            CardType::Coin(a) => ImgID::Coin(*a),
         }
     }
 
@@ -41,6 +43,10 @@ impl CardType {
             CardType::SellTower => "Allows you to destroy a tower",
             CardType::DamageEnemy => "Damages all enemies in a given range",
             CardType::Shop => "Allows you to buy one card",
+            CardType::Coin(1) => "Produces 10 Gold",
+            CardType::Coin(2) => "Produces 100 Gold",
+            CardType::Coin(3) => "Produces 1000 Gold",
+            CardType::Coin(_) => unreachable!(),
         }
     }
 
@@ -51,6 +57,10 @@ impl CardType {
             CardType::SellTower => state.gui.set_cursor_card_effect(slot, self),
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
             CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
+            CardType::Coin(a) => {
+                state.gold += (10 as usize).pow(*a as u32);
+                state.deck.card_used(slot);
+            }
         }
     }
 
@@ -69,6 +79,7 @@ impl CardType {
                     > 0;
             }
             CardType::Shop => return false,
+            CardType::Coin(_) => return false,
         }
     }
 
@@ -90,6 +101,7 @@ impl CardType {
                 state.gui.set_cursor(CursorMode::Hand(0));
             }
             CardType::Shop => {}
+            CardType::Coin(a) => {}
         }
     }
 }
@@ -107,8 +119,8 @@ impl CardDeck {
             Build(TowerType::Cannon),
             Build(TowerType::Archers),
             DamageEnemy,
-            SellTower,
-            Shop,
+            Coin(1),
+            Coin(1),
         ];
         let discard = vec![];
         Self {

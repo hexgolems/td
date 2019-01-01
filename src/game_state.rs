@@ -24,6 +24,7 @@ pub struct GameState {
     pub hp: usize,
     pub projectiles: Projectiles,
     pub overlay_state: Option<Box<OverlayState>>,
+    pub gold: usize,
 }
 
 impl GameState {
@@ -39,6 +40,7 @@ impl GameState {
         deck.shuffle();
         deck.draw(5);
         let hp = 1000000;
+        let gold = 500;
         let projectiles = Projectiles::new();
 
         let s = Self {
@@ -50,6 +52,7 @@ impl GameState {
             gui,
             deck,
             hp,
+            gold,
             projectiles,
             overlay_state: None,
         };

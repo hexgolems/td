@@ -1,5 +1,5 @@
 use ggez::event::{Keycode, Mod};
-use ggez::graphics::{self, Point2};
+use ggez::graphics::{self, Point2, Text};
 use ggez::{Context, GameResult};
 
 use crate::assets::{Data, ImgID};
@@ -121,7 +121,7 @@ impl Gui {
                 state.data.get_i(&card.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
-                    dest: Point2::new(500.0, 40.0 + (i as f32) * 80.0),
+                    dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
@@ -138,7 +138,7 @@ impl Gui {
             ctx,
             data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
-                dest: Point2::new(500.0, 40.0 + (slot as f32) * 80.0),
+                dest: Point2::new(750.0, 40.0 + (slot as f32) * 80.0),
                 offset: Point2::new(0.5, 0.5),
                 scale: Point2::new(4.0, 4.0),
                 ..Default::default()
@@ -146,6 +146,32 @@ impl Gui {
         )?;
         Ok(())
     }
+
+    pub fn draw_description(state: &GameState, ctx: &mut Context) -> GameResult<()> {
+        let font = state.data.get_font();
+        let mut desc = Text::new(
+            ctx,
+            &format!("Lives: {}, Gold: {}", state.hp, state.gold),
+            font,
+        )?;
+        desc.set_filter(graphics::FilterMode::Nearest);
+
+        graphics::draw_ex(
+            ctx,
+            &desc,
+            graphics::DrawParam {
+                // src: src,
+                dest: Point2::new(10.0, 560.0),
+                //rotation: self.zoomlevel,
+                offset: Point2::new(0.0, 0.0),
+                scale: Point2::new(1.0, 1.0),
+                // shear: shear,
+                ..Default::default()
+            },
+        )?;
+        return Ok(());
+    }
+
     pub fn draw(state: &GameState, ctx: &mut Context) -> GameResult<()> {
         Gui::draw_cards(state, ctx)?;
         match state.gui.cursor_state {
@@ -157,6 +183,7 @@ impl Gui {
                 state.gui.draw_cards_cursor(slot, &state.data, ctx)?;
             }
         }
+        Gui::draw_description(state, ctx);
         Ok(())
     }
 
