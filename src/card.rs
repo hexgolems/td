@@ -15,6 +15,7 @@ pub enum CardType {
     DamageEnemy,
     Shop,
     Coin(usize),
+    Take2,
 }
 use self::CardType::*;
 
@@ -28,6 +29,7 @@ impl CardType {
             CardType::DamageEnemy => ImgID::DamageEnemy,
             CardType::Shop => ImgID::Shop,
             CardType::Coin(a) => ImgID::Coin(*a),
+            CardType::Take2 => ImgID::Take2,
         }
     }
 
@@ -47,6 +49,7 @@ impl CardType {
             CardType::Coin(2) => "Produces 100 Gold",
             CardType::Coin(3) => "Produces 1000 Gold",
             CardType::Coin(_) => unreachable!(),
+            CardType::Take2 => "Draw 2 more cards",
         }
     }
 
@@ -62,6 +65,7 @@ impl CardType {
             CardType::Coin(2) => 0,
             CardType::Coin(3) => 0,
             CardType::Coin(_) => unreachable!(),
+            CardType::Take2 => 10,
         }
     }
 
@@ -77,6 +81,7 @@ impl CardType {
             CardType::Coin(2) => 300,
             CardType::Coin(3) => 3000,
             CardType::Coin(_) => unreachable!(),
+            CardType::Take2 => 50,
         }
     }
 
@@ -89,6 +94,10 @@ impl CardType {
             CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
             CardType::Coin(a) => {
                 state.gold += (10 as usize).pow(*a as u32);
+                state.deck.card_used(slot);
+            }
+            CardType::Take2 => {
+                state.deck.draw(2);
                 state.deck.card_used(slot);
             }
         }
@@ -113,6 +122,7 @@ impl CardType {
             }
             CardType::Shop => return false,
             CardType::Coin(_) => return false,
+            CardType::Take2 => return false,
         }
     }
 
@@ -136,6 +146,7 @@ impl CardType {
             }
             CardType::Shop => {}
             CardType::Coin(_) => {}
+            CardType::Take2 => {}
         }
     }
 }

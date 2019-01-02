@@ -32,6 +32,7 @@ impl ShopOverlay {
             CardType::Coin(1),
             CardType::Coin(2),
             CardType::Coin(3),
+            CardType::Take2,
         ];
     }
 

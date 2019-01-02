@@ -10,6 +10,7 @@ pub enum ImgID {
     Shop,
     DamageEnemy,
     Coin(usize),
+    Take2,
 
     Zombie,
 
@@ -73,6 +74,7 @@ impl Data {
         self.load_img(ctx, Coin(1), "/coin1.png")?;
         self.load_img(ctx, Coin(2), "/coin2.png")?;
         self.load_img(ctx, Coin(3), "/coin3.png")?;
+        self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Cannon, "/cannon.png")?;
