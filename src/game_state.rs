@@ -39,8 +39,8 @@ impl GameState {
         let mut deck = CardDeck::new();
         deck.shuffle();
         deck.draw(5);
-        let hp = 1000000;
-        let gold = 500;
+        let hp = 10;
+        let gold = 50;
         let projectiles = Projectiles::new();
 
         let s = Self {
