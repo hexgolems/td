@@ -184,7 +184,7 @@ impl CardDeck {
     pub fn card_used(&mut self, slot: usize) {
         assert!(self.hand[slot] != CardType::Empty);
         self.discard.push(self.hand[slot]);
-        self.hand[slot] = CardType::Empty;
+        self.hand.remove(slot);
     }
 
     pub fn shuffle(&mut self) {
