@@ -1,0 +1,7 @@
+[
+    [Target, Build, Build, Build, Build],
+    [Walk(Up), Walk(Left), Walk(Left), Walk(Left), Walk(Left)],
+    [Build, Build, Build, Build, Walk(Up)],
+    [Spawn(Right), Walk(Right), Walk(Right), Walk(Right), Walk(Up)],
+    [Build, Build, Build, Build, Build],
+]

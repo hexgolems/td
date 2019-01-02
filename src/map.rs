@@ -1,11 +1,12 @@
 use crate::assets::{Data, ImgID};
+use crate::utils::load_specs;
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 use std::ops::Range;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum WalkDir {
     Up,
     Down,
@@ -14,7 +15,7 @@ pub enum WalkDir {
 }
 
 use self::WalkDir::*;
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum MapTile {
     Walk(WalkDir),
     Build,
@@ -32,14 +33,10 @@ pub struct GameMap {
 
 impl GameMap {
     pub fn new() -> Self {
-        let data = vec![
-            vec![Target, Build, Build, Build],
-            vec![Walk(Up), Walk(Left), Walk(Left), Walk(Left)],
-            vec![Build, Build, Build, Walk(Up)],
-            vec![Spawn(Right), Walk(Right), Walk(Right), Walk(Up)],
-        ];
-        let xsize = 4;
-        let ysize = 4;
+        let data = load_specs::<Vec<MapTile>>("map");
+        println!("{:?}", data);
+        let xsize = data[0].len();
+        let ysize = data.len();
         let mut images = HashMap::new();
         images.insert(Walk(Left), ImgID::FloorWalkLeft);
         images.insert(Walk(Right), ImgID::FloorWalkRight);
