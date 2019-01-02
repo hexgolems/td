@@ -130,6 +130,28 @@ impl Gui {
                     ..Default::default()
                 },
             )?;
+
+            let cost = card.activation_cost(state);
+            if cost > 0 {
+                let font = state.data.get_font();
+
+                let mut desc = Text::new(ctx, &format!("{}", cost), font)?;
+                desc.set_filter(graphics::FilterMode::Nearest);
+
+                graphics::draw_ex(
+                    ctx,
+                    &desc,
+                    graphics::DrawParam {
+                        // src: src,
+                        dest: Point2::new(780.0, 80.0 + (i as f32) * 80.0),
+                        //rotation: self.zoomlevel,
+                        offset: Point2::new(1.0, 1.0),
+                        scale: Point2::new(1.0, 1.0),
+                        // shear: shear,
+                        ..Default::default()
+                    },
+                )?;
+            }
         }
         Ok(())
     }

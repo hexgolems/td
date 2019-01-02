@@ -50,6 +50,21 @@ impl CardType {
         }
     }
 
+    pub fn activation_cost(&self, _state: &GameState) -> usize {
+        match self {
+            CardType::Empty => 0,
+            CardType::Build(TowerType::Cannon) => 40,
+            CardType::Build(TowerType::Archer) => 30,
+            CardType::SellTower => 0,
+            CardType::DamageEnemy => 150,
+            CardType::Shop => 0,
+            CardType::Coin(1) => 0,
+            CardType::Coin(2) => 0,
+            CardType::Coin(3) => 0,
+            CardType::Coin(_) => unreachable!(),
+        }
+    }
+
     pub fn select(&self, state: &mut GameState, slot: usize) {
         match self {
             CardType::Empty => {}
@@ -65,6 +80,9 @@ impl CardType {
     }
 
     pub fn is_applicable(&self, state: &GameState, x: usize, y: usize) -> bool {
+        if state.gold < self.activation_cost(state) {
+            return false;
+        }
         match self {
             CardType::Empty => return false,
             CardType::Build(_) => {
@@ -84,6 +102,7 @@ impl CardType {
     }
 
     pub fn activate(&self, state: &mut GameState, x: usize, y: usize) {
+        state.gold -= self.activation_cost(state);
         match self {
             CardType::Empty => {}
             CardType::Build(t) => {
