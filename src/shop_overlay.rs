@@ -24,11 +24,14 @@ impl ShopOverlay {
 
     fn get_available_cards(&self, _state: &GameState) -> Vec<CardType> {
         return vec![
-            CardType::Build(TowerType::Archer),
             CardType::Build(TowerType::Cannon),
-            CardType::Shop,
+            CardType::Build(TowerType::Archer),
             CardType::SellTower,
             CardType::DamageEnemy,
+            CardType::Shop,
+            CardType::Coin(1),
+            CardType::Coin(2),
+            CardType::Coin(3),
         ];
     }
 
@@ -47,6 +50,27 @@ impl ShopOverlay {
                     ..Default::default()
                 },
             )?;
+            let cost = card.aquisition_cost(state);
+            if cost > 0 {
+                let font = state.data.get_font();
+
+                let mut desc = Text::new(ctx, &format!("{}", cost), font)?;
+                desc.set_filter(graphics::FilterMode::Nearest);
+
+                graphics::draw_ex(
+                    ctx,
+                    &desc,
+                    graphics::DrawParam {
+                        // src: src,
+                        dest: Point2::new(130.0, 80.0 + (i as f32) * 80.0),
+                        //rotation: self.zoomlevel,
+                        offset: Point2::new(1.0, 1.0),
+                        scale: Point2::new(1.0, 1.0),
+                        // shear: shear,
+                        ..Default::default()
+                    },
+                )?;
+            }
         }
         Ok(())
     }
@@ -142,12 +166,14 @@ impl OverlayState for ShopOverlay {
                 return StateTransition::Return;
             }
             Keycode::Space => {
-                state
-                    .deck
-                    .discard
-                    .push(self.get_available_cards(state)[self.cur_selected]);
-                state.deck.card_used(self.card_used);
-                return StateTransition::Return;
+                let card = self.get_available_cards(state)[self.cur_selected];
+                if state.gold > card.aquisition_cost(state) {
+                    state.gold -= card.aquisition_cost(state);
+                    state.deck.discard.push(card);
+                    state.deck.card_used(self.card_used);
+                    return StateTransition::Return;
+                }
+                return StateTransition::Stay;
             }
             _ => {}
         }

@@ -65,6 +65,21 @@ impl CardType {
         }
     }
 
+    pub fn aquisition_cost(&self, _state: &GameState) -> usize {
+        match self {
+            CardType::Empty => 0,
+            CardType::Build(TowerType::Cannon) => 80,
+            CardType::Build(TowerType::Archer) => 60,
+            CardType::SellTower => 10,
+            CardType::DamageEnemy => 100,
+            CardType::Shop => 100,
+            CardType::Coin(1) => 30,
+            CardType::Coin(2) => 300,
+            CardType::Coin(3) => 3000,
+            CardType::Coin(_) => unreachable!(),
+        }
+    }
+
     pub fn select(&self, state: &mut GameState, slot: usize) {
         match self {
             CardType::Empty => {}
@@ -140,6 +155,7 @@ impl CardDeck {
             DamageEnemy,
             Coin(1),
             Coin(1),
+            Shop,
         ];
         let discard = vec![];
         Self {
