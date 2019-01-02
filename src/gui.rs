@@ -7,6 +7,7 @@ use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::map::GameMap;
 use crate::utils::add_mod;
+use crate::wave::WaveStatus;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CursorMode {
@@ -149,9 +150,13 @@ impl Gui {
 
     pub fn draw_description(state: &GameState, ctx: &mut Context) -> GameResult<()> {
         let font = state.data.get_font();
+        let mut next_wave = "".to_string();
+        if let WaveStatus::Waiting(time) = state.waves.status {
+            next_wave = format!(", Next wave in {}", time / 60);
+        }
         let mut desc = Text::new(
             ctx,
-            &format!("Lives: {}, Gold: {}", state.hp, state.gold),
+            &format!("Lives: {}, Gold: {}{}", state.hp, state.gold, next_wave),
             font,
         )?;
         desc.set_filter(graphics::FilterMode::Nearest);
@@ -183,7 +188,7 @@ impl Gui {
                 state.gui.draw_cards_cursor(slot, &state.data, ctx)?;
             }
         }
-        Gui::draw_description(state, ctx);
+        Gui::draw_description(state, ctx)?;
         Ok(())
     }
 
