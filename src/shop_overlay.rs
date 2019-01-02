@@ -36,6 +36,13 @@ impl ShopOverlay {
         ];
     }
 
+    fn get_drawing_offset(&self) -> f32 {
+        if self.cur_selected > 5 {
+            return (self.cur_selected - 5) as f32 * 80.0;
+        }
+        return 0.0;
+    }
+
     fn draw_available_cards(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in self.get_available_cards(state).iter().enumerate() {
             graphics::draw_ex(
@@ -43,7 +50,7 @@ impl ShopOverlay {
                 state.data.get_i(&card.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
-                    dest: Point2::new(100.0, 40.0 + (i as f32) * 80.0),
+                    dest: Point2::new(100.0, 40.0 + (i as f32) * 80.0 - self.get_drawing_offset()),
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
@@ -63,7 +70,10 @@ impl ShopOverlay {
                     &desc,
                     graphics::DrawParam {
                         // src: src,
-                        dest: Point2::new(130.0, 80.0 + (i as f32) * 80.0),
+                        dest: Point2::new(
+                            130.0,
+                            80.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
+                        ),
                         //rotation: self.zoomlevel,
                         offset: Point2::new(1.0, 1.0),
                         scale: Point2::new(1.0, 1.0),
@@ -82,7 +92,10 @@ impl ShopOverlay {
             state.data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
                 // src: src,
-                dest: Point2::new(100.0, 40.0 + (self.cur_selected as f32) * 80.0),
+                dest: Point2::new(
+                    100.0,
+                    40.0 + (self.cur_selected as f32) * 80.0 - self.get_drawing_offset(),
+                ),
                 //rotation: self.zoomlevel,
                 offset: Point2::new(0.5, 0.5),
                 scale: Point2::new(4.0, 4.0),
