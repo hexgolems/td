@@ -17,7 +17,7 @@ pub struct Enemy {
     walk_speed: f32,
     next_walk_target: graphics::Point2,
     reached_goal: bool,
-    color: (f32,f32,f32),
+    color: (f32, f32, f32),
     size: f32,
 }
 
@@ -91,7 +91,7 @@ impl Enemies {
                     dest: e.position, //+e.offset_in_tile,
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(4.0*e.size, 4.0*e.size),
+                    scale: Point2::new(4.0 * e.size, 4.0 * e.size),
                     color: Some(graphics::Color::new(e.color.0, e.color.1, e.color.2, 1.0)),
                     // shear: shear,
                     ..Default::default()
