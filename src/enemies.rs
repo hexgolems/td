@@ -3,6 +3,7 @@ use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::distance;
 use crate::utils::move_to;
+use crate::wave::WaveSpec;
 use ggez::graphics;
 use ggez::graphics::{Point2, Vector2};
 use ggez::{Context, GameResult};
@@ -16,16 +17,20 @@ pub struct Enemy {
     walk_speed: f32,
     next_walk_target: graphics::Point2,
     reached_goal: bool,
+    color: (f32,f32,f32),
+    size: f32,
 }
 
 impl Enemy {
-    pub fn new(position: graphics::Point2, health: usize, walk_speed: f32) -> Self {
+    pub fn new(position: graphics::Point2, spec: &WaveSpec) -> Self {
         return Self {
-            disp: ImgID::Zombie,
+            disp: spec.img,
             position,
-            health,
+            health: spec.health,
             next_walk_target: position,
-            walk_speed,
+            walk_speed: spec.speed,
+            color: spec.color,
+            size: spec.size,
             reached_goal: false,
         };
     }
@@ -86,7 +91,8 @@ impl Enemies {
                     dest: e.position, //+e.offset_in_tile,
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(4.0, 4.0),
+                    scale: Point2::new(4.0*e.size, 4.0*e.size),
+                    color: Some(graphics::Color::new(e.color.0, e.color.1, e.color.2, 1.0)),
                     // shear: shear,
                     ..Default::default()
                 },

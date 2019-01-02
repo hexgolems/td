@@ -152,7 +152,7 @@ impl CardDeck {
         let deck = vec![
             Build(TowerType::Cannon),
             Build(TowerType::Archer),
-            DamageEnemy,
+            Coin(1),
             Coin(1),
             Coin(1),
             Shop,

@@ -2,13 +2,17 @@ use crate::enemies::Enemy;
 use crate::game_state::GameState;
 use crate::map::GameMap;
 use crate::utils::load_specs;
+use crate::assets::{ImgID};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct WaveSpec {
-    speed: f32,
-    health: usize,
-    enemy_count: usize,
-    spawn_delay: usize,
+    pub speed: f32,
+    pub health: usize,
+    pub enemy_count: usize,
+    pub spawn_delay: usize,
+    pub size: f32,
+    pub color: (f32,f32,f32),
+    pub img: ImgID,
 }
 
 pub struct Waves {
@@ -71,8 +75,7 @@ impl Waves {
                         .expect("I need to spawn zombies");
                     state.enemies.spawn(Enemy::new(
                         GameMap::tile_center(x, y),
-                        wave.health,
-                        wave.speed,
+                        &wave,
                     ));
                     state.waves.enemy_count += 1;
                     state.waves.next_spawn = wave.spawn_delay;

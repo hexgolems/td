@@ -2,7 +2,7 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum ImgID {
     EmptySlot,
     Cursor,
