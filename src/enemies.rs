@@ -121,7 +121,7 @@ impl Enemies {
             e.tick(&state.map)
         }
         state.enemies.enemies.retain(|_id, e| e.health > 0);
-        state.hp -= state
+        state.player_mut().hp -= state
             .enemies
             .enemies
             .iter()

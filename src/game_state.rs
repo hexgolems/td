@@ -9,22 +9,31 @@ use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;
 use crate::overlay_state::{OverlayState, StateTransition};
+use crate::player::Player;
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
 use crate::wave::{WaveStatus, Waves};
+use std::collections::HashMap;
 
 pub struct GameState {
+    pub me: usize,
     pub data: Data,
     pub map: GameMap,
     pub enemies: Enemies,
     pub towers: Towers,
     pub waves: Waves,
     pub gui: Gui,
-    pub deck: CardDeck,
-    pub hp: usize,
+    pub players: HashMap<usize, Player>,
     pub projectiles: Projectiles,
     pub overlay_state: Option<Box<OverlayState>>,
-    pub gold: usize,
+}
+
+pub struct GameStateShared {
+    pub player: Player,
+    pub map: GameMap,
+    pub enemies: Enemies,
+    pub towers: Towers,
+    pub projectiles: Projectiles,
 }
 
 impl GameState {
@@ -36,27 +45,33 @@ impl GameState {
         let towers = Towers::new();
         let waves = Waves::new();
         let gui = Gui::new();
-        let mut deck = CardDeck::new();
-        deck.shuffle();
-        deck.draw(5);
-        let hp = 10;
-        let gold = 50;
         let projectiles = Projectiles::new();
+        let mut players = HashMap::new();
+        let me = 42;
+        let player = Player::new(me);
+        players.insert(me, player);
 
         let s = Self {
+            me,
             data,
             map,
             enemies,
             towers,
             waves,
             gui,
-            deck,
-            hp,
-            gold,
             projectiles,
             overlay_state: None,
+            players,
         };
         Ok(s)
+    }
+
+    pub fn player_mut(&mut self) -> &mut Player {
+        self.players.get_mut(&self.me).unwrap()
+    }
+
+    pub fn player(&self) -> &Player {
+        self.players.get(&self.me).unwrap()
     }
 }
 
@@ -70,7 +85,7 @@ impl event::EventHandler for GameState {
             return Ok(());
         }
         const _DESIRED_FPS: u32 = 60;
-        assert!(self.hp > 0, "0xDEAD");
+        assert!(self.player().hp > 0, "0xDEAD");
         //while timer::check_update_time(ctx, DESIRED_FPS) {
         Waves::tick(self);
         Enemies::tick(self);
@@ -81,8 +96,8 @@ impl event::EventHandler for GameState {
             self.waves.status = WaveStatus::Waiting(5 * 60);
         }
         if self.waves.status == WaveStatus::Ready {
-            self.deck.discard_all();
-            self.deck.draw(5);
+            self.player_mut().deck.discard_all();
+            self.player_mut().deck.draw(5);
             self.waves.status = WaveStatus::Ongoing;
         }
 
