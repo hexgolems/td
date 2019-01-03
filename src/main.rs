@@ -19,6 +19,7 @@ mod game_state;
 mod gui;
 mod map;
 mod overlay_state;
+mod player;
 mod projectiles;
 mod shop_overlay;
 mod towers;

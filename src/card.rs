@@ -93,18 +93,18 @@ impl CardType {
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
             CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
             CardType::Coin(a) => {
-                state.gold += (10 as usize).pow(*a as u32);
-                state.deck.card_used(slot);
+                state.player_mut().gold += (10 as usize).pow(*a as u32);
+                state.player_mut().deck.card_used(slot);
             }
             CardType::Take2 => {
-                state.deck.draw(2);
-                state.deck.card_used(slot);
+                state.player_mut().deck.draw(2);
+                state.player_mut().deck.card_used(slot);
             }
         }
     }
 
     pub fn is_applicable(&self, state: &GameState, x: usize, y: usize) -> bool {
-        if state.gold < self.activation_cost(state) {
+        if state.player().gold < self.activation_cost(state) {
             return false;
         }
         match self {
@@ -127,7 +127,7 @@ impl CardType {
     }
 
     pub fn activate(&self, state: &mut GameState, x: usize, y: usize) {
-        state.gold -= self.activation_cost(state);
+        state.player_mut().gold -= self.activation_cost(state);
         match self {
             CardType::Empty => {}
             CardType::Build(t) => {

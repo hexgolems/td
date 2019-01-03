@@ -41,6 +41,7 @@ impl Gui {
     }
 
     pub fn move_cursor(state: &mut GameState, ix: isize, iy: isize) {
+        let len = state.player().deck.hand.len().clone();
         match state.gui.cursor_state {
             Map {
                 ref mut x,
@@ -50,7 +51,9 @@ impl Gui {
                 *y = add_mod(*y, iy, state.map.ysize);
                 *x = add_mod(*x, ix, state.map.xsize);
             }
-            Hand(ref mut slot) => *slot = add_mod(*slot, iy, state.deck.hand.len()),
+            Hand(ref mut slot) => {
+                *slot = add_mod(*slot, iy, len);
+            }
         }
     }
 
@@ -116,7 +119,7 @@ impl Gui {
     }
 
     fn draw_cards(state: &GameState, ctx: &mut Context) -> GameResult<()> {
-        for (i, card) in state.deck.hand.iter().enumerate() {
+        for (i, card) in state.player().deck.hand.iter().enumerate() {
             graphics::draw_ex(
                 ctx,
                 state.data.get_i(&card.get_image_id()),
@@ -178,7 +181,12 @@ impl Gui {
         }
         let mut desc = Text::new(
             ctx,
-            &format!("Lives: {}, Gold: {}{}", state.hp, state.gold, next_wave),
+            &format!(
+                "Lives: {}, Gold: {}{}",
+                state.player().hp,
+                state.player().gold,
+                next_wave
+            ),
             font,
         )?;
         desc.set_filter(graphics::FilterMode::Nearest);
@@ -234,12 +242,12 @@ impl Gui {
     fn event_activate(state: &mut GameState, x: usize, y: usize, slot: usize, card: CardType) {
         if card.is_applicable(state, x, y) {
             card.activate(state, x, y);
-            state.deck.card_used(slot);
+            state.player_mut().deck.card_used(slot);
         }
     }
 
     fn event_select(state: &mut GameState, slot: usize) {
-        let card = state.deck.hand[slot].clone();
+        let card = state.player().deck.hand[slot].clone();
         card.select(state, slot);
     }
 }

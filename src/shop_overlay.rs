@@ -181,10 +181,10 @@ impl OverlayState for ShopOverlay {
             }
             Keycode::Space => {
                 let card = self.get_available_cards(state)[self.cur_selected];
-                if state.gold > card.aquisition_cost(state) {
-                    state.gold -= card.aquisition_cost(state);
-                    state.deck.discard.push(card);
-                    state.deck.card_used(self.card_used);
+                if state.player().gold > card.aquisition_cost(state) {
+                    state.player_mut().gold -= card.aquisition_cost(state);
+                    state.player_mut().deck.discard.push(card);
+                    state.player_mut().deck.card_used(self.card_used);
                     return StateTransition::Return;
                 }
                 return StateTransition::Stay;
