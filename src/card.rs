@@ -142,6 +142,8 @@ impl CardType {
             CardType::Build(t) => {
                 state.towers.spawn(Tower::new(*t, (x, y)));
                 state.gui.set_cursor(CursorMode::Hand(0));
+                let pos = GameMap::tile_center(x, y);
+                state.effects.smoke(pos.x, pos.y)
             }
             CardType::SellTower => {
                 state.towers.remove_tower(x, y);
@@ -159,6 +161,8 @@ impl CardType {
             CardType::Buff(b) => {
                 state.towers.get_tower_mut(x, y).unwrap().add_buff(*b);
                 state.gui.set_cursor(CursorMode::Hand(0));
+                let pos = GameMap::tile_center(x, y);
+                state.effects.ice(pos.x, pos.y)
             }
         }
     }

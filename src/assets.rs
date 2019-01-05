@@ -13,6 +13,9 @@ pub enum ImgID {
     Take2,
     Freeze,
 
+    Smoke,
+    Fire,
+
     Zombie,
 
     Cannon,
@@ -78,7 +81,12 @@ impl Data {
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
+
+        self.load_img(ctx, Smoke, "/smoke.png")?;
+        self.load_img(ctx, Fire, "/fire.png")?;
+
         self.load_img(ctx, Zombie, "/enemy.png")?;
+
         self.load_img(ctx, Cannon, "/cannon.png")?;
         self.load_img(ctx, CannonBall, "/cannon_ball.png")?;
         self.load_img(ctx, Explosion, "/explosion.png")?;
