@@ -13,7 +13,9 @@ use std::env;
 use std::path;
 
 mod assets;
+mod buffs;
 mod card;
+mod curses;
 mod enemies;
 mod game_state;
 mod gui;

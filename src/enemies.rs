@@ -1,4 +1,5 @@
 use crate::assets::{Data, ImgID};
+use crate::curses::CurseType;
 use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::distance;
@@ -8,7 +9,7 @@ use ggez::graphics;
 use ggez::graphics::{Point2, Vector2};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub struct Enemy {
     disp: ImgID,
@@ -19,6 +20,7 @@ pub struct Enemy {
     reached_goal: bool,
     color: (f32, f32, f32),
     size: f32,
+    curses: HashSet<CurseType>,
 }
 
 impl Enemy {
@@ -31,12 +33,14 @@ impl Enemy {
             walk_speed: spec.speed,
             color: spec.color,
             size: spec.size,
+            curses: HashSet::new(),
             reached_goal: false,
         };
     }
 
     pub fn tick(&mut self, map: &GameMap) {
-        let (new_pos, finished) = move_to(self.position, self.next_walk_target, self.walk_speed);
+        let (new_pos, finished) =
+            move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
             let offset = (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
@@ -51,6 +55,13 @@ impl Enemy {
                 _ => self.position,
             };
         }
+    }
+
+    pub fn get_walk_speed(&self) -> f32 {
+        if self.curses.contains(&CurseType::Freeze) {
+            return self.walk_speed * 0.7;
+        }
+        return self.walk_speed;
     }
 
     fn walk_target(&mut self, dir: WalkDir) -> Point2 {
@@ -83,6 +94,10 @@ impl Enemies {
 
     pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for e in self.enemies.values() {
+            let mut color = e.color;
+            if e.curses.contains(&CurseType::Freeze) {
+                color = (0.0, 0.0, 1.0);
+            }
             graphics::draw_ex(
                 ctx,
                 data.get_i(&e.disp),
@@ -92,7 +107,7 @@ impl Enemies {
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0 * e.size, 4.0 * e.size),
-                    color: Some(graphics::Color::new(e.color.0, e.color.1, e.color.2, 1.0)),
+                    color: Some(graphics::Color::new(color.0, color.1, color.2, 1.0)),
                     // shear: shear,
                     ..Default::default()
                 },
@@ -133,9 +148,12 @@ impl Enemies {
             .retain(|_id, e| e.reached_goal == false);
     }
 
-    pub fn damage(&mut self, id: usize, damage: usize) {
+    pub fn damage(&mut self, id: usize, damage: usize, curses: &HashSet<CurseType>) {
         if let Some(e) = self.enemies.get_mut(&id) {
             e.health = e.health.saturating_sub(damage);
+            for c in curses.iter() {
+                e.curses.insert(c.clone());
+            }
         }
     }
 
