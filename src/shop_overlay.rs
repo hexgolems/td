@@ -33,6 +33,9 @@ impl ShopOverlay {
             CardType::Coin(3),
             CardType::Take2,
             CardType::Buff(BuffType::Freeze),
+            CardType::Buff(BuffType::Damage),
+            CardType::Buff(BuffType::RPM),
+            CardType::Buff(BuffType::Range),
         ];
     }
 
@@ -45,7 +48,6 @@ impl ShopOverlay {
 
     fn draw_available_cards(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in self.get_available_cards(state).iter().enumerate() {
-
             graphics::draw_ex(
                 ctx,
                 state.data.get_i(&ImgID::Card),

@@ -5,6 +5,9 @@ use crate::towers::Tower;
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum BuffType {
     Freeze,
+    Damage,
+    RPM,
+    Range,
 }
 
 pub fn calc_buff_projectile_effect(tower: &Tower, p: &mut Projectile) {

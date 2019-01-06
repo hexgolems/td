@@ -12,7 +12,7 @@ use crate::projectiles::{Projectile, Projectiles};
 use crate::utils::load_specs;
 
 #[derive(Debug, Deserialize, Clone)]
-pub struct TowerBaseStats {
+pub struct TowerStats {
     pub damage: usize,
     pub projectile_speed: f32,
     pub range: f32,
@@ -20,6 +20,39 @@ pub struct TowerBaseStats {
     pub price: usize,
 }
 
+impl TowerStats {
+    pub fn get_buffed_stats(t: &Tower, base: &TowerStats) -> Self {
+        let mut base = base.clone();
+        let buffs = t.get_buffs();
+        base.rpm += base.get_buffed_rpm(buffs);
+        base.damage += base.get_buffed_damage(buffs);
+        base.range += base.get_buffed_range(buffs);
+        return base;
+    }
+
+    fn get_buffed_range(&self, buffs: &HashMap<BuffType, usize>) -> f32 {
+        if let Some(x) = buffs.get(&BuffType::Range) {
+            return (20 * x) as f32;
+        };
+        return 0.0;
+    }
+
+    fn get_buffed_damage(&self, buffs: &HashMap<BuffType, usize>) -> usize {
+        if let Some(x) = buffs.get(&BuffType::Damage) {
+            return 25 * x;
+        };
+        return 0;
+    }
+
+    fn get_buffed_rpm(&self, buffs: &HashMap<BuffType, usize>) -> usize {
+        if let Some(x) = buffs.get(&BuffType::RPM) {
+            return 30 * x;
+        };
+        return 0;
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Tower {
     id: usize,
     cooldown: usize,
@@ -39,19 +72,17 @@ impl Tower {
     }
 
     pub fn add_buff(&mut self, buff: BuffType) {
-        self.buff_to_level.insert(buff, 1);
+        match self.buff_to_level.get(&buff) {
+            Some(x) => self.buff_to_level.insert(buff, x + 1),
+            None => self.buff_to_level.insert(buff, 1),
+        };
     }
 
     pub fn get_buffs(&self) -> &HashMap<BuffType, usize> {
         return &self.buff_to_level;
     }
 
-    pub fn tick(
-        &mut self,
-        enemies: &Enemies,
-        projectiles: &mut Projectiles,
-        stats: &TowerBaseStats,
-    ) {
+    pub fn tick(&mut self, enemies: &Enemies, projectiles: &mut Projectiles, stats: &TowerStats) {
         self.cooldown = self.cooldown.saturating_sub(1);
         if let Some(enemy_id) = enemies.weakest_enemy_in_range(
             stats.range,
@@ -75,7 +106,7 @@ impl Tower {
 }
 
 pub struct Towers {
-    pub base_stats: TowerBaseStats,
+    pub stats: TowerStats,
     built: HashMap<usize, Tower>,
     position_to_towerid: HashMap<(usize, usize), usize>,
     next_tower_id: usize,
@@ -83,11 +114,11 @@ pub struct Towers {
 
 impl Towers {
     pub fn new() -> Self {
-        let base_stats = load_specs::<TowerBaseStats>("tower")[0].clone();
+        let stats = load_specs::<TowerStats>("tower")[0].clone();
         let built = HashMap::new();
         let position_to_towerid = HashMap::new();
         return Self {
-            base_stats,
+            stats,
             built,
             position_to_towerid,
             next_tower_id: 0,
@@ -144,7 +175,7 @@ impl Towers {
             t.tick(
                 &state.enemies,
                 &mut state.projectiles,
-                &state.towers.base_stats,
+                &TowerStats::get_buffed_stats(&t, &state.towers.stats),
             )
         }
     }

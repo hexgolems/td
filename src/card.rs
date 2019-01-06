@@ -33,6 +33,9 @@ impl CardType {
             CardType::Coin(a) => ImgID::Coin(*a),
             CardType::Take2 => ImgID::Take2,
             CardType::Buff(BuffType::Freeze) => ImgID::Freeze,
+            CardType::Buff(BuffType::RPM) => ImgID::RPM,
+            CardType::Buff(BuffType::Range) => ImgID::Range,
+            CardType::Buff(BuffType::Damage) => ImgID::Damage,
         }
     }
 
@@ -53,13 +56,16 @@ impl CardType {
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => "Draw 2 more cards",
             CardType::Buff(BuffType::Freeze) => "Adds freeze buff to slow down enemies",
+            CardType::Buff(BuffType::Range) => "Increases range",
+            CardType::Buff(BuffType::Damage) => "Increases damage",
+            CardType::Buff(BuffType::RPM) => "Increases rpm",
         }
     }
 
     pub fn activation_cost(&self, state: &GameState) -> usize {
         match self {
             CardType::Empty => 0,
-            CardType::Tower => state.towers.base_stats.price,
+            CardType::Tower => state.towers.stats.price,
             CardType::SellTower => 0,
             CardType::DamageEnemy => 150,
             CardType::Shop => 0,
@@ -69,6 +75,9 @@ impl CardType {
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 10,
             CardType::Buff(BuffType::Freeze) => 10,
+            CardType::Buff(BuffType::Damage) => 10,
+            CardType::Buff(BuffType::RPM) => 10,
+            CardType::Buff(BuffType::Range) => 10,
         }
     }
 
@@ -85,6 +94,9 @@ impl CardType {
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 50,
             CardType::Buff(BuffType::Freeze) => 10,
+            CardType::Buff(BuffType::Damage) => 10,
+            CardType::Buff(BuffType::RPM) => 10,
+            CardType::Buff(BuffType::Range) => 10,
         }
     }
 
@@ -104,6 +116,9 @@ impl CardType {
                 state.player_mut().deck.card_used(slot);
             }
             CardType::Buff(BuffType::Freeze) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Buff(BuffType::Damage) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Buff(BuffType::Range) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Buff(BuffType::RPM) => state.gui.set_cursor_card_effect(slot, self),
         }
     }
 
@@ -180,6 +195,9 @@ impl CardDeck {
             Coin(1),
             Shop,
             Buff(BuffType::Freeze),
+            Buff(BuffType::Damage),
+            Buff(BuffType::RPM),
+            Buff(BuffType::Range),
         ];
         let discard = vec![];
         Self {
