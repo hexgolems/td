@@ -3,6 +3,7 @@ use ggez::graphics::{self, Point2, Text};
 use ggez::{Context, GameResult};
 
 use crate::assets::ImgID;
+use crate::buffs::BuffType;
 use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::overlay_state::{OverlayState, StateTransition};
@@ -33,6 +34,7 @@ impl ShopOverlay {
             CardType::Coin(2),
             CardType::Coin(3),
             CardType::Take2,
+            CardType::Buff(BuffType::Freeze),
         ];
     }
 

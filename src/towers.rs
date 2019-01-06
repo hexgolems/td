@@ -1,9 +1,10 @@
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::assets::{Data, ImgID};
+use crate::buffs::{self, BuffType};
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::map::GameMap;
@@ -36,34 +37,50 @@ pub struct TowerSpec {
 }
 
 pub struct Tower {
+    id: usize,
     cooldown: usize,
     map_position: (usize, usize),
     kind: TowerType,
+    buff_to_level: HashMap<BuffType,usize>,
 }
 
 impl Tower {
     pub fn new(kind: TowerType, map_position: (usize, usize)) -> Self {
+        let buff_to_level = HashMap::new();
         return Self {
+            id: 0,
             map_position,
             kind,
             cooldown: 0,
+            buff_to_level,
         };
+    }
+
+    pub fn add_buff(&mut self, buff: BuffType) {
+        self.buff_to_level.insert(buff, 1);
+    }
+
+    pub fn get_buffs(&self) -> &HashMap<BuffType, usize> {
+        return &self.buff_to_level;
     }
 
     pub fn tick(&mut self, enemies: &Enemies, projectiles: &mut Projectiles, spec: &TowerSpec) {
         self.cooldown = self.cooldown.saturating_sub(1);
-        if let Some(id) = enemies.weakest_enemy_in_range(
+        if let Some(enemy_id) = enemies.weakest_enemy_in_range(
             spec.range,
             GameMap::tile_center(self.map_position.0, self.map_position.1),
         ) {
             if self.cooldown == 0 {
-                projectiles.spawn(Projectile::new(
+                let mut projectile = Projectile::new(
                     GameMap::tile_center(self.map_position.0, self.map_position.1),
-                    id,
+                    self.id,
+                    enemy_id,
                     spec.damage,
                     spec.projectile_speed,
                     spec.kind,
-                ));
+                );
+                buffs::calc_buff_projectile_effect(self, &mut projectile);
+                projectiles.spawn(projectile);
                 // 60 sec per minute / rpm * 60 ticks per second
                 self.cooldown = 3600 / spec.rpm;
             }
@@ -94,11 +111,12 @@ impl Towers {
         };
     }
 
-    pub fn spawn(&mut self, tower: Tower) {
-        self.position_to_towerid
-            .insert(tower.map_position.clone(), self.next_tower_id);
-        self.built.insert(self.next_tower_id, tower);
+    pub fn spawn(&mut self, mut tower: Tower) {
+        tower.id = self.next_tower_id;
         self.next_tower_id += 1;
+        self.position_to_towerid
+            .insert(tower.map_position.clone(), tower.id);
+        self.built.insert(tower.id, tower);
     }
 
     pub fn has_building(&self, x: usize, y: usize) -> bool {
@@ -110,6 +128,13 @@ impl Towers {
             self.built.remove(id);
             self.position_to_towerid.remove(&(x, y));
         }
+    }
+
+    pub fn get_tower_mut(&mut self, x: usize, y: usize) -> Option<&mut Tower> {
+        if let Some(id) = self.position_to_towerid.get(&(x, y)) {
+            return self.built.get_mut(&id);
+        }
+        return None;
     }
 
     pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {

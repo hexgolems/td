@@ -1,4 +1,5 @@
 use crate::assets::ImgID;
+use crate::buffs::BuffType;
 use crate::game_state::GameState;
 use crate::gui::CursorMode;
 use crate::map::GameMap;
@@ -6,6 +7,7 @@ use crate::shop_overlay::ShopOverlay;
 use crate::towers::{Tower, TowerType};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use std::collections::HashSet;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CardType {
@@ -16,6 +18,7 @@ pub enum CardType {
     Shop,
     Coin(usize),
     Take2,
+    Buff(BuffType),
 }
 use self::CardType::*;
 
@@ -30,6 +33,7 @@ impl CardType {
             CardType::Shop => ImgID::Shop,
             CardType::Coin(a) => ImgID::Coin(*a),
             CardType::Take2 => ImgID::Take2,
+            CardType::Buff(BuffType::Freeze) => ImgID::Freeze,
         }
     }
 
@@ -50,6 +54,7 @@ impl CardType {
             CardType::Coin(3) => "Produces 1000 Gold",
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => "Draw 2 more cards",
+            CardType::Buff(BuffType::Freeze) => "Adds freeze buff to slow down enemies",
         }
     }
 
@@ -66,6 +71,7 @@ impl CardType {
             CardType::Coin(3) => 0,
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 10,
+            CardType::Buff(BuffType::Freeze) => 10,
         }
     }
 
@@ -82,6 +88,7 @@ impl CardType {
             CardType::Coin(3) => 3000,
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 50,
+            CardType::Buff(BuffType::Freeze) => 10,
         }
     }
 
@@ -100,6 +107,7 @@ impl CardType {
                 state.player_mut().deck.draw(2);
                 state.player_mut().deck.card_used(slot);
             }
+            CardType::Buff(BuffType::Freeze) => state.gui.set_cursor_card_effect(slot, self),
         }
     }
 
@@ -123,6 +131,7 @@ impl CardType {
             CardType::Shop => return false,
             CardType::Coin(_) => return false,
             CardType::Take2 => return false,
+            CardType::Buff(_) => return state.towers.has_building(x, y),
         }
     }
 
@@ -140,13 +149,17 @@ impl CardType {
             }
             CardType::DamageEnemy => {
                 for e in state.enemies.in_range(GameMap::tile_center(x, y), 80.0) {
-                    state.enemies.damage(e, 150);
+                    state.enemies.damage(e, 150, &HashSet::new());
                 }
                 state.gui.set_cursor(CursorMode::Hand(0));
             }
             CardType::Shop => {}
             CardType::Coin(_) => {}
             CardType::Take2 => {}
+            CardType::Buff(b) => {
+                state.towers.get_tower_mut(x, y).unwrap().add_buff(*b);
+                state.gui.set_cursor(CursorMode::Hand(0));
+            }
         }
     }
 }
@@ -167,6 +180,7 @@ impl CardDeck {
             Coin(1),
             Coin(1),
             Shop,
+            Buff(BuffType::Freeze),
         ];
         let discard = vec![];
         Self {

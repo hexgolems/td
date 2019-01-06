@@ -4,7 +4,6 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
-use crate::card::CardDeck;
 use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;

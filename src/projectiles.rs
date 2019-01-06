@@ -1,4 +1,5 @@
 use crate::assets::{Data, ImgID};
+use crate::curses::CurseType;
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::towers::TowerType;
@@ -6,23 +7,26 @@ use crate::utils::move_to;
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub struct Projectile {
     disp: ImgID,
     enemy_id: usize,
+    tower_id: usize,
     position: graphics::Point2,
     damage: usize,
     speed: f32,
     next_walk_target: graphics::Point2,
     reached_goal: bool,
     kind: TowerType,
+    curses: HashSet<CurseType>,
 }
 
 impl Projectile {
     pub fn new(
         position: graphics::Point2,
+        tower_id: usize,
         enemy_id: usize,
         damage: usize,
         speed: f32,
@@ -33,6 +37,8 @@ impl Projectile {
                 TowerType::Cannon => ImgID::CannonBall,
                 TowerType::Archer => ImgID::Arrow,
             },
+            curses: HashSet::new(),
+            tower_id,
             enemy_id,
             position,
             damage,
@@ -51,8 +57,12 @@ impl Projectile {
         self.position = new_pos;
         self.reached_goal = finished;
         if self.reached_goal == true {
-            enemies.damage(self.enemy_id, self.damage);
+            enemies.damage(self.enemy_id, self.damage, &self.curses);
         }
+    }
+
+    pub fn add_curse(&mut self, curse: CurseType) {
+        self.curses.insert(curse);
     }
 }
 
