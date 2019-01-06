@@ -1,18 +1,9 @@
 [
-    (
-        kind: Cannon,
-        damage: 50,
-        range: 200.0,
-        rpm: 30,
-        projectile_speed: 10.0,
-        price: 75,
-    ),
-    (
-        kind: Archer,
-        damage: 10,
-        range: 120.0,
-        rpm: 140,
-        projectile_speed: 5.0,
-        price: 50,
-    ),
+  (
+    damage: 20,
+    range: 150.0,
+    rpm: 140,
+    projectile_speed: 6.0,
+    price: 50,
+  ),
 ]

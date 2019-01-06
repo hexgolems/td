@@ -3,7 +3,6 @@ use crate::curses::CurseType;
 use crate::effects::Effects;
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
-use crate::towers::TowerType;
 use crate::utils::move_to;
 use ggez::graphics;
 use ggez::graphics::Point2;
@@ -20,7 +19,6 @@ pub struct Projectile {
     speed: f32,
     next_walk_target: graphics::Point2,
     reached_goal: bool,
-    kind: TowerType,
     curses: HashSet<CurseType>,
 }
 
@@ -31,13 +29,9 @@ impl Projectile {
         enemy_id: usize,
         damage: usize,
         speed: f32,
-        kind: TowerType,
     ) -> Self {
         return Self {
-            disp: match kind {
-                TowerType::Cannon => ImgID::CannonBall,
-                TowerType::Archer => ImgID::Arrow,
-            },
+            disp: ImgID::Arrow,
             curses: HashSet::new(),
             tower_id,
             enemy_id,
@@ -45,7 +39,6 @@ impl Projectile {
             damage,
             next_walk_target: position,
             speed,
-            kind,
             reached_goal: false,
         };
     }
