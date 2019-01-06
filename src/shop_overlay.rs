@@ -7,7 +7,6 @@ use crate::buffs::BuffType;
 use crate::card::CardType;
 use crate::game_state::GameState;
 use crate::overlay_state::{OverlayState, StateTransition};
-use crate::towers::TowerType;
 use crate::utils::add_mod;
 
 pub struct ShopOverlay {
@@ -25,8 +24,7 @@ impl ShopOverlay {
 
     fn get_available_cards(&self, _state: &GameState) -> Vec<CardType> {
         return vec![
-            CardType::Build(TowerType::Cannon),
-            CardType::Build(TowerType::Archer),
+            CardType::Tower,
             CardType::SellTower,
             CardType::DamageEnemy,
             CardType::Shop,

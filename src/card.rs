@@ -4,7 +4,7 @@ use crate::game_state::GameState;
 use crate::gui::CursorMode;
 use crate::map::GameMap;
 use crate::shop_overlay::ShopOverlay;
-use crate::towers::{Tower, TowerType};
+use crate::towers::Tower;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
@@ -12,7 +12,7 @@ use std::collections::HashSet;
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CardType {
     Empty,
-    Build(TowerType),
+    Tower,
     SellTower,
     DamageEnemy,
     Shop,
@@ -26,8 +26,7 @@ impl CardType {
     pub fn get_image_id(&self) -> ImgID {
         match self {
             CardType::Empty => ImgID::EmptySlot,
-            CardType::Build(TowerType::Cannon) => ImgID::Cannon,
-            CardType::Build(TowerType::Archer) => ImgID::Archer,
+            CardType::Tower => ImgID::Archer,
             CardType::SellTower => ImgID::SellTower,
             CardType::DamageEnemy => ImgID::DamageEnemy,
             CardType::Shop => ImgID::Shop,
@@ -44,8 +43,7 @@ impl CardType {
     pub fn get_description(&self) -> &'static str {
         match self {
             CardType::Empty => "",
-            CardType::Build(TowerType::Cannon) => "Builds a cannon tower",
-            CardType::Build(TowerType::Archer) => "Builds an archer tower",
+            CardType::Tower => "Build a tower",
             CardType::SellTower => "Allows you to destroy a tower",
             CardType::DamageEnemy => "Damages all enemies in a given range",
             CardType::Shop => "Allows you to buy one card",
@@ -58,11 +56,10 @@ impl CardType {
         }
     }
 
-    pub fn activation_cost(&self, _state: &GameState) -> usize {
+    pub fn activation_cost(&self, state: &GameState) -> usize {
         match self {
             CardType::Empty => 0,
-            CardType::Build(TowerType::Cannon) => 40,
-            CardType::Build(TowerType::Archer) => 30,
+            CardType::Tower => state.towers.base_stats.price,
             CardType::SellTower => 0,
             CardType::DamageEnemy => 150,
             CardType::Shop => 0,
@@ -78,8 +75,7 @@ impl CardType {
     pub fn aquisition_cost(&self, _state: &GameState) -> usize {
         match self {
             CardType::Empty => 0,
-            CardType::Build(TowerType::Cannon) => 80,
-            CardType::Build(TowerType::Archer) => 60,
+            CardType::Tower => 60,
             CardType::SellTower => 10,
             CardType::DamageEnemy => 100,
             CardType::Shop => 100,
@@ -95,7 +91,7 @@ impl CardType {
     pub fn select(&self, state: &mut GameState, slot: usize) {
         match self {
             CardType::Empty => {}
-            CardType::Build(_) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Tower => state.gui.set_cursor_card_effect(slot, self),
             CardType::SellTower => state.gui.set_cursor_card_effect(slot, self),
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
             CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
@@ -117,7 +113,7 @@ impl CardType {
         }
         match self {
             CardType::Empty => return false,
-            CardType::Build(_) => {
+            CardType::Tower => {
                 return state.map.is_buildable(x, y) && !state.towers.has_building(x, y);
             }
             CardType::SellTower => return state.towers.has_building(x, y),
@@ -139,8 +135,8 @@ impl CardType {
         state.player_mut().gold -= self.activation_cost(state);
         match self {
             CardType::Empty => {}
-            CardType::Build(t) => {
-                state.towers.spawn(Tower::new(*t, (x, y)));
+            CardType::Tower => {
+                state.towers.spawn(Tower::new((x, y)));
                 state.gui.set_cursor(CursorMode::Hand(0));
                 let pos = GameMap::tile_center(x, y);
                 state.effects.smoke(pos.x, pos.y)
@@ -178,8 +174,7 @@ impl CardDeck {
     pub fn new() -> Self {
         let hand = vec![];
         let deck = vec![
-            Build(TowerType::Cannon),
-            Build(TowerType::Archer),
+            Tower,
             Coin(1),
             Coin(1),
             Coin(1),
