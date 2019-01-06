@@ -41,27 +41,27 @@ pub struct Tower {
     cooldown: usize,
     map_position: (usize, usize),
     kind: TowerType,
-    buffs: HashSet<BuffType>,
+    buff_to_level: HashMap<BuffType,usize>,
 }
 
 impl Tower {
     pub fn new(kind: TowerType, map_position: (usize, usize)) -> Self {
-        let buffs = HashSet::new();
+        let buff_to_level = HashMap::new();
         return Self {
             id: 0,
             map_position,
             kind,
             cooldown: 0,
-            buffs,
+            buff_to_level,
         };
     }
 
     pub fn add_buff(&mut self, buff: BuffType) {
-        self.buffs.insert(buff);
+        self.buff_to_level.insert(buff, 1);
     }
 
-    pub fn get_buffs(&self) -> &HashSet<BuffType> {
-        return &self.buffs;
+    pub fn get_buffs(&self) -> &HashMap<BuffType, usize> {
+        return &self.buff_to_level;
     }
 
     pub fn tick(&mut self, enemies: &Enemies, projectiles: &mut Projectiles, spec: &TowerSpec) {
