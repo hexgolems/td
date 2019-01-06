@@ -16,6 +16,7 @@ mod assets;
 mod buffs;
 mod card;
 mod curses;
+mod effects;
 mod enemies;
 mod game_state;
 mod gui;

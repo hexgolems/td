@@ -4,6 +4,7 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
+use crate::effects::Effects;
 use crate::enemies::Enemies;
 use crate::gui::Gui;
 use crate::map::GameMap;
@@ -24,6 +25,7 @@ pub struct GameState {
     pub gui: Gui,
     pub players: HashMap<usize, Player>,
     pub projectiles: Projectiles,
+    pub effects: Effects,
     pub overlay_state: Option<Box<OverlayState>>,
 }
 
@@ -48,6 +50,7 @@ impl GameState {
         let mut players = HashMap::new();
         let me = 42;
         let player = Player::new(me);
+        let effects = Effects::new();
         players.insert(me, player);
 
         let s = Self {
@@ -61,6 +64,7 @@ impl GameState {
             projectiles,
             overlay_state: None,
             players,
+            effects,
         };
         Ok(s)
     }
@@ -90,6 +94,7 @@ impl event::EventHandler for GameState {
         Enemies::tick(self);
         Towers::tick(self);
         Projectiles::tick(self);
+        self.effects.tick();
         //Wait for
         if self.waves.status == WaveStatus::Finished {
             self.waves.status = WaveStatus::Waiting(5 * 60);
@@ -116,8 +121,9 @@ impl event::EventHandler for GameState {
         self.enemies.draw(&self.data, ctx)?;
         self.towers.draw(&self.data, ctx)?;
         //self.gui.draw(&self.data, ctx)?;
-        Gui::draw(self, ctx)?;
         self.projectiles.draw(&self.data, ctx)?;
+        self.effects.draw(&self.data, ctx)?;
+        Gui::draw(self, ctx)?;
 
         graphics::present(ctx);
         Ok(())

@@ -73,9 +73,9 @@ impl Waves {
                         .get_spawn_points()
                         .pop()
                         .expect("I need to spawn zombies");
-                    state
-                        .enemies
-                        .spawn(Enemy::new(GameMap::tile_center(x, y), &wave));
+                    let pos = GameMap::tile_center(x, y);
+                    state.enemies.spawn(Enemy::new(pos, &wave));
+                    state.effects.fire(pos.x, pos.y);
                     state.waves.enemy_count += 1;
                     state.waves.next_spawn = wave.spawn_delay;
                 }

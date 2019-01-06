@@ -1,5 +1,6 @@
 use crate::assets::{Data, ImgID};
 use crate::curses::CurseType;
+use crate::effects::Effects;
 use crate::enemies::Enemies;
 use crate::game_state::GameState;
 use crate::towers::TowerType;
@@ -49,7 +50,7 @@ impl Projectile {
         };
     }
 
-    pub fn tick(&mut self, enemies: &mut Enemies) {
+    pub fn tick(&mut self, enemies: &mut Enemies, effects: &mut Effects) {
         if let Some(e) = enemies.enemies.get(&self.enemy_id) {
             self.next_walk_target = e.position;
         }
@@ -58,6 +59,7 @@ impl Projectile {
         self.reached_goal = finished;
         if self.reached_goal == true {
             enemies.damage(self.enemy_id, self.damage, &self.curses);
+            effects.smoke(self.next_walk_target.x, self.next_walk_target.y);
         }
     }
 
@@ -107,7 +109,7 @@ impl Projectiles {
 
     pub fn tick(state: &mut GameState) {
         for p in state.projectiles.projectiles.values_mut() {
-            p.tick(&mut state.enemies)
+            p.tick(&mut state.enemies, &mut state.effects)
         }
         state
             .projectiles
