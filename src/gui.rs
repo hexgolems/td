@@ -120,6 +120,21 @@ impl Gui {
 
     fn draw_cards(state: &GameState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in state.player().deck.hand.iter().enumerate() {
+
+            graphics::draw_ex(
+                ctx,
+                state.data.get_i(&ImgID::Card),
+                graphics::DrawParam {
+                    // src: src,
+                    dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
+                    //rotation: self.zoomlevel,
+                    offset: Point2::new(0.5, 0.5),
+                    scale: Point2::new(4.0, 4.0),
+                    // shear: shear,
+                    ..Default::default()
+                },
+            )?;
+
             graphics::draw_ex(
                 ctx,
                 state.data.get_i(&card.get_image_id()),

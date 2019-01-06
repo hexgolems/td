@@ -12,6 +12,7 @@ pub enum ImgID {
     Coin(usize),
     Take2,
     Freeze,
+    Card,
 
     Smoke,
     Fire,
@@ -76,14 +77,12 @@ impl Data {
         self.load_img(ctx, Coin(2), "/coin2.png")?;
         self.load_img(ctx, Coin(3), "/coin3.png")?;
         self.load_img(ctx, Take2, "/take_2.png")?;
-        self.load_img(ctx, Freeze, "/freeze.png")?;
+        self.load_img(ctx, Card, "/card.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
-
         self.load_img(ctx, Smoke, "/smoke.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
-
+	self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, Zombie, "/enemy.png")?;
-
         self.load_img(ctx, Archer, "/archer.png")?;
         self.load_img(ctx, Arrow, "/arrow.png")?;
 
