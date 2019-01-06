@@ -1,7 +1,7 @@
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use crate::assets::{Data, ImgID};
 use crate::buffs::{self, BuffType};
