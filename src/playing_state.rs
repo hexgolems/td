@@ -1,23 +1,25 @@
-use ggez::event::{self, Keycode, Mod};
+use ggez::event::{Keycode, Mod};
 use ggez::graphics;
 //use ggez::timer;
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
 use crate::effects::Effects;
+use crate::end_state::EndState;
 use crate::enemies::Enemies;
+use crate::event_handler::{self, StateTransition};
 use crate::gui::Gui;
 use crate::map::GameMap;
-use crate::overlay_state::{OverlayState, StateTransition};
+use crate::overlay_state::OverlayState;
 use crate::player::Player;
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
 use crate::wave::{WaveStatus, Waves};
 use std::collections::HashMap;
 
-pub struct GameState {
+pub struct PlayingState {
     pub me: usize,
-    pub data: Data,
+    pub data: Option<Data>,
     pub map: GameMap,
     pub enemies: Enemies,
     pub towers: Towers,
@@ -29,18 +31,9 @@ pub struct GameState {
     pub overlay_state: Option<Box<OverlayState>>,
 }
 
-pub struct GameStateShared {
-    pub player: Player,
-    pub map: GameMap,
-    pub enemies: Enemies,
-    pub towers: Towers,
-    pub projectiles: Projectiles,
-}
-
-impl GameState {
-    pub fn new(ctx: &mut Context) -> GameResult<Self> {
-        let mut data = Data::new();
-        data.init(ctx).expect("couldn't load resources");
+impl PlayingState {
+    pub fn new() -> Self {
+        let data = None;
         let map = GameMap::new();
         let enemies = Enemies::new();
         let towers = Towers::new();
@@ -53,7 +46,7 @@ impl GameState {
         let effects = Effects::new();
         players.insert(me, player);
 
-        let s = Self {
+        return Self {
             me,
             data,
             map,
@@ -66,7 +59,6 @@ impl GameState {
             players,
             effects,
         };
-        Ok(s)
     }
 
     pub fn player_mut(&mut self) -> &mut Player {
@@ -78,25 +70,33 @@ impl GameState {
     }
 }
 
-impl event::EventHandler for GameState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+impl event_handler::GameState for PlayingState {
+    fn update(&mut self, _ctx: &mut Context) -> GameResult<event_handler::StateTransition> {
         if let Some(mut overlay) = self.overlay_state.take() {
             match overlay.update(self)? {
                 StateTransition::Stay => self.overlay_state = Some(overlay),
                 StateTransition::Return => {}
+                _ => unreachable!(),
             }
-            return Ok(());
+            return Ok(event_handler::StateTransition::Stay);
         }
         const _DESIRED_FPS: u32 = 60;
-        assert!(self.player().hp > 0, "0xDEAD");
-        //while timer::check_update_time(ctx, DESIRED_FPS) {
+        if self.player().hp <= 0 {
+            return Ok(event_handler::StateTransition::Next(Box::new(
+                EndState::failed(),
+            )));
+        }
+        if self.waves.status == WaveStatus::LevelFinished {
+            return Ok(event_handler::StateTransition::Next(Box::new(
+                EndState::win(),
+            )));
+        }
         Waves::tick(self);
         Enemies::tick(self);
         Towers::tick(self);
         Projectiles::tick(self);
         self.effects.tick();
-        //Wait for
-        if self.waves.status == WaveStatus::Finished {
+        if self.waves.status == WaveStatus::WaveFinished {
             self.waves.status = WaveStatus::Waiting(5 * 60);
         }
         if self.waves.status == WaveStatus::Ready {
@@ -104,9 +104,7 @@ impl event::EventHandler for GameState {
             self.player_mut().deck.draw(5);
             self.waves.status = WaveStatus::Ongoing;
         }
-
-        //}
-        Ok(())
+        return Ok(event_handler::StateTransition::Stay);
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
@@ -117,26 +115,40 @@ impl event::EventHandler for GameState {
         }
         graphics::clear(ctx);
         graphics::set_color(ctx, graphics::WHITE)?;
-        self.map.draw(&self.data, ctx)?;
-        self.enemies.draw(&self.data, ctx)?;
-        self.towers.draw(&self.data, ctx)?;
-        //self.gui.draw(&self.data, ctx)?;
-        self.projectiles.draw(&self.data, ctx)?;
-        self.effects.draw(&self.data, ctx)?;
+        self.map.draw(&self.data.as_ref().unwrap(), ctx)?;
+        self.enemies.draw(&self.data.as_ref().unwrap(), ctx)?;
+        self.towers.draw(&self.data.as_ref().unwrap(), ctx)?;
+        self.projectiles.draw(&self.data.as_ref().unwrap(), ctx)?;
+        self.effects.draw(&self.data.as_ref().unwrap(), ctx)?;
         Gui::draw(self, ctx)?;
 
         graphics::present(ctx);
         Ok(())
     }
 
-    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+    fn key_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        keycode: Keycode,
+        keymod: Mod,
+        repeat: bool,
+    ) -> event_handler::StateTransition {
         if let Some(mut overlay) = self.overlay_state.take() {
             match overlay.key_down_event(self, keycode, keymod, repeat) {
                 StateTransition::Stay => self.overlay_state = Some(overlay),
                 StateTransition::Return => {}
+                _ => unreachable!(),
             }
-            return;
+            return event_handler::StateTransition::Stay;
         }
         Gui::key_down(self, keycode, keymod, repeat);
+        return event_handler::StateTransition::Stay;
+    }
+
+    fn set_data(&mut self, data: Data) {
+        self.data = Some(data);
+    }
+    fn take_data(&mut self) -> Data {
+        return self.data.take().unwrap();
     }
 }

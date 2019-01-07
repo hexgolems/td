@@ -1,7 +1,7 @@
 use crate::assets::{Data, ImgID};
 use crate::curses::CurseType;
-use crate::game_state::GameState;
 use crate::map::{GameMap, MapTile, WalkDir};
+use crate::playing_state::PlayingState;
 use crate::utils::distance;
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
@@ -130,17 +130,19 @@ impl Enemies {
             .cloned()
     }
 
-    pub fn tick(state: &mut GameState) {
+    pub fn tick(state: &mut PlayingState) {
         for e in state.enemies.enemies.values_mut() {
             e.tick(&state.map)
         }
         state.enemies.enemies.retain(|_id, e| e.health > 0);
-        state.player_mut().hp -= state
-            .enemies
-            .enemies
-            .iter()
-            .filter(|(_id, e)| e.reached_goal)
-            .count();
+        state.player_mut().hp.saturating_sub(
+            state
+                .enemies
+                .enemies
+                .iter()
+                .filter(|(_id, e)| e.reached_goal)
+                .count(),
+        );
         state
             .enemies
             .enemies

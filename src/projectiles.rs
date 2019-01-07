@@ -2,7 +2,7 @@ use crate::assets::{Data, ImgID};
 use crate::curses::CurseType;
 use crate::effects::Effects;
 use crate::enemies::Enemies;
-use crate::game_state::GameState;
+use crate::playing_state::PlayingState;
 use crate::utils::move_to;
 use ggez::graphics;
 use ggez::graphics::Point2;
@@ -100,7 +100,7 @@ impl Projectiles {
         Ok(())
     }
 
-    pub fn tick(state: &mut GameState) {
+    pub fn tick(state: &mut PlayingState) {
         for p in state.projectiles.projectiles.values_mut() {
             p.tick(&mut state.enemies, &mut state.effects)
         }

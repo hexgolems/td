@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use crate::assets::{Data, ImgID};
 use crate::buffs::{self, BuffType};
 use crate::enemies::Enemies;
-use crate::game_state::GameState;
 use crate::map::GameMap;
+use crate::playing_state::PlayingState;
 use crate::projectiles::{Projectile, Projectiles};
 use crate::utils::load_specs;
 
@@ -170,7 +170,7 @@ impl Towers {
         Ok(())
     }
 
-    pub fn tick(state: &mut GameState) {
+    pub fn tick(state: &mut PlayingState) {
         for (_id, t) in state.towers.built.iter_mut() {
             t.tick(
                 &state.enemies,

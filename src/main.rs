@@ -17,19 +17,23 @@ mod buffs;
 mod card;
 mod curses;
 mod effects;
+mod end_state;
 mod enemies;
-mod game_state;
+mod event_handler;
 mod gui;
 mod map;
+mod menu_state;
 mod overlay_state;
 mod player;
+mod playing_state;
 mod projectiles;
 mod shop_overlay;
 mod towers;
 mod utils;
 mod wave;
-
-use crate::game_state::GameState;
+use crate::assets::Data;
+use crate::event_handler::GameState;
+use crate::menu_state::MenuState;
 
 pub fn main() {
     let c = conf::Conf::new();
@@ -44,9 +48,14 @@ pub fn main() {
     }
 
     println!("{}", graphics::get_renderer_info(ctx).unwrap());
-    let state = &mut GameState::new(ctx).unwrap();
+    let mut data = Data::new();
+    data.init(ctx).expect("couldn't load resources");
+    let mut init_state = Box::new(MenuState::new());
+    //let mut init_state = PlayingState::new(ctx).unwrap();
+    init_state.set_data(data);
+    let events = &mut event_handler::GameEventHandler::new(init_state);
 
-    if let Err(e) = event::run(ctx, state) {
+    if let Err(e) = event::run(ctx, events) {
         println!("Error encountered: {}", e);
     } else {
         println!("Game exited cleanly.");

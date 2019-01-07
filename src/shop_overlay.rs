@@ -5,8 +5,9 @@ use ggez::{Context, GameResult};
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::card::CardType;
-use crate::game_state::GameState;
-use crate::overlay_state::{OverlayState, StateTransition};
+use crate::event_handler::StateTransition;
+use crate::overlay_state::OverlayState;
+use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
 
 pub struct ShopOverlay {
@@ -22,7 +23,7 @@ impl ShopOverlay {
         };
     }
 
-    fn get_available_cards(&self, _state: &GameState) -> Vec<CardType> {
+    fn get_available_cards(&self, _state: &PlayingState) -> Vec<CardType> {
         return vec![
             CardType::Tower,
             CardType::SellTower,
@@ -46,11 +47,11 @@ impl ShopOverlay {
         return 0.0;
     }
 
-    fn draw_available_cards(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    fn draw_available_cards(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in self.get_available_cards(state).iter().enumerate() {
             graphics::draw_ex(
                 ctx,
-                state.data.get_i(&ImgID::Card),
+                state.data.as_ref().unwrap().get_i(&ImgID::Card),
                 graphics::DrawParam {
                     // src: src,
                     dest: Point2::new(100.0, 40.0 + (i as f32) * 80.0 - self.get_drawing_offset()),
@@ -61,10 +62,9 @@ impl ShopOverlay {
                     ..Default::default()
                 },
             )?;
-
             graphics::draw_ex(
                 ctx,
-                state.data.get_i(&card.get_image_id()),
+                state.data.as_ref().unwrap().get_i(&card.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
                     dest: Point2::new(100.0, 40.0 + (i as f32) * 80.0 - self.get_drawing_offset()),
@@ -77,7 +77,7 @@ impl ShopOverlay {
             )?;
             let cost = card.aquisition_cost(state);
             if cost > 0 {
-                let font = state.data.get_font();
+                let font = state.data.as_ref().unwrap().get_font();
 
                 let mut desc = Text::new(ctx, &format!("{}", cost), font)?;
                 desc.set_filter(graphics::FilterMode::Nearest);
@@ -103,10 +103,10 @@ impl ShopOverlay {
         Ok(())
     }
 
-    fn draw_cursor(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    fn draw_cursor(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         graphics::draw_ex(
             ctx,
-            state.data.get_i(&ImgID::Cursor),
+            state.data.as_ref().unwrap().get_i(&ImgID::Cursor),
             graphics::DrawParam {
                 // src: src,
                 dest: Point2::new(
@@ -123,11 +123,11 @@ impl ShopOverlay {
         return Ok(());
     }
 
-    fn draw_selected(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    fn draw_selected(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         let card = self.get_available_cards(state)[self.cur_selected];
         graphics::draw_ex(
             ctx,
-            state.data.get_i(&card.get_image_id()),
+            state.data.as_ref().unwrap().get_i(&card.get_image_id()),
             graphics::DrawParam {
                 // src: src,
                 dest: Point2::new(300.0, 40.0),
@@ -138,7 +138,7 @@ impl ShopOverlay {
                 ..Default::default()
             },
         )?;
-        let font = state.data.get_font();
+        let font = state.data.as_ref().unwrap().get_font();
         let (_, txts) = font.get_wrap(card.get_description(), 200);
         for (i, txt) in txts.iter().enumerate() {
             let mut desc = Text::new(ctx, txt, font)?;
@@ -163,11 +163,11 @@ impl ShopOverlay {
 }
 
 impl OverlayState for ShopOverlay {
-    fn update(&mut self, _state: &mut GameState) -> GameResult<StateTransition> {
+    fn update(&mut self, _state: &mut PlayingState) -> GameResult<StateTransition> {
         return Ok(StateTransition::Stay);
     }
 
-    fn draw(&self, state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
         graphics::set_color(ctx, graphics::WHITE)?;
         self.draw_available_cards(state, ctx)?;
@@ -179,7 +179,7 @@ impl OverlayState for ShopOverlay {
 
     fn key_down_event(
         &mut self,
-        state: &mut GameState,
+        state: &mut PlayingState,
         keycode: Keycode,
         _keymod: Mod,
         _repeat: bool,
