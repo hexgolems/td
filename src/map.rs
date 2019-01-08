@@ -1,8 +1,9 @@
 use crate::assets::{Data, ImgID};
 use crate::utils::load_specs;
 use ggez::graphics;
-use ggez::graphics::Point2;
+use ggez::graphics::{Point2, Vector2};
 use ggez::{Context, GameResult};
+use rand::prelude::*;
 use std::collections::HashMap;
 use std::ops::Range;
 
@@ -24,19 +25,25 @@ pub enum MapTile {
 }
 use self::MapTile::*;
 
+struct Decoration {
+    pos: Point2,
+    disp: ImgID,
+}
+
 pub struct GameMap {
     pub xsize: usize,
     pub ysize: usize,
     data: Vec<Vec<MapTile>>,
+    decorations: Vec<Decoration>,
     images: HashMap<MapTile, ImgID>,
 }
 
 impl GameMap {
     pub fn new() -> Self {
         let data = load_specs::<Vec<MapTile>>("map");
-        println!("{:?}", data);
         let xsize = data[0].len();
         let ysize = data.len();
+        let decorations = vec![];
         let mut images = HashMap::new();
         images.insert(Walk(Left), ImgID::FloorWalkLeft);
         images.insert(Walk(Right), ImgID::FloorWalkRight);
@@ -48,12 +55,65 @@ impl GameMap {
         images.insert(Spawn(Right), ImgID::FloorSpawnRight);
         images.insert(Spawn(Up), ImgID::FloorSpawnUp);
         images.insert(Spawn(Down), ImgID::FloorSpawnDown);
-        return Self {
+        let mut res = Self {
+            decorations,
             data,
             xsize,
             ysize,
             images,
         };
+        res.create_decorations();
+        return res;
+    }
+
+    pub fn create_decorations(&mut self) {
+        let decoration_build = vec![ImgID::Tree1, ImgID::Tree2, ImgID::Tree3];
+        let decoration_walk = vec![
+            ImgID::Stone(1),
+            ImgID::Stone(2),
+            ImgID::Stone(2),
+            ImgID::Stone(3),
+            ImgID::Stone(4),
+            ImgID::Stone(4),
+        ];
+        for x in self.xrange() {
+            for y in self.yrange() {
+                match self.get_tile_type(x, y) {
+                    Build => {
+                        if rand::thread_rng().gen::<f32>() > 0.1 {
+                            let offset =
+                                (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen())
+                                    * 60.0)
+                                    - Vector2::new(30.0, 30.0);
+                            let pos = GameMap::tile_center(x, y) + offset;
+                            self.decorations.push(Decoration {
+                                pos,
+                                disp: decoration_build
+                                    [rand::thread_rng().gen::<usize>() % decoration_build.len()],
+                            });
+                        }
+                    }
+                    Walk(_) => {
+                        for i in 1..4 {
+                            if rand::thread_rng().gen::<f32>() > 0.1 {
+                                let offset = (Vector2::new(
+                                    rand::thread_rng().gen(),
+                                    rand::thread_rng().gen(),
+                                ) * 70.0)
+                                    - Vector2::new(35.0, 30.0);
+                                let pos = GameMap::tile_center(x, y) + offset;
+                                self.decorations.push(Decoration {
+                                    pos,
+                                    disp: decoration_walk
+                                        [rand::thread_rng().gen::<usize>() % decoration_walk.len()],
+                                });
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
     }
 
     pub fn tile_pos(x: usize, y: usize) -> graphics::Point2 {
@@ -68,9 +128,12 @@ impl GameMap {
         return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
     }
 
+    pub fn get_tile_type(&self, x: usize, y: usize) -> MapTile {
+        return self.data[y][x];
+    }
     pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
         let (xi, yi) = GameMap::tile_index_at(pos);
-        return self.data[yi][xi];
+        return self.get_tile_type(xi, yi);
     }
 
     pub fn xrange(&self) -> Range<usize> {
@@ -123,6 +186,19 @@ impl GameMap {
                     },
                 )?;
             }
+        }
+
+        for dec in self.decorations.iter() {
+            graphics::draw_ex(
+                ctx,
+                data.get_i(&dec.disp),
+                graphics::DrawParam {
+                    dest: dec.pos,
+                    scale: Point2::new(4.0, 4.0),
+                    offset: Point2::new(0.5, 1.0),
+                    ..Default::default()
+                },
+            )?;
         }
         Ok(())
     }
