@@ -1,8 +1,8 @@
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
-use crate::game_state::GameState;
 use crate::gui::CursorMode;
 use crate::map::GameMap;
+use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
 use crate::towers::Tower;
 use rand::seq::SliceRandom;
@@ -62,7 +62,7 @@ impl CardType {
         }
     }
 
-    pub fn activation_cost(&self, state: &GameState) -> usize {
+    pub fn activation_cost(&self, state: &PlayingState) -> usize {
         match self {
             CardType::Empty => 0,
             CardType::Tower => state.towers.stats.price,
@@ -81,7 +81,7 @@ impl CardType {
         }
     }
 
-    pub fn aquisition_cost(&self, _state: &GameState) -> usize {
+    pub fn aquisition_cost(&self, _state: &PlayingState) -> usize {
         match self {
             CardType::Empty => 0,
             CardType::Tower => 60,
@@ -100,7 +100,7 @@ impl CardType {
         }
     }
 
-    pub fn select(&self, state: &mut GameState, slot: usize) {
+    pub fn select(&self, state: &mut PlayingState, slot: usize) {
         match self {
             CardType::Empty => {}
             CardType::Tower => state.gui.set_cursor_card_effect(slot, self),
@@ -122,7 +122,7 @@ impl CardType {
         }
     }
 
-    pub fn is_applicable(&self, state: &GameState, x: usize, y: usize) -> bool {
+    pub fn is_applicable(&self, state: &PlayingState, x: usize, y: usize) -> bool {
         if state.player().gold < self.activation_cost(state) {
             return false;
         }
@@ -146,7 +146,7 @@ impl CardType {
         }
     }
 
-    pub fn activate(&self, state: &mut GameState, x: usize, y: usize) {
+    pub fn activate(&self, state: &mut PlayingState, x: usize, y: usize) {
         state.player_mut().gold -= self.activation_cost(state);
         match self {
             CardType::Empty => {}

@@ -4,8 +4,8 @@ use ggez::{Context, GameResult};
 
 use crate::assets::{Data, ImgID};
 use crate::card::CardType;
-use crate::game_state::GameState;
 use crate::map::GameMap;
+use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
 use crate::wave::WaveStatus;
 
@@ -36,11 +36,11 @@ impl Gui {
         self.cursor_state = c;
     }
 
-    pub fn chancel(state: &mut GameState) {
+    pub fn chancel(state: &mut PlayingState) {
         state.gui.set_cursor(CursorMode::Hand(0));
     }
 
-    pub fn move_cursor(state: &mut GameState, ix: isize, iy: isize) {
+    pub fn move_cursor(state: &mut PlayingState, ix: isize, iy: isize) {
         let len = state.player().deck.hand.len().clone();
         match state.gui.cursor_state {
             Map {
@@ -90,7 +90,7 @@ impl Gui {
     }
 
     fn draw_effect_preview(
-        state: &GameState,
+        state: &PlayingState,
         x: usize,
         y: usize,
         card: CardType,
@@ -103,7 +103,11 @@ impl Gui {
         };
         graphics::draw_ex(
             ctx,
-            state.data.get_i(&card.get_preview_image_id()),
+            state
+                .data
+                .as_ref()
+                .unwrap()
+                .get_i(&card.get_preview_image_id()),
             graphics::DrawParam {
                 // src: src,
                 dest: GameMap::tile_center(x, y),
@@ -118,12 +122,11 @@ impl Gui {
         Ok(())
     }
 
-    fn draw_cards(state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    fn draw_cards(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in state.player().deck.hand.iter().enumerate() {
-
             graphics::draw_ex(
                 ctx,
-                state.data.get_i(&ImgID::Card),
+                state.data.as_ref().unwrap().get_i(&ImgID::Card),
                 graphics::DrawParam {
                     // src: src,
                     dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
@@ -137,7 +140,7 @@ impl Gui {
 
             graphics::draw_ex(
                 ctx,
-                state.data.get_i(&card.get_image_id()),
+                state.data.as_ref().unwrap().get_i(&card.get_image_id()),
                 graphics::DrawParam {
                     // src: src,
                     dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
@@ -151,7 +154,7 @@ impl Gui {
 
             let cost = card.activation_cost(state);
             if cost > 0 {
-                let font = state.data.get_font();
+                let font = state.data.as_ref().unwrap().get_font();
 
                 let mut desc = Text::new(ctx, &format!("{}", cost), font)?;
                 desc.set_filter(graphics::FilterMode::Nearest);
@@ -188,8 +191,8 @@ impl Gui {
         Ok(())
     }
 
-    pub fn draw_description(state: &GameState, ctx: &mut Context) -> GameResult<()> {
-        let font = state.data.get_font();
+    pub fn draw_description(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
+        let font = state.data.as_ref().unwrap().get_font();
         let mut next_wave = "".to_string();
         if let WaveStatus::Waiting(time) = state.waves.status {
             next_wave = format!(", Next wave in {}", time / 60);
@@ -222,22 +225,26 @@ impl Gui {
         return Ok(());
     }
 
-    pub fn draw(state: &GameState, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         Gui::draw_cards(state, ctx)?;
         match state.gui.cursor_state {
             CursorMode::Map { x, y, card, .. } => {
-                state.gui.draw_map_cursor(x, y, &state.data, ctx)?;
+                state
+                    .gui
+                    .draw_map_cursor(x, y, &state.data.as_ref().unwrap(), ctx)?;
                 Gui::draw_effect_preview(state, x, y, card, ctx)?;
             }
             CursorMode::Hand(slot) => {
-                state.gui.draw_cards_cursor(slot, &state.data, ctx)?;
+                state
+                    .gui
+                    .draw_cards_cursor(slot, &state.data.as_ref().unwrap(), ctx)?;
             }
         }
         Gui::draw_description(state, ctx)?;
         Ok(())
     }
 
-    pub fn key_down(state: &mut GameState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    pub fn key_down(state: &mut PlayingState, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Up => Gui::move_cursor(state, 0, -1),
             Keycode::Down => Gui::move_cursor(state, 0, 1),
@@ -254,14 +261,14 @@ impl Gui {
         }
     }
 
-    fn event_activate(state: &mut GameState, x: usize, y: usize, slot: usize, card: CardType) {
+    fn event_activate(state: &mut PlayingState, x: usize, y: usize, slot: usize, card: CardType) {
         if card.is_applicable(state, x, y) {
             card.activate(state, x, y);
             state.player_mut().deck.card_used(slot);
         }
     }
 
-    fn event_select(state: &mut GameState, slot: usize) {
+    fn event_select(state: &mut PlayingState, slot: usize) {
         let card = state.player().deck.hand[slot].clone();
         card.select(state, slot);
     }

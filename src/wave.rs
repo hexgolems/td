@@ -1,7 +1,7 @@
 use crate::assets::ImgID;
 use crate::enemies::Enemy;
-use crate::game_state::GameState;
 use crate::map::GameMap;
+use crate::playing_state::PlayingState;
 use crate::utils::load_specs;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -25,10 +25,11 @@ pub struct Waves {
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum WaveStatus {
-    Finished,
+    WaveFinished,
     Ongoing,
     Waiting(usize),
     Ready,
+    LevelFinished,
 }
 impl Waves {
     pub fn new() -> Self {
@@ -42,14 +43,21 @@ impl Waves {
     }
 
     fn current_wave(&self) -> WaveSpec {
-        self.waves
-            .get(self.id)
-            .expect("All your base belongs to you!")
-            .clone()
+        self.waves.get(self.id).unwrap().clone()
     }
 
-    pub fn tick(state: &mut GameState) {
+    fn is_finished(&self) -> bool {
+        self.waves.get(self.id).is_none()
+    }
+
+    pub fn tick(state: &mut PlayingState) {
+        if state.waves.is_finished() {
+            state.waves.status = WaveStatus::LevelFinished;
+            return;
+        }
+
         let wave = state.waves.current_wave();
+
         match state.waves.status {
             WaveStatus::Waiting(ref mut a) => {
                 if *a > 0 {
@@ -60,7 +68,7 @@ impl Waves {
                     return;
                 }
             }
-            WaveStatus::Finished | WaveStatus::Ready => {
+            WaveStatus::WaveFinished | WaveStatus::LevelFinished | WaveStatus::Ready => {
                 return;
             }
             WaveStatus::Ongoing => {}
@@ -87,7 +95,7 @@ impl Waves {
                 state.waves.id += 1;
                 state.waves.next_spawn = 0;
                 state.waves.enemy_count = 0;
-                state.waves.status = WaveStatus::Finished;
+                state.waves.status = WaveStatus::WaveFinished;
             }
         }
     }
