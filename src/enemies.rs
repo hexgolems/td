@@ -135,7 +135,7 @@ impl Enemies {
             e.tick(&state.map)
         }
         state.enemies.enemies.retain(|_id, e| e.health > 0);
-        state.player_mut().hp.saturating_sub(
+        state.player_mut().hp = state.player_mut().hp.saturating_sub(
             state
                 .enemies
                 .enemies
