@@ -197,12 +197,11 @@ impl CardDeck {
             Coin(1),
             Coin(1),
             Coin(1),
-            Coin(1),
-            //Shop,
-            //Buff(BuffType::Freeze),
-            //Buff(BuffType::Damage),
-            //Buff(BuffType::RPM),
-            //Buff(BuffType::Range),
+            Shop,
+            Buff(BuffType::Freeze),
+            Buff(BuffType::Damage),
+            Buff(BuffType::RPM),
+            Buff(BuffType::Range),
         ];
         let discard = vec![];
         Self {
