@@ -36,6 +36,13 @@ impl Gui {
         self.cursor_state = c;
     }
 
+    pub fn get_cursor_pos(&self) -> (usize, usize) {
+        match self.cursor_state {
+            Map { x, y, .. } => (x, y),
+            Hand(slot) => (0, slot),
+        }
+    }
+
     pub fn chancel(state: &mut PlayingState) {
         state.gui.set_cursor(CursorMode::Hand(0));
     }
@@ -52,7 +59,9 @@ impl Gui {
                 *x = add_mod(*x, ix, state.map.xsize);
             }
             Hand(ref mut slot) => {
-                *slot = add_mod(*slot, iy, len);
+                if len > 0 {
+                    *slot = add_mod(*slot, iy, len);
+                }
             }
         }
     }
@@ -269,7 +278,8 @@ impl Gui {
     }
 
     fn event_select(state: &mut PlayingState, slot: usize) {
-        let card = state.player().deck.hand[slot].clone();
-        card.select(state, slot);
+        if let Some(card) = state.player().deck.hand.get(slot) {
+            card.clone().select(state, slot);
+        }
     }
 }

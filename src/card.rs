@@ -110,6 +110,10 @@ impl CardType {
             CardType::Coin(a) => {
                 state.player_mut().gold += (10 as usize).pow(*a as u32);
                 state.player_mut().deck.card_used(slot);
+                let cards = state.player().deck.hand.len();
+                if slot > 0 && slot == cards {
+                    state.gui.set_cursor(CursorMode::Hand(slot - 1));
+                }
             }
             CardType::Take2 => {
                 state.player_mut().deck.draw(2);
@@ -193,11 +197,12 @@ impl CardDeck {
             Coin(1),
             Coin(1),
             Coin(1),
-            Shop,
-            Buff(BuffType::Freeze),
-            Buff(BuffType::Damage),
-            Buff(BuffType::RPM),
-            Buff(BuffType::Range),
+            Coin(1),
+            //Shop,
+            //Buff(BuffType::Freeze),
+            //Buff(BuffType::Damage),
+            //Buff(BuffType::RPM),
+            //Buff(BuffType::Range),
         ];
         let discard = vec![];
         Self {
