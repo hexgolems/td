@@ -52,7 +52,9 @@ impl Gui {
                 *x = add_mod(*x, ix, state.map.xsize);
             }
             Hand(ref mut slot) => {
-                *slot = add_mod(*slot, iy, len);
+                if len > 0 {
+                    *slot = add_mod(*slot, iy, len);
+                }
             }
         }
     }
@@ -269,7 +271,8 @@ impl Gui {
     }
 
     fn event_select(state: &mut PlayingState, slot: usize) {
-        let card = state.player().deck.hand[slot].clone();
-        card.select(state, slot);
+        if let Some(card) = state.player().deck.hand.get(slot) {
+            card.clone().select(state, slot);
+        }
     }
 }
