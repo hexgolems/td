@@ -36,13 +36,6 @@ impl Gui {
         self.cursor_state = c;
     }
 
-    pub fn get_cursor_pos(&self) -> (usize, usize) {
-        match self.cursor_state {
-            Map { x, y, .. } => (x, y),
-            Hand(slot) => (0, slot),
-        }
-    }
-
     pub fn chancel(state: &mut PlayingState) {
         state.gui.set_cursor(CursorMode::Hand(0));
     }
