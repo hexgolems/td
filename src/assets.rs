@@ -25,6 +25,11 @@ pub enum ImgID {
     Archer,
     Arrow,
 
+    Tree1,
+    Tree2,
+    Tree3,
+    Stone(usize),
+
     FloorWalkLeft,
     FloorWalkRight,
     FloorWalkDown,
@@ -81,8 +86,8 @@ impl Data {
         self.load_img(ctx, Coin(3), "/coin3.png")?;
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
-	self.load_img(ctx, Card, "/card.png")?;        
-	self.load_img(ctx, Damage, "/damage.png")?;
+        self.load_img(ctx, Card, "/card.png")?;
+        self.load_img(ctx, Damage, "/damage.png")?;
         self.load_img(ctx, RPM, "/rpm.png")?;
         self.load_img(ctx, Range, "/range.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
@@ -91,6 +96,14 @@ impl Data {
         self.load_img(ctx, Zombie, "/enemy.png")?;
         self.load_img(ctx, Archer, "/archer.png")?;
         self.load_img(ctx, Arrow, "/arrow.png")?;
+
+        self.load_img(ctx, Tree1, "/tree1.png")?;
+        self.load_img(ctx, Tree2, "/tree2.png")?;
+        self.load_img(ctx, Tree3, "/tree3.png")?;
+        self.load_img(ctx, Stone(1), "/stone1.png")?;
+        self.load_img(ctx, Stone(2), "/stone2.png")?;
+        self.load_img(ctx, Stone(3), "/stone3.png")?;
+        self.load_img(ctx, Stone(4), "/stone4.png")?;
 
         self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;
         self.load_img(ctx, FloorWalkRight, "/floor_walk_right.png")?;
