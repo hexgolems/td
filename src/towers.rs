@@ -97,8 +97,12 @@ impl Towers {
     pub fn affected_by_aura(&self, t: &Tower) -> Vec<usize> {
         let mut nn = Vec::new();
         let n = t.aura_level();
-        for x in (t.map_position.0 - n..t.map_position.0 + n).into_iter() {
-            for y in (t.map_position.1 - n..t.map_position.1 + n).into_iter() {
+        for x in
+            (t.map_position.0.saturating_sub(n)..t.map_position.0.saturating_add(n)).into_iter()
+        {
+            for y in
+                (t.map_position.1.saturating_sub(n)..t.map_position.1.saturating_add(n)).into_iter()
+            {
                 if let Some(id) = self.position_to_towerid.get(&(x, y)) {
                     if *id != t.id {
                         nn.push(*id);

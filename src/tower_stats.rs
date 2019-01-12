@@ -30,7 +30,7 @@ impl TowerStats {
         buffs: &HashMap<BuffType, usize>,
         auras: &HashMap<BuffType, usize>,
     ) -> f32 {
-        return (20
+        return (40
             * (buffs.get(&BuffType::Range).unwrap_or(&0)
                 + auras.get(&BuffType::Range).unwrap_or(&0))) as f32;
     }
