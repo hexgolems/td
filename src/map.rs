@@ -94,7 +94,7 @@ impl GameMap {
                         }
                     }
                     Walk(_) => {
-                        for i in 1..4 {
+                        for _i in 1..4 {
                             if rand::thread_rng().gen::<f32>() > 0.1 {
                                 let offset = (Vector2::new(
                                     rand::thread_rng().gen(),

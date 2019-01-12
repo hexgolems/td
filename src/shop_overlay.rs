@@ -37,6 +37,7 @@ impl ShopOverlay {
             CardType::Buff(BuffType::Damage),
             CardType::Buff(BuffType::RPM),
             CardType::Buff(BuffType::Range),
+            CardType::Buff(BuffType::Aura),
         ];
     }
 

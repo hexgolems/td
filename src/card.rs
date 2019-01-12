@@ -4,7 +4,7 @@ use crate::gui::CursorMode;
 use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
-use crate::towers::Tower;
+use crate::tower::Tower;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
@@ -36,6 +36,7 @@ impl CardType {
             CardType::Buff(BuffType::RPM) => ImgID::RPM,
             CardType::Buff(BuffType::Range) => ImgID::Range,
             CardType::Buff(BuffType::Damage) => ImgID::Damage,
+            CardType::Buff(BuffType::Aura) => ImgID::Aura,
         }
     }
 
@@ -59,6 +60,7 @@ impl CardType {
             CardType::Buff(BuffType::Range) => "Increases range",
             CardType::Buff(BuffType::Damage) => "Increases damage",
             CardType::Buff(BuffType::RPM) => "Increases rpm",
+            CardType::Buff(BuffType::Aura) => "Increases stats of nearby towers",
         }
     }
 
@@ -78,6 +80,7 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => 10,
             CardType::Buff(BuffType::RPM) => 10,
             CardType::Buff(BuffType::Range) => 10,
+            CardType::Buff(BuffType::Aura) => 10,
         }
     }
 
@@ -97,6 +100,7 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => 10,
             CardType::Buff(BuffType::RPM) => 10,
             CardType::Buff(BuffType::Range) => 10,
+            CardType::Buff(BuffType::Aura) => 10,
         }
     }
 
@@ -123,6 +127,7 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => state.gui.set_cursor_card_effect(slot, self),
             CardType::Buff(BuffType::Range) => state.gui.set_cursor_card_effect(slot, self),
             CardType::Buff(BuffType::RPM) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::Buff(BuffType::Aura) => state.gui.set_cursor_card_effect(slot, self),
         }
     }
 
@@ -177,7 +182,7 @@ impl CardType {
                 state.towers.get_tower_mut(x, y).unwrap().add_buff(*b);
                 state.gui.set_cursor(CursorMode::Hand(0));
                 let pos = GameMap::tile_center(x, y);
-                state.effects.ice(pos.x, pos.y)
+                state.effects.buff(pos.x, pos.y, b)
             }
         }
     }
@@ -197,9 +202,12 @@ impl CardDeck {
             Coin(1),
             Coin(1),
             Coin(1),
+            Coin(1),
+            Coin(1),
             Shop,
-            Buff(BuffType::Freeze),
+            Buff(BuffType::Aura),
             Buff(BuffType::Damage),
+            Buff(BuffType::Freeze),
             Buff(BuffType::RPM),
             Buff(BuffType::Range),
         ];

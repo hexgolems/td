@@ -28,6 +28,8 @@ mod player;
 mod playing_state;
 mod projectiles;
 mod shop_overlay;
+mod tower;
+mod tower_stats;
 mod towers;
 mod utils;
 mod wave;
