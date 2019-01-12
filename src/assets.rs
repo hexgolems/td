@@ -4,39 +4,38 @@ use std::collections::HashMap;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum ImgID {
-    EmptySlot,
-    Cursor,
-    SellTower,
-    Shop,
-    DamageEnemy,
-    Coin(usize),
-    Take2,
-    Freeze,
-    Card,
-    Damage,
-    RPM,
-    Range,
-
-    Smoke,
-    Fire,
-
-    Zombie,
-
     Archer,
     Arrow,
-
-    FloorWalkLeft,
-    FloorWalkRight,
-    FloorWalkDown,
-    FloorWalkUp,
-
+    Aura,
+    Card,
+    Coin(usize),
+    Cursor,
+    Damage,
+    DamageEnemy,
+    EmptySlot,
+    Fire,
+    FloorBuild,
+    FloorSpawnDown,
     FloorSpawnLeft,
     FloorSpawnRight,
-    FloorSpawnDown,
     FloorSpawnUp,
-
     FloorTarget,
-    FloorBuild,
+    FloorWalkDown,
+    FloorWalkLeft,
+    FloorWalkRight,
+    FloorWalkUp,
+    Freeze,
+    RPM,
+    Range,
+    SellTower,
+    Shop,
+    Smoke,
+    Stone(usize),
+    Take2,
+    Tree1,
+    Tree2,
+    Tree3,
+    Zombie,
 }
 use self::ImgID::*;
 
@@ -72,41 +71,44 @@ impl Data {
     }
 
     pub fn init(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
-        self.load_img(ctx, Cursor, "/cursor.png")?;
-        self.load_img(ctx, SellTower, "/sell_tower.png")?;
-        self.load_img(ctx, Shop, "/shop.png")?;
+        self.load_font(ctx, FontID::Std, "/Typecast.ttf")?;
+        self.load_img(ctx, Archer, "/archer.png")?;
+        self.load_img(ctx, Arrow, "/arrow.png")?;
+        self.load_img(ctx, Aura, "/aura.png")?;
+        self.load_img(ctx, Card, "/card.png")?;
         self.load_img(ctx, Coin(1), "/coin1.png")?;
         self.load_img(ctx, Coin(2), "/coin2.png")?;
         self.load_img(ctx, Coin(3), "/coin3.png")?;
-        self.load_img(ctx, Take2, "/take_2.png")?;
-        self.load_img(ctx, Freeze, "/freeze.png")?;
-	self.load_img(ctx, Card, "/card.png")?;        
-	self.load_img(ctx, Damage, "/damage.png")?;
-        self.load_img(ctx, RPM, "/rpm.png")?;
-        self.load_img(ctx, Range, "/range.png")?;
+        self.load_img(ctx, Cursor, "/cursor.png")?;
+        self.load_img(ctx, Damage, "/damage.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
-        self.load_img(ctx, Smoke, "/smoke.png")?;
+        self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
-        self.load_img(ctx, Zombie, "/enemy.png")?;
-        self.load_img(ctx, Archer, "/archer.png")?;
-        self.load_img(ctx, Arrow, "/arrow.png")?;
-
-        self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;
-        self.load_img(ctx, FloorWalkRight, "/floor_walk_right.png")?;
-        self.load_img(ctx, FloorWalkUp, "/floor_walk_up.png")?;
-        self.load_img(ctx, FloorWalkDown, "/floor_walk_down.png")?;
-
+        self.load_img(ctx, FloorBuild, "/floor_build.png")?;
+        self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
         self.load_img(ctx, FloorSpawnLeft, "/floor_spawn_left.png")?;
         self.load_img(ctx, FloorSpawnRight, "/floor_spawn_right.png")?;
         self.load_img(ctx, FloorSpawnUp, "/floor_spawn_up.png")?;
-        self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
-
         self.load_img(ctx, FloorTarget, "/floor_target.png")?;
-        self.load_img(ctx, FloorBuild, "/floor_build.png")?;
-
-        //self.load_font(ctx, FontID::Std, "/Tangerine_Regular.ttf")?;
-        self.load_font(ctx, FontID::Std, "/Typecast.ttf")?;
+        self.load_img(ctx, FloorWalkDown, "/floor_walk_down.png")?;
+        self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;
+        self.load_img(ctx, FloorWalkRight, "/floor_walk_right.png")?;
+        self.load_img(ctx, FloorWalkUp, "/floor_walk_up.png")?;
+        self.load_img(ctx, Freeze, "/freeze.png")?;
+        self.load_img(ctx, RPM, "/rpm.png")?;
+        self.load_img(ctx, Range, "/range.png")?;
+        self.load_img(ctx, SellTower, "/sell_tower.png")?;
+        self.load_img(ctx, Shop, "/shop.png")?;
+        self.load_img(ctx, Smoke, "/smoke.png")?;
+        self.load_img(ctx, Stone(1), "/stone1.png")?;
+        self.load_img(ctx, Stone(2), "/stone2.png")?;
+        self.load_img(ctx, Stone(3), "/stone3.png")?;
+        self.load_img(ctx, Stone(4), "/stone4.png")?;
+        self.load_img(ctx, Take2, "/take_2.png")?;
+        self.load_img(ctx, Tree1, "/tree1.png")?;
+        self.load_img(ctx, Tree2, "/tree2.png")?;
+        self.load_img(ctx, Tree3, "/tree3.png")?;
+        self.load_img(ctx, Zombie, "/enemy.png")?;
         return Ok(());
     }
 
