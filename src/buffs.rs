@@ -1,6 +1,6 @@
 use crate::curses::CurseType;
 use crate::projectiles::Projectile;
-use crate::towers::Tower;
+use crate::tower::Tower;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum BuffType {
@@ -8,6 +8,7 @@ pub enum BuffType {
     Damage,
     RPM,
     Range,
+    Aura,
 }
 
 pub fn calc_buff_projectile_effect(tower: &Tower, p: &mut Projectile) {

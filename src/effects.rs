@@ -1,4 +1,5 @@
 use crate::assets::{Data, ImgID};
+use crate::buffs::BuffType;
 use ggez::graphics::{self, Point2, Vector2};
 use ggez::{Context, GameResult};
 
@@ -88,10 +89,29 @@ impl Effects {
             .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Smoke)));
     }
 
-    pub fn ice(&mut self, x: f32, y: f32) {
-        self.effects
-            .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Freeze)));
+    pub fn buff(&mut self, x: f32, y: f32, buff: &BuffType) {
+        match buff {
+            BuffType::Aura => self
+                .effects
+                .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Aura))),
+            BuffType::Damage => {
+                self.effects
+                    .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Damage)))
+            }
+            BuffType::Freeze => {
+                self.effects
+                    .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Freeze)))
+            }
+            BuffType::Range => {
+                self.effects
+                    .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Range)))
+            }
+            BuffType::RPM => self
+                .effects
+                .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::RPM))),
+        }
     }
+
     pub fn fire(&mut self, x: f32, y: f32) {
         self.effects
             .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Fire)));
