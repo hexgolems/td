@@ -65,14 +65,14 @@ impl Towers {
         return None;
     }
 
-    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for (_id, t) in self.built.iter() {
+    pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
+        for (_id, t) in state.towers.built.iter() {
             graphics::draw_ex(
                 ctx,
                 data.get_i(&ImgID::Archer),
                 graphics::DrawParam {
                     // src: src,
-                    dest: GameMap::tile_center(t.map_position.0, t.map_position.1),
+                    dest: state.gui.cam().pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),

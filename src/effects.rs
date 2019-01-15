@@ -1,9 +1,11 @@
-use crate::assets::{Data, ImgID};
 use crate::buffs::BuffType;
 use ggez::graphics::{self, Point2, Vector2};
 use ggez::{Context, GameResult};
 
-struct ParticleData {
+use crate::assets::{Data, ImgID};
+use crate::playing_state::PlayingState;
+
+pub struct ParticleData {
     disp: ImgID,
     position: Point2,
     vel: Vector2,
@@ -29,19 +31,19 @@ impl ParticleData {
     }
 }
 
-trait Effect {
+pub trait Effect {
     fn tick(&mut self);
 
     fn get_particles(&self) -> &Vec<ParticleData>;
 
-    fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&self, state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for e in self.get_particles() {
             graphics::draw_ex(
                 ctx,
                 data.get_i(&e.disp),
                 graphics::DrawParam {
                     // src: src,
-                    dest: e.position, //+e.offset_in_tile,
+                    dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
                     rotation: e.rotation,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(e.size, e.size),
@@ -62,7 +64,7 @@ trait Effect {
 }
 
 pub struct Effects {
-    effects: Vec<Box<Effect>>,
+    pub effects: Vec<Box<Effect>>,
 }
 
 impl Effects {
@@ -77,9 +79,9 @@ impl Effects {
         self.effects.retain(|e| e.alive());
     }
 
-    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for e in self.effects.iter() {
-            e.draw(data, ctx)?;
+    pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
+        for e in state.effects.effects.iter() {
+            e.draw(state, data, ctx)?;
         }
         return Ok(());
     }
@@ -111,7 +113,6 @@ impl Effects {
                 .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::RPM))),
         }
     }
-
     pub fn fire(&mut self, x: f32, y: f32) {
         self.effects
             .push(Box::new(SmokeEffect::new(x, y, 4.0, ImgID::Fire)));

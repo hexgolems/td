@@ -27,6 +27,8 @@ pub enum ImgID {
     Freeze,
     RPM,
     Range,
+    NextWave,
+
     SellTower,
     Shop,
     Smoke,
@@ -35,7 +37,9 @@ pub enum ImgID {
     Tree1,
     Tree2,
     Tree3,
+
     Zombie,
+
 }
 use self::ImgID::*;
 
@@ -79,16 +83,24 @@ impl Data {
         self.load_img(ctx, Coin(1), "/coin1.png")?;
         self.load_img(ctx, Coin(2), "/coin2.png")?;
         self.load_img(ctx, Coin(3), "/coin3.png")?;
-        self.load_img(ctx, Cursor, "/cursor.png")?;
+        self.load_img(ctx, Take2, "/take_2.png")?;
+        self.load_img(ctx, Freeze, "/freeze.png")?;
+        self.load_img(ctx, Card, "/card.png")?;        
         self.load_img(ctx, Damage, "/damage.png")?;
+        self.load_img(ctx, RPM, "/rpm.png")?;
+        self.load_img(ctx, Range, "/range.png")?;
+        self.load_img(ctx, NextWave, "/next_wave.png")?; 
+        self.load_img(ctx, Cursor, "/cursor.png")?; 
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
         self.load_img(ctx, FloorBuild, "/floor_build.png")?;
         self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
+
         self.load_img(ctx, FloorSpawnLeft, "/floor_spawn_left.png")?;
         self.load_img(ctx, FloorSpawnRight, "/floor_spawn_right.png")?;
         self.load_img(ctx, FloorSpawnUp, "/floor_spawn_up.png")?;
+
         self.load_img(ctx, FloorTarget, "/floor_target.png")?;
         self.load_img(ctx, FloorWalkDown, "/floor_walk_down.png")?;
         self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;

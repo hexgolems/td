@@ -1,11 +1,13 @@
-use crate::assets::{Data, ImgID};
-use crate::utils::load_specs;
 use ggez::graphics;
 use ggez::graphics::{Point2, Vector2};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use std::collections::HashMap;
 use std::ops::Range;
+
+use crate::assets::{Data, ImgID};
+use crate::utils::load_specs;
+use crate::playing_state::PlayingState;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum WalkDir {
@@ -169,15 +171,15 @@ impl GameMap {
         }
         return spawns;
     }
-    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for x in self.xrange() {
-            for y in self.yrange() {
+    pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
+        for x in state.map.xrange() {
+            for y in state.map.yrange() {
                 graphics::draw_ex(
                     ctx,
-                    data.get_i(&self.images[&self.data[y][x]]),
+                    data.get_i(&state.map.images[&state.map.data[y][x]]),
                     graphics::DrawParam {
                         // src: src,
-                        dest: GameMap::tile_pos(x, y),
+                        dest: state.gui.cam().pos(GameMap::tile_pos(x, y)),
                         //rotation: self.zoomlevel,
                         // offset: Point2::new(-16.0, 0.0),
                         scale: Point2::new(4.0, 4.0),
@@ -188,12 +190,12 @@ impl GameMap {
             }
         }
 
-        for dec in self.decorations.iter() {
+        for dec in state.map.decorations.iter() {
             graphics::draw_ex(
                 ctx,
                 data.get_i(&dec.disp),
                 graphics::DrawParam {
-                    dest: dec.pos,
+                    dest: state.gui.cam().pos(dec.pos),
                     scale: Point2::new(4.0, 4.0),
                     offset: Point2::new(0.5, 1.0),
                     ..Default::default()
