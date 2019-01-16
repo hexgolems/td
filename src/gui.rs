@@ -3,6 +3,7 @@ use ggez::graphics::{self, Point2, Text};
 use ggez::{Context, GameResult};
 
 use crate::assets::{Data, ImgID};
+use crate::camera::Camera;
 use crate::card::CardType;
 use crate::map::GameMap;
 use crate::playing_state::PlayingState;
@@ -17,19 +18,24 @@ pub enum CursorMode {
         card: CardType,
         slot: usize,
     },
-    Hand(usize),
+    Actions(usize),
 }
 
 use self::CursorMode::*;
 
 pub struct Gui {
     cursor_state: CursorMode,
+    camera: Camera,
 }
 
 impl Gui {
     pub fn new() -> Self {
-        let cursor_state = CursorMode::Hand(0);
-        return Self { cursor_state };
+        let cursor_state = CursorMode::Actions(0);
+        let camera = Camera::new();
+        return Self {
+            cursor_state,
+            camera,
+        };
     }
 
     pub fn set_cursor(&mut self, c: CursorMode) {
@@ -37,11 +43,11 @@ impl Gui {
     }
 
     pub fn chancel(state: &mut PlayingState) {
-        state.gui.set_cursor(CursorMode::Hand(0));
+        state.gui.set_cursor(CursorMode::Actions(0));
     }
 
     pub fn move_cursor(state: &mut PlayingState, ix: isize, iy: isize) {
-        let len = state.player().deck.hand.len().clone();
+        let len = state.player().deck.hand.len().clone() + state.player().deck.actions.len();
         match state.gui.cursor_state {
             Map {
                 ref mut x,
@@ -51,9 +57,9 @@ impl Gui {
                 *y = add_mod(*y, iy, state.map.ysize);
                 *x = add_mod(*x, ix, state.map.xsize);
             }
-            Hand(ref mut slot) => {
+            Actions(ref mut slot) => {
                 if len > 0 {
-                    *slot = add_mod(*slot, iy, len);
+                    *slot = add_mod(*slot, ix, len);
                 }
             }
         }
@@ -68,6 +74,10 @@ impl Gui {
         });
     }
 
+    pub fn cam(&self) -> &Camera {
+        return &self.camera;
+    }
+
     fn draw_map_cursor(
         &self,
         x: usize,
@@ -80,7 +90,7 @@ impl Gui {
             data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
                 // src: src,
-                dest: GameMap::tile_pos(x, y),
+                dest: self.camera.pos(GameMap::tile_pos(x, y)),
                 //rotation: self.zoomlevel,
                 offset: Point2::new(1.0 / 22.0, 1.0 / 22.0),
                 scale: Point2::new(4.0, 4.0),
@@ -112,7 +122,7 @@ impl Gui {
                 .get_i(&card.get_preview_image_id()),
             graphics::DrawParam {
                 // src: src,
-                dest: GameMap::tile_center(x, y),
+                dest: state.gui.camera.pos(GameMap::tile_center(x, y)),
                 //rotation: self.zoomlevel,
                 offset: Point2::new(0.5, 0.5),
                 scale: Point2::new(4.0, 4.0),
@@ -130,12 +140,9 @@ impl Gui {
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
                 graphics::DrawParam {
-                    // src: src,
-                    dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
-                    //rotation: self.zoomlevel,
+                    dest: Point2::new(50.0 + (i as f32) * 80.0, 550.0),
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
-                    // shear: shear,
                     ..Default::default()
                 },
             )?;
@@ -144,12 +151,9 @@ impl Gui {
                 ctx,
                 state.data.as_ref().unwrap().get_i(&card.get_image_id()),
                 graphics::DrawParam {
-                    // src: src,
-                    dest: Point2::new(750.0, 40.0 + (i as f32) * 80.0),
-                    //rotation: self.zoomlevel,
+                    dest: Point2::new(50.0 + (i as f32) * 80.0, 550.0),
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
-                    // shear: shear,
                     ..Default::default()
                 },
             )?;
@@ -165,12 +169,9 @@ impl Gui {
                     ctx,
                     &desc,
                     graphics::DrawParam {
-                        // src: src,
-                        dest: Point2::new(780.0, 80.0 + (i as f32) * 80.0),
-                        //rotation: self.zoomlevel,
+                        dest: Point2::new(80.0 + (i as f32) * 80.0, 550.0),
                         offset: Point2::new(1.0, 1.0),
                         scale: Point2::new(1.0, 1.0),
-                        // shear: shear,
                         ..Default::default()
                     },
                 )?;
@@ -179,12 +180,73 @@ impl Gui {
         Ok(())
     }
 
-    fn draw_cards_cursor(&self, slot: usize, data: &Data, ctx: &mut Context) -> GameResult<()> {
+    fn draw_actions(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
+        for (i, card) in state.player().deck.actions.iter().rev().enumerate() {
+            graphics::draw_ex(
+                ctx,
+                state.data.as_ref().unwrap().get_i(&ImgID::Card),
+                graphics::DrawParam {
+                    dest: Point2::new(750.0 - (i as f32) * 80.0, 550.0),
+                    offset: Point2::new(0.5, 0.5),
+                    scale: Point2::new(4.0, 4.0),
+                    ..Default::default()
+                },
+            )?;
+
+            graphics::draw_ex(
+                ctx,
+                state.data.as_ref().unwrap().get_i(&card.get_image_id()),
+                graphics::DrawParam {
+                    dest: Point2::new(750.0 - (i as f32) * 80.0, 550.0),
+                    offset: Point2::new(0.5, 0.5),
+                    scale: Point2::new(4.0, 4.0),
+                    ..Default::default()
+                },
+            )?;
+
+            let cost = card.activation_cost(state);
+            if cost > 0 {
+                let font = state.data.as_ref().unwrap().get_font();
+
+                let mut desc = Text::new(ctx, &format!("{}", cost), font)?;
+                desc.set_filter(graphics::FilterMode::Nearest);
+
+                graphics::draw_ex(
+                    ctx,
+                    &desc,
+                    graphics::DrawParam {
+                        dest: Point2::new(750.0 - (i as f32) * 80.0, 550.0),
+                        offset: Point2::new(1.0, 1.0),
+                        scale: Point2::new(1.0, 1.0),
+                        ..Default::default()
+                    },
+                )?;
+            }
+        }
+        Ok(())
+    }
+
+    fn draw_cards_cursor(
+        state: &PlayingState,
+        slot: usize,
+        data: &Data,
+        ctx: &mut Context,
+    ) -> GameResult<()> {
+        let hand_len = state.player().deck.hand.len();
+        let actions_len = state.player().deck.actions.len();
+        let pos = if slot < hand_len {
+            Point2::new(50.0 + (slot as f32) * 80.0, 550.0)
+        } else {
+            Point2::new(
+                750.0 - ((actions_len - 1 - (slot - hand_len)) as f32) * 80.0,
+                550.0,
+            )
+        };
         graphics::draw_ex(
             ctx,
             data.get_i(&ImgID::Cursor),
             graphics::DrawParam {
-                dest: Point2::new(750.0, 40.0 + (slot as f32) * 80.0),
+                dest: pos,
                 offset: Point2::new(0.5, 0.5),
                 scale: Point2::new(4.0, 4.0),
                 ..Default::default()
@@ -215,12 +277,9 @@ impl Gui {
             ctx,
             &desc,
             graphics::DrawParam {
-                // src: src,
-                dest: Point2::new(10.0, 560.0),
-                //rotation: self.zoomlevel,
+                dest: Point2::new(10.0, 2.0),
                 offset: Point2::new(0.0, 0.0),
                 scale: Point2::new(1.0, 1.0),
-                // shear: shear,
                 ..Default::default()
             },
         )?;
@@ -229,6 +288,8 @@ impl Gui {
 
     pub fn draw(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         Gui::draw_cards(state, ctx)?;
+        Gui::draw_actions(state, ctx)?;
+
         match state.gui.cursor_state {
             CursorMode::Map { x, y, card, .. } => {
                 state
@@ -236,10 +297,8 @@ impl Gui {
                     .draw_map_cursor(x, y, &state.data.as_ref().unwrap(), ctx)?;
                 Gui::draw_effect_preview(state, x, y, card, ctx)?;
             }
-            CursorMode::Hand(slot) => {
-                state
-                    .gui
-                    .draw_cards_cursor(slot, &state.data.as_ref().unwrap(), ctx)?;
+            CursorMode::Actions(slot) => {
+                Gui::draw_cards_cursor(state, slot, &state.data.as_ref().unwrap(), ctx)?;
             }
         }
         Gui::draw_description(state, ctx)?;
@@ -257,7 +316,7 @@ impl Gui {
                 CursorMode::Map { x, y, slot, card } => {
                     Gui::event_activate(state, x, y, slot, card)
                 }
-                CursorMode::Hand(slot) => Gui::event_select(state, slot),
+                CursorMode::Actions(slot) => Gui::event_select(state, slot),
             },
             _ => {}
         }
@@ -271,7 +330,7 @@ impl Gui {
     }
 
     fn event_select(state: &mut PlayingState, slot: usize) {
-        if let Some(card) = state.player().deck.hand.get(slot) {
+        if let Some(card) = state.player().deck.get_selected_card(slot) {
             card.clone().select(state, slot);
         }
     }

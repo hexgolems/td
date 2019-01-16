@@ -115,11 +115,11 @@ impl event_handler::GameState for PlayingState {
         }
         graphics::clear(ctx);
         graphics::set_color(ctx, graphics::WHITE)?;
-        self.map.draw(&self.data.as_ref().unwrap(), ctx)?;
-        self.enemies.draw(&self.data.as_ref().unwrap(), ctx)?;
-        self.towers.draw(&self.data.as_ref().unwrap(), ctx)?;
-        self.projectiles.draw(&self.data.as_ref().unwrap(), ctx)?;
-        self.effects.draw(&self.data.as_ref().unwrap(), ctx)?;
+        GameMap::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
+        Enemies::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
+        Towers::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
+        Projectiles::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
+        Effects::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         Gui::draw(self, ctx)?;
 
         graphics::present(ctx);

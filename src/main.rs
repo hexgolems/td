@@ -14,6 +14,7 @@ use std::path;
 
 mod assets;
 mod buffs;
+mod camera;
 mod card;
 mod curses;
 mod effects;

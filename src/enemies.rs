@@ -91,8 +91,8 @@ impl Enemies {
         self.id += 1;
     }
 
-    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for e in self.enemies.values() {
+    pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
+        for e in state.enemies.enemies.values() {
             let mut color = e.color;
             if e.curses.contains(&CurseType::Freeze) {
                 color = (0.0, 0.0, 1.0);
@@ -102,7 +102,7 @@ impl Enemies {
                 data.get_i(&e.disp),
                 graphics::DrawParam {
                     // src: src,
-                    dest: e.position, //+e.offset_in_tile,
+                    dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0 * e.size, 4.0 * e.size),

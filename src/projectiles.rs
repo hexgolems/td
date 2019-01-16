@@ -79,8 +79,8 @@ impl Projectiles {
         self.id = self.id.wrapping_add(1);
     }
 
-    pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for p in self.projectiles.values() {
+    pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
+        for p in state.projectiles.projectiles.values() {
             let dir = p.next_walk_target - p.position;
             let rot = dir.y.atan2(dir.x);
             graphics::draw_ex(
@@ -88,7 +88,7 @@ impl Projectiles {
                 data.get_i(&p.disp),
                 graphics::DrawParam {
                     // src: src,
-                    dest: p.position, //+p.offset_in_tile,
+                    dest: state.gui.cam().pos(p.position), //+p.offset_in_tile,
                     rotation: rot,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),

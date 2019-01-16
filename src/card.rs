@@ -5,6 +5,7 @@ use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
 use crate::tower::Tower;
+use crate::wave::WaveStatus;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
@@ -19,6 +20,7 @@ pub enum CardType {
     Coin(usize),
     Take2,
     Buff(BuffType),
+    NextWave,
 }
 use self::CardType::*;
 
@@ -37,6 +39,7 @@ impl CardType {
             CardType::Buff(BuffType::Range) => ImgID::Range,
             CardType::Buff(BuffType::Damage) => ImgID::Damage,
             CardType::Buff(BuffType::Aura) => ImgID::Aura,
+            CardType::NextWave => ImgID::NextWave,
         }
     }
 
@@ -61,6 +64,7 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => "Increases damage",
             CardType::Buff(BuffType::RPM) => "Increases rpm",
             CardType::Buff(BuffType::Aura) => "Increases stats of nearby towers",
+            CardType::NextWave => "Immediatly starts next wave",
         }
     }
 
@@ -81,6 +85,7 @@ impl CardType {
             CardType::Buff(BuffType::RPM) => 10,
             CardType::Buff(BuffType::Range) => 10,
             CardType::Buff(BuffType::Aura) => 10,
+            CardType::NextWave => 0,
         }
     }
 
@@ -96,6 +101,7 @@ impl CardType {
             CardType::Coin(3) => 3000,
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 50,
+            CardType::NextWave => 50,
             CardType::Buff(BuffType::Freeze) => 10,
             CardType::Buff(BuffType::Damage) => 10,
             CardType::Buff(BuffType::RPM) => 10,
@@ -116,7 +122,7 @@ impl CardType {
                 state.player_mut().deck.card_used(slot);
                 let cards = state.player().deck.hand.len();
                 if slot > 0 && slot == cards {
-                    state.gui.set_cursor(CursorMode::Hand(slot - 1));
+                    state.gui.set_cursor(CursorMode::Actions(slot - 1));
                 }
             }
             CardType::Take2 => {
@@ -128,6 +134,11 @@ impl CardType {
             CardType::Buff(BuffType::Range) => state.gui.set_cursor_card_effect(slot, self),
             CardType::Buff(BuffType::RPM) => state.gui.set_cursor_card_effect(slot, self),
             CardType::Buff(BuffType::Aura) => state.gui.set_cursor_card_effect(slot, self),
+            CardType::NextWave => {
+                if let WaveStatus::Waiting(_) = state.waves.status {
+                    state.waves.status = WaveStatus::Waiting(0);
+                }
+            }
         }
     }
 
@@ -151,6 +162,7 @@ impl CardType {
             CardType::Shop => return false,
             CardType::Coin(_) => return false,
             CardType::Take2 => return false,
+            CardType::NextWave => return false,
             CardType::Buff(b) => {
                 return state.towers.has_building(x, y)
                     && state.towers.get_tower(x, y).unwrap().can_have_aura(b);
@@ -164,26 +176,27 @@ impl CardType {
             CardType::Empty => {}
             CardType::Tower => {
                 state.towers.spawn(Tower::new((x, y)));
-                state.gui.set_cursor(CursorMode::Hand(0));
+                state.gui.set_cursor(CursorMode::Actions(0));
                 let pos = GameMap::tile_center(x, y);
                 state.effects.smoke(pos.x, pos.y)
             }
             CardType::SellTower => {
                 state.towers.remove_tower(x, y);
-                state.gui.set_cursor(CursorMode::Hand(0));
+                state.gui.set_cursor(CursorMode::Actions(0));
             }
             CardType::DamageEnemy => {
                 for e in state.enemies.in_range(GameMap::tile_center(x, y), 80.0) {
                     state.enemies.damage(e, 150, &HashSet::new());
                 }
-                state.gui.set_cursor(CursorMode::Hand(0));
+                state.gui.set_cursor(CursorMode::Actions(0));
             }
             CardType::Shop => {}
             CardType::Coin(_) => {}
             CardType::Take2 => {}
+            CardType::NextWave => {}
             CardType::Buff(b) => {
                 state.towers.get_tower_mut(x, y).unwrap().add_buff(*b);
-                state.gui.set_cursor(CursorMode::Hand(0));
+                state.gui.set_cursor(CursorMode::Actions(0));
                 let pos = GameMap::tile_center(x, y);
                 state.effects.buff(pos.x, pos.y, b)
             }
@@ -193,6 +206,7 @@ impl CardType {
 
 pub struct CardDeck {
     pub hand: Vec<CardType>,
+    pub actions: Vec<CardType>,
     pub deck: Vec<CardType>,
     pub discard: Vec<CardType>,
 }
@@ -201,23 +215,23 @@ impl CardDeck {
     pub fn new() -> Self {
         let hand = vec![];
         let deck = vec![
-            Tower,
             Coin(1),
             Coin(1),
             Coin(1),
             Coin(1),
             Coin(1),
-            Shop,
             Buff(BuffType::Aura),
             Buff(BuffType::Damage),
             Buff(BuffType::Freeze),
             Buff(BuffType::RPM),
             Buff(BuffType::Range),
         ];
+        let actions = vec![NextWave, Tower, Shop];
         let discard = vec![];
         Self {
             hand,
             deck,
+            actions,
             discard,
         }
     }
@@ -228,9 +242,18 @@ impl CardDeck {
     }
 
     pub fn card_used(&mut self, slot: usize) {
-        assert!(self.hand[slot] != CardType::Empty);
-        self.discard.push(self.hand[slot]);
-        self.hand.remove(slot);
+        if slot < self.hand.len() {
+            assert!(self.hand[slot] != CardType::Empty);
+            self.discard.push(self.hand[slot]);
+            self.hand.remove(slot);
+        }
+    }
+
+    pub fn get_selected_card(&self, slot: usize) -> Option<&CardType> {
+        if slot < self.hand.len() {
+            return self.hand.get(slot);
+        }
+        return self.actions.get(slot - self.hand.len());
     }
 
     pub fn shuffle(&mut self) {
