@@ -3,12 +3,12 @@ use ggez::graphics::{self, Point2, Text};
 use ggez::{Context, GameResult};
 
 use crate::assets::{Data, ImgID};
+use crate::camera::Camera;
 use crate::card::CardType;
 use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
 use crate::wave::WaveStatus;
-use crate::camera::Camera;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CursorMode {
@@ -32,7 +32,10 @@ impl Gui {
     pub fn new() -> Self {
         let cursor_state = CursorMode::Actions(0);
         let camera = Camera::new();
-        return Self { cursor_state, camera };
+        return Self {
+            cursor_state,
+            camera,
+        };
     }
 
     pub fn set_cursor(&mut self, c: CursorMode) {
@@ -223,13 +226,21 @@ impl Gui {
         Ok(())
     }
 
-    fn draw_cards_cursor(state: &PlayingState, slot: usize, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        let hand_len =state.player().deck.hand.len();
-        let actions_len =state.player().deck.actions.len();
+    fn draw_cards_cursor(
+        state: &PlayingState,
+        slot: usize,
+        data: &Data,
+        ctx: &mut Context,
+    ) -> GameResult<()> {
+        let hand_len = state.player().deck.hand.len();
+        let actions_len = state.player().deck.actions.len();
         let pos = if slot < hand_len {
             Point2::new(50.0 + (slot as f32) * 80.0, 550.0)
         } else {
-            Point2::new(750.0 - ( (actions_len - 1 - (slot - hand_len) ) as f32) * 80.0, 550.0)
+            Point2::new(
+                750.0 - ((actions_len - 1 - (slot - hand_len)) as f32) * 80.0,
+                550.0,
+            )
         };
         graphics::draw_ex(
             ctx,

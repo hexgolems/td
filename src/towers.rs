@@ -72,7 +72,10 @@ impl Towers {
                 data.get_i(&ImgID::Archer),
                 graphics::DrawParam {
                     // src: src,
-                    dest: state.gui.cam().pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                    dest: state
+                        .gui
+                        .cam()
+                        .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                     //rotation: self.zoomlevel,
                     offset: Point2::new(0.5, 0.5),
                     scale: Point2::new(4.0, 4.0),
@@ -90,7 +93,10 @@ impl Towers {
                     data.get_i(&buff_to_img(buff)),
                     graphics::DrawParam {
                         // src: src,
-                        dest: GameMap::tile_center(t.map_position.0, t.map_position.1),
+                        dest: state
+                            .gui
+                            .cam()
+                            .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                         //rotation: self.zoomlevel,
                         offset: offset,
                         scale: Point2::new(1.0, 1.0),

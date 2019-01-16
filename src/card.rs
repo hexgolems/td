@@ -5,7 +5,7 @@ use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
 use crate::tower::Tower;
-use crate::wave::{WaveStatus};
+use crate::wave::WaveStatus;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashSet;
@@ -64,7 +64,7 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => "Increases damage",
             CardType::Buff(BuffType::RPM) => "Increases rpm",
             CardType::Buff(BuffType::Aura) => "Increases stats of nearby towers",
-            CardType::NextWave => "Immediatly starts next wave"
+            CardType::NextWave => "Immediatly starts next wave",
         }
     }
 
@@ -138,8 +138,8 @@ impl CardType {
                 if let WaveStatus::Waiting(_) = state.waves.status {
                     state.waves.status = WaveStatus::Waiting(0);
                 }
-            },        
-	}
+            }
+        }
     }
 
     pub fn is_applicable(&self, state: &PlayingState, x: usize, y: usize) -> bool {
@@ -226,11 +226,7 @@ impl CardDeck {
             Buff(BuffType::RPM),
             Buff(BuffType::Range),
         ];
-        let actions = vec![
-            NextWave,
-            Tower,
-            Shop,
-        ];
+        let actions = vec![NextWave, Tower, Shop];
         let discard = vec![];
         Self {
             hand,
@@ -253,7 +249,7 @@ impl CardDeck {
         }
     }
 
-    pub fn get_selected_card(&self, slot: usize) -> Option<&CardType>{
+    pub fn get_selected_card(&self, slot: usize) -> Option<&CardType> {
         if slot < self.hand.len() {
             return self.hand.get(slot);
         }

@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use std::ops::Range;
 
 use crate::assets::{Data, ImgID};
-use crate::utils::load_specs;
 use crate::playing_state::PlayingState;
+use crate::utils::load_specs;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum WalkDir {

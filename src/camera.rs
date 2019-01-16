@@ -5,11 +5,13 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self{
-        return Self{translate: Vector2::new(40.0,40.0)}; 
+    pub fn new() -> Self {
+        return Self {
+            translate: Vector2::new(40.0, 40.0),
+        };
     }
 
     pub fn pos(&self, p: Point2) -> Point2 {
-        return p+self.translate;
+        return p + self.translate;
     }
 }
