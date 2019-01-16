@@ -151,7 +151,10 @@ impl CardType {
             CardType::Shop => return false,
             CardType::Coin(_) => return false,
             CardType::Take2 => return false,
-            CardType::Buff(_) => return state.towers.has_building(x, y),
+            CardType::Buff(b) => {
+                return state.towers.has_building(x, y)
+                    && state.towers.get_tower(x, y).unwrap().can_have_aura(b);
+            }
         }
     }
 

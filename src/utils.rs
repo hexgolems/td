@@ -1,3 +1,5 @@
+use crate::assets::ImgID;
+use crate::buffs::BuffType;
 use ggez::graphics::Point2;
 use ron;
 use ron::de::from_reader;
@@ -41,4 +43,14 @@ where
         }
     };
     return specs;
+}
+
+pub fn buff_to_img(buff: &BuffType) -> ImgID {
+    return match buff {
+        BuffType::Aura => ImgID::Aura,
+        BuffType::Damage => ImgID::Damage,
+        BuffType::RPM => ImgID::RPM,
+        BuffType::Freeze => ImgID::Freeze,
+        BuffType::Range => ImgID::Range,
+    };
 }
