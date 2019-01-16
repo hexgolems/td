@@ -9,6 +9,7 @@ use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::tower::Tower;
 use crate::tower_stats::TowerStats;
+use crate::utils::buff_to_img;
 use crate::utils::load_specs;
 
 pub struct Towers {
@@ -57,6 +58,13 @@ impl Towers {
         return None;
     }
 
+    pub fn get_tower(&self, x: usize, y: usize) -> Option<&Tower> {
+        if let Some(id) = self.position_to_towerid.get(&(x, y)) {
+            return self.built.get(&id);
+        }
+        return None;
+    }
+
     pub fn draw(&self, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for (_id, t) in self.built.iter() {
             graphics::draw_ex(
@@ -72,6 +80,25 @@ impl Towers {
                     ..Default::default()
                 },
             )?;
+            for (i, buff) in t.buff_to_level.keys().into_iter().enumerate() {
+                let mut offset = Point2::new(1.25, -0.75);
+                if i == 1 {
+                    offset = Point2::new(-0.25, -0.75);
+                }
+                graphics::draw_ex(
+                    ctx,
+                    data.get_i(&buff_to_img(buff)),
+                    graphics::DrawParam {
+                        // src: src,
+                        dest: GameMap::tile_center(t.map_position.0, t.map_position.1),
+                        //rotation: self.zoomlevel,
+                        offset: offset,
+                        scale: Point2::new(1.0, 1.0),
+                        // shear: shear,
+                        ..Default::default()
+                    },
+                )?;
+            }
         }
         Ok(())
     }

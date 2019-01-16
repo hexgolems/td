@@ -28,6 +28,16 @@ impl Tower {
         return *self.buff_to_level.get(&BuffType::Aura).unwrap_or(&0);
     }
 
+    pub fn can_have_aura(&self, buff: &BuffType) -> bool {
+        if self.buff_to_level.keys().count() < 2 {
+            return true;
+        }
+        if let Some(_) = self.buff_to_level.get(buff) {
+            return true;
+        }
+        return false;
+    }
+
     pub fn add_buff(&mut self, buff: BuffType) {
         match self.buff_to_level.get(&buff) {
             Some(x) => self.buff_to_level.insert(buff, x + 1),
