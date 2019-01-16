@@ -1,8 +1,7 @@
-use crate::curses::CurseType;
-use crate::projectiles::Projectile;
-use crate::tower::Tower;
+use std::collections::HashMap;
+use std::rc::Rc;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum BuffType {
     Freeze,
     Damage,
@@ -11,8 +10,48 @@ pub enum BuffType {
     Aura,
 }
 
-pub fn calc_buff_projectile_effect(tower: &Tower, p: &mut Projectile) {
-    if tower.get_buffs().contains_key(&BuffType::Freeze) {
-        p.add_curse(CurseType::Freeze);
+#[derive(Debug, Deserialize, Clone)]
+pub struct BuffStats {
+    pub kind: BuffType,
+    pub level_to_effectiveness: HashMap<usize, usize>,
+    pub level_to_cooldown: HashMap<usize, usize>,
+    pub level_to_price: HashMap<usize, usize>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Buff {
+    pub stats: Rc<BuffStats>,
+    pub level: usize,
+}
+
+impl Buff {
+    pub fn new(stats: Rc<BuffStats>) -> Self {
+        let level = 1;
+        return Self { stats, level };
+    }
+
+    pub fn effectiveness(&self) -> usize {
+        return *self
+            .stats
+            .level_to_effectiveness
+            .get(&self.level)
+            .unwrap_or(&0);
+    }
+
+    pub fn cooldown(&self) -> usize {
+        return *self.stats.level_to_cooldown.get(&self.level).unwrap_or(&0);
+    }
+
+    pub fn upgrade(&mut self) {
+        if self.upgradeable() {
+            self.level += 1;
+        }
+    }
+
+    pub fn upgradeable(&self) -> bool {
+        if self.level < 5 {
+            return true;
+        }
+        return false;
     }
 }

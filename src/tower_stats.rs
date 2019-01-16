@@ -1,4 +1,4 @@
-use crate::buffs::BuffType;
+use crate::buffs::{Buff, BuffType};
 use crate::tower::Tower;
 use std::collections::HashMap;
 
@@ -12,45 +12,29 @@ pub struct TowerStats {
 }
 
 impl TowerStats {
-    pub fn get_buffed_stats(
-        t: &Tower,
-        aura_buffs_to_level: &HashMap<BuffType, usize>,
-        base: &TowerStats,
-    ) -> Self {
+    pub fn get_buffed_stats(t: &Tower, auras: &HashMap<BuffType, Buff>, base: &TowerStats) -> Self {
         let mut base = base.clone();
         let buffs = t.get_buffs();
-        base.rpm += base.get_buffed_rpm(buffs, aura_buffs_to_level);
-        base.damage += base.get_buffed_damage(buffs, aura_buffs_to_level);
-        base.range += base.get_buffed_range(buffs, aura_buffs_to_level);
+        base.rpm += base.get_buffed(buffs, auras, &BuffType::RPM);
+        base.damage += base.get_buffed(buffs, auras, &BuffType::Damage);
+        base.range += base.get_buffed(buffs, auras, &BuffType::Range) as f32;
         return base;
     }
 
-    fn get_buffed_range(
+    fn get_buffed(
         &self,
-        buffs: &HashMap<BuffType, usize>,
-        auras: &HashMap<BuffType, usize>,
-    ) -> f32 {
-        return (40
-            * (buffs.get(&BuffType::Range).unwrap_or(&0)
-                + auras.get(&BuffType::Range).unwrap_or(&0))) as f32;
-    }
-
-    fn get_buffed_damage(
-        &self,
-        buffs: &HashMap<BuffType, usize>,
-        auras: &HashMap<BuffType, usize>,
+        buffs: &HashMap<BuffType, Buff>,
+        auras: &HashMap<BuffType, Buff>,
+        buff_type: &BuffType,
     ) -> usize {
-        return 25
-            * (buffs.get(&BuffType::Damage).unwrap_or(&0)
-                + auras.get(&BuffType::Damage).unwrap_or(&0));
-    }
-
-    fn get_buffed_rpm(
-        &self,
-        buffs: &HashMap<BuffType, usize>,
-        auras: &HashMap<BuffType, usize>,
-    ) -> usize {
-        return 30
-            * (buffs.get(&BuffType::RPM).unwrap_or(&0) + auras.get(&BuffType::RPM).unwrap_or(&0));
+        let own = match buffs.get(buff_type) {
+            Some(buff) => buff.effectiveness(),
+            None => 0,
+        };
+        let from_aura = match auras.get(buff_type) {
+            Some(buff) => buff.effectiveness(),
+            None => 0,
+        };
+        return own + from_aura;
     }
 }
