@@ -1,5 +1,6 @@
 use crate::assets::{Data, ImgID};
-use crate::curses::CurseType;
+use crate::buffs::BuffType;
+use crate::debuffs::Debuff;
 use crate::effects::Effects;
 use crate::enemies::Enemies;
 use crate::playing_state::PlayingState;
@@ -7,7 +8,7 @@ use crate::utils::move_to;
 use ggez::graphics;
 use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Projectile {
@@ -19,7 +20,7 @@ pub struct Projectile {
     speed: f32,
     next_walk_target: graphics::Point2,
     reached_goal: bool,
-    curses: HashSet<CurseType>,
+    debuffs: HashMap<BuffType, Debuff>,
 }
 
 impl Projectile {
@@ -32,7 +33,7 @@ impl Projectile {
     ) -> Self {
         return Self {
             disp: ImgID::Arrow,
-            curses: HashSet::new(),
+            debuffs: HashMap::new(),
             tower_id,
             enemy_id,
             position,
@@ -51,13 +52,23 @@ impl Projectile {
         self.position = new_pos;
         self.reached_goal = finished;
         if self.reached_goal == true {
-            enemies.damage(self.enemy_id, self.damage, &self.curses);
+            enemies.damage(self.enemy_id, self.damage);
+            enemies.debuff(self.enemy_id, &self.debuffs);
             effects.smoke(self.next_walk_target.x, self.next_walk_target.y);
         }
     }
 
-    pub fn add_curse(&mut self, curse: CurseType) {
-        self.curses.insert(curse);
+    pub fn add_debuff(&mut self, debuff: Debuff) {
+        match self.debuffs.get(&debuff.kind) {
+            Some(own) => {
+                if own.effectiveness < debuff.effectiveness {
+                    self.debuffs.insert(debuff.kind, debuff);
+                }
+            }
+            None => {
+                self.debuffs.insert(debuff.kind, debuff);
+            }
+        }
     }
 }
 

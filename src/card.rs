@@ -8,7 +8,6 @@ use crate::tower::Tower;
 use crate::wave::WaveStatus;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::collections::HashSet;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CardType {
@@ -165,7 +164,7 @@ impl CardType {
             CardType::NextWave => return false,
             CardType::Buff(b) => {
                 return state.towers.has_building(x, y)
-                    && state.towers.get_tower(x, y).unwrap().can_have_aura(b);
+                    && state.towers.get_tower(x, y).unwrap().can_have_buff(b);
             }
         }
     }
@@ -186,7 +185,7 @@ impl CardType {
             }
             CardType::DamageEnemy => {
                 for e in state.enemies.in_range(GameMap::tile_center(x, y), 80.0) {
-                    state.enemies.damage(e, 150, &HashSet::new());
+                    state.enemies.damage(e, 150);
                 }
                 state.gui.set_cursor(CursorMode::Actions(0));
             }
@@ -195,7 +194,7 @@ impl CardType {
             CardType::Take2 => {}
             CardType::NextWave => {}
             CardType::Buff(b) => {
-                state.towers.get_tower_mut(x, y).unwrap().add_buff(*b);
+                state.towers.add_buff_at_pos(x, y, *b);
                 state.gui.set_cursor(CursorMode::Actions(0));
                 let pos = GameMap::tile_center(x, y);
                 state.effects.buff(pos.x, pos.y, b)
@@ -249,15 +248,15 @@ impl CardDeck {
         }
     }
 
+    pub fn shuffle(&mut self) {
+        self.deck.as_mut_slice().shuffle(&mut thread_rng());
+    }
+
     pub fn get_selected_card(&self, slot: usize) -> Option<&CardType> {
         if slot < self.hand.len() {
             return self.hand.get(slot);
         }
         return self.actions.get(slot - self.hand.len());
-    }
-
-    pub fn shuffle(&mut self) {
-        self.deck.as_mut_slice().shuffle(&mut thread_rng());
     }
 
     pub fn draw(&mut self, n: usize) {

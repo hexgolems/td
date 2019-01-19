@@ -13,7 +13,7 @@ impl Player {
         deck.shuffle();
         deck.draw(5);
         let hp = 10;
-        let gold = 30;
+        let gold = 3000;
         Self { id, deck, hp, gold }
     }
 }

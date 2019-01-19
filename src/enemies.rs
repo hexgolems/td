@@ -1,78 +1,12 @@
-use crate::assets::{Data, ImgID};
-use crate::curses::CurseType;
-use crate::map::{GameMap, MapTile, WalkDir};
+use crate::assets::Data;
+use crate::buffs::BuffType;
+use crate::debuffs::Debuff;
+use crate::enemy::Enemy;
 use crate::playing_state::PlayingState;
 use crate::utils::distance;
-use crate::utils::move_to;
-use crate::wave::WaveSpec;
-use ggez::graphics::{self, Point2, Vector2};
+use ggez::graphics::{self, Point2};
 use ggez::{Context, GameResult};
-use rand::prelude::*;
-use std::collections::{HashMap, HashSet};
-
-pub struct Enemy {
-    disp: ImgID,
-    pub position: graphics::Point2,
-    health: usize,
-    walk_speed: f32,
-    next_walk_target: graphics::Point2,
-    reached_goal: bool,
-    color: (f32, f32, f32),
-    size: f32,
-    curses: HashSet<CurseType>,
-}
-
-impl Enemy {
-    pub fn new(position: graphics::Point2, spec: &WaveSpec) -> Self {
-        return Self {
-            disp: spec.img,
-            position,
-            health: spec.health,
-            next_walk_target: position,
-            walk_speed: spec.speed,
-            color: spec.color,
-            size: spec.size,
-            curses: HashSet::new(),
-            reached_goal: false,
-        };
-    }
-
-    pub fn tick(&mut self, map: &GameMap) {
-        let (new_pos, finished) =
-            move_to(self.position, self.next_walk_target, self.get_walk_speed());
-        self.position = new_pos;
-        if finished {
-            let offset = (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
-                - Vector2::new(30.0, 30.0);
-            self.next_walk_target = match map.tile_at(self.position) {
-                MapTile::Walk(a) => self.walk_target(a) + offset,
-                MapTile::Spawn(a) => self.walk_target(a) + offset,
-                MapTile::Target => {
-                    self.reached_goal = true;
-                    self.position
-                }
-                _ => self.position,
-            };
-        }
-    }
-
-    pub fn get_walk_speed(&self) -> f32 {
-        if self.curses.contains(&CurseType::Freeze) {
-            return self.walk_speed * 0.7;
-        }
-        return self.walk_speed;
-    }
-
-    fn walk_target(&mut self, dir: WalkDir) -> Point2 {
-        let (x, y) = GameMap::tile_index_at(self.position);
-        return match dir {
-            WalkDir::Up => GameMap::tile_center(x, y - 1),
-            WalkDir::Down => GameMap::tile_center(x, y + 1),
-            WalkDir::Left => GameMap::tile_center(x - 1, y),
-            WalkDir::Right => GameMap::tile_center(x + 1, y),
-        };
-    }
-}
+use std::collections::HashMap;
 
 pub struct Enemies {
     pub enemies: HashMap<usize, Enemy>,
@@ -94,8 +28,13 @@ impl Enemies {
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for e in state.enemies.enemies.values() {
             let mut color = e.color;
-            if e.curses.contains(&CurseType::Freeze) {
-                color = (0.0, 0.0, 1.0);
+            match e.debuffs.get(&BuffType::Freeze) {
+                Some(debuffs) => {
+                    if debuffs.len() > 0 {
+                        color = (0.5, 5.0, 1.0);
+                    }
+                }
+                None => (),
             }
             graphics::draw_ex(
                 ctx,
@@ -149,12 +88,18 @@ impl Enemies {
             .retain(|_id, e| e.reached_goal == false);
     }
 
-    pub fn damage(&mut self, id: usize, damage: usize, curses: &HashSet<CurseType>) {
+    pub fn debuff(&mut self, id: usize, debuffs: &HashMap<BuffType, Debuff>) {
+        if let Some(e) = self.enemies.get_mut(&id) {
+            for (bt, d) in debuffs.iter() {
+                let debuff_vec = e.debuffs.entry(*bt).or_insert(Vec::new());
+                debuff_vec.push(d.clone());
+            }
+        }
+    }
+
+    pub fn damage(&mut self, id: usize, damage: usize) {
         if let Some(e) = self.enemies.get_mut(&id) {
             e.health = e.health.saturating_sub(damage);
-            for c in curses.iter() {
-                e.curses.insert(c.clone());
-            }
         }
     }
 

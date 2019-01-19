@@ -1,5 +1,5 @@
 use crate::assets::ImgID;
-use crate::enemies::Enemy;
+use crate::enemy::Enemy;
 use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::utils::load_specs;
