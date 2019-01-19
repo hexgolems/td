@@ -180,6 +180,47 @@ impl Gui {
         Ok(())
     }
 
+    fn draw_card_info(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
+        if let Actions(id) = state.gui.cursor_state {
+            if let Some(card) = state.player().deck.get_selected_card(id) {
+                graphics::draw_ex(
+                    ctx,
+                    state.data.as_ref().unwrap().get_i(&card.get_image_id()),
+                    graphics::DrawParam {
+                        // src: src,
+                        dest: Point2::new(600.0, 40.0),
+                        //rotation: self.zoomlevel,
+                        offset: Point2::new(0.0, 0.0),
+                        scale: Point2::new(8.0, 8.0),
+                        // shear: shear,
+                        ..Default::default()
+                    },
+                )?;
+                let font = state.data.as_ref().unwrap().get_font();
+                let (_, txts) = font.get_wrap(card.get_description(), 200);
+                for (i, txt) in txts.iter().enumerate() {
+                    let mut desc = Text::new(ctx, txt, font)?;
+                    desc.set_filter(graphics::FilterMode::Nearest);
+
+                    graphics::draw_ex(
+                        ctx,
+                        &desc,
+                        graphics::DrawParam {
+                            // src: src,
+                            dest: Point2::new(600.0, 200.0 + (i as f32) * 30.0),
+                            //rotation: self.zoomlevel,
+                            offset: Point2::new(0.0, 0.0),
+                            scale: Point2::new(1.0, 1.0),
+                            // shear: shear,
+                            ..Default::default()
+                        },
+                    )?;
+                }
+            }
+        }
+        return Ok(());
+    }
+
     fn draw_actions(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         for (i, card) in state.player().deck.actions.iter().rev().enumerate() {
             graphics::draw_ex(
@@ -299,6 +340,7 @@ impl Gui {
             }
             CursorMode::Actions(slot) => {
                 Gui::draw_cards_cursor(state, slot, &state.data.as_ref().unwrap(), ctx)?;
+                Gui::draw_card_info(state, ctx)?;
             }
         }
         Gui::draw_description(state, ctx)?;
