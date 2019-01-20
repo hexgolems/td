@@ -7,7 +7,7 @@ use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
 use crate::wave::WaveStatus;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text, TextFragment};
+use ggez::graphics::{self, Scale, Text, TextFragment};
 use ggez::{Context, GameResult};
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]

@@ -1,4 +1,4 @@
-use crate::algebra::{Point, Vector};
+use crate::algebra::Point;
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use ron;
