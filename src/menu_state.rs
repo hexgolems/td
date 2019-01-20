@@ -3,8 +3,8 @@ use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
-use ggez::event::{KeyCode, Mod};
-use ggez::graphics::{self, Color, Text};
+use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{self, Color, Scale, Text, TextFragment};
 use ggez::{Context, GameResult};
 
 enum MenuItem {
@@ -45,11 +45,11 @@ impl event_handler::GameState for MenuState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
-        graphics::set_color(ctx, graphics::WHITE)?;
+        //graphics::set_color(ctx, graphics::WHITE)?;
 
         let font = self.data.as_ref().unwrap().get_font();
         for (i, item) in self.options.iter().enumerate() {
-            let tf = TextFragment::new(&item.get_text());
+            let tf = TextFragment::new(item.get_text());
             let mut desc = Text::new(tf);
             desc.set_font(*font, Scale::uniform(1.0));
             //desc.set_filter(graphics::FilterMode::Nearest);
@@ -81,7 +81,7 @@ impl event_handler::GameState for MenuState {
         &mut self,
         _ctx: &mut Context,
         keycode: KeyCode,
-        _keymod: Mod,
+        _keymod: KeyMods,
         _repeat: bool,
     ) -> StateTransition {
         match keycode {

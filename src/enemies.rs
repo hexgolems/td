@@ -5,7 +5,7 @@ use crate::debuffs::Debuff;
 use crate::enemy::Enemy;
 use crate::playing_state::PlayingState;
 use crate::utils::distance;
-use ggez::graphics::{self, Point};
+use ggez::graphics;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 

@@ -6,8 +6,8 @@ use crate::event_handler::StateTransition;
 use crate::overlay_state::OverlayState;
 use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
-use ggez::event::{KeyCode, Mod};
-use ggez::graphics::{self, Scale, Text};
+use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{self, Color, Scale, Text, TextFragment};
 use ggez::{Context, GameResult};
 
 pub struct ShopOverlay {
@@ -80,7 +80,7 @@ impl ShopOverlay {
             if cost > 0 {
                 let font = state.data.as_ref().unwrap().get_font();
 
-                let tf = TextFragment::new(&format!("{}", cost));
+                let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
                 desc.set_font(*font, Scale::uniform(1.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
@@ -145,13 +145,13 @@ impl ShopOverlay {
         let txt = card.get_description();
         let mut desc = Text::new(txt);
         desc.set_font(*font, Scale::uniform(1.0));
-        //desc.set_filter(graphics::FilterMode::Nearest);
+        //desc.set_filter(graphics::FilterKeyModse::Nearest);
         graphics::draw(
             ctx,
             &desc,
             graphics::DrawParam {
                 // src: src,
-                dest: Point::new(300.0, 200.0 + (i as f32) * 30.0),
+                dest: Point::new(300.0, 200.0),
                 //rotation: self.zoomlevel,
                 offset: Point::new(0.0, 0.0),
                 scale: Vector::new(1.0, 1.0),
@@ -170,7 +170,7 @@ impl OverlayState for ShopOverlay {
 
     fn draw(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
-        graphics::set_color(ctx, graphics::WHITE)?;
+        //graphics::set_color(ctx, graphics::WHITE)?;
         self.draw_available_cards(state, ctx)?;
         self.draw_cursor(state, ctx)?;
         self.draw_selected(state, ctx)?;
@@ -182,7 +182,7 @@ impl OverlayState for ShopOverlay {
         &mut self,
         state: &mut PlayingState,
         keycode: KeyCode,
-        _keymod: Mod,
+        _keymod: KeyMods,
         _repeat: bool,
     ) -> StateTransition {
         match keycode {

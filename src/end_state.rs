@@ -2,8 +2,8 @@ use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::menu_state::MenuState;
-use ggez::event::{KeyCode, Mod};
-use ggez::graphics::{self, Color, Text};
+use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{self, Color, Scale, Text, TextFragment};
 use ggez::{Context, GameResult};
 
 pub struct EndState {
@@ -33,7 +33,7 @@ impl event_handler::GameState for EndState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
-        graphics::set_color(ctx, graphics::WHITE)?;
+        //graphics::set_color(ctx, graphics::WHITE)?;
 
         let font = self.data.as_ref().unwrap().get_font();
         let text = if self.victory {
@@ -73,7 +73,7 @@ impl event_handler::GameState for EndState {
         &mut self,
         _ctx: &mut Context,
         keycode: KeyCode,
-        _keymod: Mod,
+        _keymod: KeyMods,
         _repeat: bool,
     ) -> StateTransition {
         match keycode {

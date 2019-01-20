@@ -1,4 +1,4 @@
-use ggez::event::{self, KeyCode, Mod};
+use ggez::event::{self, KeyCode, KeyMods};
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
@@ -17,7 +17,7 @@ pub trait GameState {
         &mut self,
         ctx: &mut Context,
         keycode: KeyCode,
-        keymod: Mod,
+        keymod: KeyMods,
         repeat: bool,
     ) -> StateTransition;
     fn set_data(&mut self, data: Data);
@@ -57,7 +57,13 @@ impl event::EventHandler for GameEventHandler {
         Ok(())
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, keymod: Mod, repeat: bool) {
+    fn key_down_event(
+        &mut self,
+        ctx: &mut Context,
+        keycode: KeyCode,
+        keymod: KeyMods,
+        repeat: bool,
+    ) {
         match self.state.key_down_event(ctx, keycode, keymod, repeat) {
             StateTransition::Stay => {}
             StateTransition::Return => unreachable!(),

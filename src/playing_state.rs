@@ -1,8 +1,3 @@
-use ggez::event::{KeyCode, Mod};
-use ggez::graphics;
-//use ggez::timer;
-use ggez::{Context, GameResult};
-
 use crate::assets::Data;
 use crate::background::Background;
 use crate::effects::Effects;
@@ -16,6 +11,9 @@ use crate::player::Player;
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
 use crate::wave::{WaveStatus, Waves};
+use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{self, Color};
+use ggez::{Context, GameResult};
 use std::collections::HashMap;
 
 pub struct PlayingState {
@@ -119,7 +117,7 @@ impl event_handler::GameState for PlayingState {
             return Ok(());
         }
         graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
-        graphics::set_color(ctx, graphics::WHITE)?;
+        //graphics::set_color(ctx, graphics::WHITE)?;
         Background::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         GameMap::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         Enemies::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
@@ -136,7 +134,7 @@ impl event_handler::GameState for PlayingState {
         &mut self,
         _ctx: &mut Context,
         keycode: KeyCode,
-        keymod: Mod,
+        keymod: KeyMods,
         repeat: bool,
     ) -> event_handler::StateTransition {
         if let Some(mut overlay) = self.overlay_state.take() {

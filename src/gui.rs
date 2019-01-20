@@ -6,8 +6,8 @@ use crate::map::GameMap;
 use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
 use crate::wave::WaveStatus;
-use ggez::event::{KeyCode, Mod};
-use ggez::graphics::{self, Text};
+use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{self, Color, Scale, Text, TextFragment};
 use ggez::{Context, GameResult};
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
@@ -162,7 +162,7 @@ impl Gui {
             if cost > 0 {
                 let font = state.data.as_ref().unwrap().get_font();
 
-                let tf = TextFragment::new(&format!("{}", cost));
+                let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
                 desc.set_font(*font, Scale::uniform(1.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
@@ -209,7 +209,7 @@ impl Gui {
                     &desc,
                     graphics::DrawParam {
                         // src: src,
-                        dest: Point::new(600.0, 200.0 + (i as f32) * 30.0),
+                        dest: Point::new(600.0, 200.0),
                         //rotation: self.zoomlevel,
                         offset: Point::new(0.0, 0.0),
                         scale: Vector::new(1.0, 1.0),
@@ -250,9 +250,9 @@ impl Gui {
             if cost > 0 {
                 let font = state.data.as_ref().unwrap().get_font();
 
-                let tf = TextFragment::new(&format!("{}", cost));
+                let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale(1.0));
+                desc.set_font(*font, Scale::uniform(1.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
 
                 graphics::draw(
@@ -305,7 +305,7 @@ impl Gui {
         if let WaveStatus::Waiting(time) = state.waves.status {
             next_wave = format!(", Next wave in {}", time / 60);
         }
-        let mut tf = TextFragment::new(&format!(
+        let mut tf = TextFragment::new(format!(
             "Lives: {}, Gold: {}{}",
             state.player().hp,
             state.player().gold,
@@ -348,7 +348,7 @@ impl Gui {
         Ok(())
     }
 
-    pub fn key_down(state: &mut PlayingState, keycode: KeyCode, _keymod: Mod, _repeat: bool) {
+    pub fn key_down(state: &mut PlayingState, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
         match keycode {
             KeyCode::Up => Gui::move_cursor(state, 0, -1),
             KeyCode::Down => Gui::move_cursor(state, 0, 1),
