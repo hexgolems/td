@@ -4,6 +4,7 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
+use crate::background::Background;
 use crate::effects::Effects;
 use crate::end_state::EndState;
 use crate::enemies::Enemies;
@@ -15,7 +16,6 @@ use crate::player::Player;
 use crate::projectiles::Projectiles;
 use crate::towers::Towers;
 use crate::wave::{WaveStatus, Waves};
-use crate::background::Background;
 use std::collections::HashMap;
 
 pub struct PlayingState {

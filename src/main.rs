@@ -13,6 +13,7 @@ use std::env;
 use std::path;
 
 mod assets;
+mod background;
 mod buffs;
 mod camera;
 mod card;
@@ -35,7 +36,6 @@ mod tower_stats;
 mod towers;
 mod utils;
 mod wave;
-mod background;
 use crate::assets::Data;
 use crate::event_handler::GameState;
 use crate::menu_state::MenuState;

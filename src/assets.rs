@@ -122,7 +122,7 @@ impl Data {
         self.load_img(ctx, BackgroundWave(2), "/sea_wave2.png")?;
         self.load_img(ctx, BackgroundWave(3), "/sea_wave3.png")?;
         self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
-        self.load_img(ctx, BackgroundWater,   "/sea_bg.png")?;
+        self.load_img(ctx, BackgroundWater, "/sea_bg.png")?;
 
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;

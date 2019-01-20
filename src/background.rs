@@ -1,10 +1,10 @@
 use ggez::graphics;
-use ggez::graphics::{Point2, Vector2, Color};
+use ggez::graphics::{Color, Point2, Vector2};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
+use rand::thread_rng;
 use std::collections::HashMap;
 use std::ops::Range;
-use rand::{thread_rng};
 
 use crate::assets::{Data, ImgID};
 use crate::playing_state::PlayingState;
@@ -16,12 +16,19 @@ pub struct Wave {
     time: f32,
 }
 
-impl Wave{
-    pub fn new() -> Self{
-        let wave_id = 1+thread_rng().gen::<usize>()%4;
+impl Wave {
+    pub fn new() -> Self {
+        let wave_id = 1 + thread_rng().gen::<usize>() % 4;
         let disp = ImgID::BackgroundWave(wave_id);
-        let pos = Point2::new(thread_rng().gen::<f32>()*800.0, thread_rng().gen::<f32>()*800.0);
-        return Self{disp, pos, time: thread_rng().gen::<f32>()*16.0}
+        let pos = Point2::new(
+            thread_rng().gen::<f32>() * 800.0,
+            thread_rng().gen::<f32>() * 800.0,
+        );
+        return Self {
+            disp,
+            pos,
+            time: thread_rng().gen::<f32>() * 16.0,
+        };
     }
 
     pub fn tick(&mut self) {
@@ -43,7 +50,7 @@ impl Wave{
             graphics::DrawParam {
                 dest: self.pos,
                 scale: Point2::new(4.0, 4.0),
-                color: Some(Color::new(1.0, 1.0, 1.0, (self.time.sin()+1.0)/2.0)),
+                color: Some(Color::new(1.0, 1.0, 1.0, (self.time.sin() + 1.0) / 2.0)),
                 ..Default::default()
             },
         )?;
@@ -56,14 +63,19 @@ pub struct Background {
     pub waves: Vec<Wave>,
 }
 
-impl Background{
+impl Background {
     pub fn new() -> Self {
-        let mut waves  = vec!();
-        for _ in (0..20) { waves.push(Wave::new()); }
-        Self{ waves, offset: Point2::new(0.0, 0.0)}
+        let mut waves = vec![];
+        for _ in (0..20) {
+            waves.push(Wave::new());
+        }
+        Self {
+            waves,
+            offset: Point2::new(0.0, 0.0),
+        }
     }
 
-    pub fn tick(&mut self){
+    pub fn tick(&mut self) {
         for w in self.waves.iter_mut() {
             w.tick();
         }
@@ -83,7 +95,10 @@ impl Background{
                     ctx,
                     data.get_i(&ImgID::BackgroundWater),
                     graphics::DrawParam {
-                        dest: state.gui.cam().pos(Point2::new(4.0*80.0*x as f32, 4.0*80.0*y as f32)),
+                        dest: state
+                            .gui
+                            .cam()
+                            .pos(Point2::new(4.0 * 80.0 * x as f32, 4.0 * 80.0 * y as f32)),
                         offset: state.background.offset,
                         scale: Point2::new(4.0, 4.0),
                         ..Default::default()
