@@ -78,7 +78,7 @@ impl ShopOverlay {
 
                 let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(1.0));
+                desc.set_font(*font, Scale::uniform(24.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
 
                 graphics::draw(
@@ -125,7 +125,7 @@ impl ShopOverlay {
         let font = state.data.as_ref().unwrap().get_font();
         let txt = card.get_description();
         let mut desc = Text::new(txt);
-        desc.set_font(*font, Scale::uniform(1.0));
+        desc.set_font(*font, Scale::uniform(24.0));
         //desc.set_filter(graphics::FilterKeyModse::Nearest);
         graphics::draw(
             ctx,
@@ -145,7 +145,7 @@ impl OverlayState for ShopOverlay {
     }
 
     fn draw(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
+        graphics::clear(ctx, Color::new(0.1, 0.2, 0.4, 1.0));
         //graphics::set_color(ctx, graphics::WHITE)?;
         self.draw_available_cards(state, ctx)?;
         self.draw_cursor(state, ctx)?;

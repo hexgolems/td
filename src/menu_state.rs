@@ -44,14 +44,14 @@ impl event_handler::GameState for MenuState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
+        graphics::clear(ctx, Color::new(0.1, 0.2, 0.2, 0.0));
         //graphics::set_color(ctx, graphics::WHITE)?;
 
         let font = self.data.as_ref().unwrap().get_font();
         for (i, item) in self.options.iter().enumerate() {
             let tf = TextFragment::new(item.get_text());
             let mut desc = Text::new(tf);
-            desc.set_font(*font, Scale::uniform(1.0));
+            desc.set_font(*font, Scale::uniform(24.0));
             //desc.set_filter(graphics::FilterMode::Nearest);
             let mut color = Color::new(1.0, 1.0, 1.0, 1.0);
             if i == self.option_selected {
@@ -68,7 +68,7 @@ impl event_handler::GameState for MenuState {
                     .color(color),
             )?;
         }
-        graphics::present(ctx);
+        graphics::present(ctx)?;
         Ok(())
     }
 

@@ -116,7 +116,7 @@ impl event_handler::GameState for PlayingState {
             self.overlay_state = Some(overlay);
             return Ok(());
         }
-        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
+        graphics::clear(ctx, Color::new(0.1, 0.2, 0.4, 0.0));
         //graphics::set_color(ctx, graphics::WHITE)?;
         Background::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         GameMap::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
@@ -126,7 +126,7 @@ impl event_handler::GameState for PlayingState {
         Effects::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         Gui::draw(self, ctx)?;
 
-        graphics::present(ctx);
+        graphics::present(ctx)?;
         Ok(())
     }
 

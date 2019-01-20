@@ -149,7 +149,7 @@ impl Gui {
 
                 let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(1.0));
+                desc.set_font(*font, Scale::uniform(24.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
 
                 graphics::draw(
@@ -180,7 +180,7 @@ impl Gui {
                 //let (_, txts) = font.get_wrap(card.get_description(), 200);
                 let txt = card.get_description();
                 let mut desc = Text::new(txt);
-                desc.set_font(*font, Scale::uniform(1.0));
+                desc.set_font(*font, Scale::uniform(24.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
                 graphics::draw(
                     ctx,
@@ -221,7 +221,7 @@ impl Gui {
 
                 let tf = TextFragment::new(format!("{}", cost));
                 let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(1.0));
+                desc.set_font(*font, Scale::uniform(24.0));
                 //desc.set_filter(graphics::FilterMode::Nearest);
 
                 graphics::draw(
@@ -277,7 +277,7 @@ impl Gui {
             next_wave
         ));
         let mut desc = Text::new(tf);
-        desc.set_font(*font, Scale::uniform(1.0));
+        desc.set_font(*font, Scale::uniform(24.0));
         //desc.set_filter(graphics::FilterMode::Nearest);
 
         graphics::draw(
