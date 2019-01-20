@@ -8,7 +8,7 @@ extern crate serde;
 extern crate serde_derive;
 use ggez::conf;
 use ggez::event;
-use ggez::graphics;
+use ggez::graphics::{self, FilterMode};
 use ggez::ContextBuilder;
 use std::env;
 use std::path;
@@ -61,6 +61,7 @@ pub fn main() {
 
     let mut events = &mut event_handler::GameEventHandler::new(init_state);
 
+    graphics::set_default_filter(&mut ctx, FilterMode::Nearest);
     match event::run(&mut ctx, &mut event_loop, events) {
         Ok(_) => println!("Exited cleanly."),
         Err(e) => println!("Error occured: {}", e),
