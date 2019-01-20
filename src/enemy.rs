@@ -1,19 +1,20 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
-use ggez::graphics::{self, Point2, Vector2};
+use ggez::graphics;
 use rand::prelude::*;
 use std::collections::HashMap;
 
 pub struct Enemy {
     pub disp: ImgID,
-    pub position: graphics::Point2,
+    pub position: Point,
     pub health: usize,
     pub walk_speed: f32,
-    pub next_walk_target: graphics::Point2,
+    pub next_walk_target: Point,
     pub reached_goal: bool,
     pub color: (f32, f32, f32),
     pub size: f32,
@@ -21,7 +22,7 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn new(position: graphics::Point2, spec: &WaveSpec) -> Self {
+    pub fn new(position: Point, spec: &WaveSpec) -> Self {
         return Self {
             disp: spec.img,
             position,
@@ -40,8 +41,8 @@ impl Enemy {
             move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
-            let offset = (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
-                - Vector2::new(30.0, 30.0);
+            let offset = (Vector::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
+                - Vector::new(30.0, 30.0);
             self.next_walk_target = match map.tile_at(self.position) {
                 MapTile::Walk(a) => self.walk_target(a) + offset,
                 MapTile::Spawn(a) => self.walk_target(a) + offset,
@@ -75,7 +76,7 @@ impl Enemy {
         return self.walk_speed;
     }
 
-    fn walk_target(&mut self, dir: WalkDir) -> Point2 {
+    fn walk_target(&mut self, dir: WalkDir) -> Point {
         let (x, y) = GameMap::tile_index_at(self.position);
         return match dir {
             WalkDir::Up => GameMap::tile_center(x, y - 1),

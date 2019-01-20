@@ -1,5 +1,6 @@
 #![feature(range_contains)]
 extern crate ggez;
+extern crate nalgebra;
 extern crate rand;
 extern crate ron;
 #[macro_use]
@@ -12,6 +13,7 @@ use ggez::Context;
 use std::env;
 use std::path;
 
+mod algebra;
 mod assets;
 mod background;
 mod buffs;
@@ -52,7 +54,7 @@ pub fn main() {
         ctx.filesystem.mount(&path, true);
     }
 
-    println!("{}", graphics::get_renderer_info(ctx).unwrap());
+    println!("{}", graphics::renderer_info(ctx).unwrap());
     let mut data = Data::new();
     data.init(ctx).expect("couldn't load resources");
     let mut init_state = Box::new(MenuState::new());
@@ -60,7 +62,7 @@ pub fn main() {
     init_state.set_data(data);
     let events = &mut event_handler::GameEventHandler::new(init_state);
 
-    if let Err(e) = event::run(ctx, events) {
+    if let Err(e) = event::run(ctx, events, &mut init_state) {
         println!("Error encountered: {}", e);
     } else {
         println!("Game exited cleanly.");

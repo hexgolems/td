@@ -1,14 +1,14 @@
-use crate::buffs::BuffType;
-use ggez::graphics::{self, Point2, Vector2};
-use ggez::{Context, GameResult};
-
+use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
+use crate::buffs::BuffType;
 use crate::playing_state::PlayingState;
+use ggez::graphics;
+use ggez::{Context, GameResult};
 
 pub struct ParticleData {
     disp: ImgID,
-    position: Point2,
-    vel: Vector2,
+    position: Point,
+    vel: Vector,
     size: f32,
     color: (f32, f32, f32),
     alpha: f32,
@@ -20,8 +20,8 @@ impl ParticleData {
     pub fn new(disp: ImgID, x: f32, y: f32) -> Self {
         return ParticleData {
             disp,
-            position: Point2::new(x, y),
-            vel: Vector2::new(0.0, 0.0),
+            position: Point::new(x, y),
+            vel: Vector::new(0.0, 0.0),
             size: 1.0,
             color: (1.0, 1.0, 1.0),
             alpha: 1.0,
@@ -38,18 +38,16 @@ pub trait Effect {
 
     fn draw(&self, state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for e in self.get_particles() {
-            graphics::draw_ex(
+            graphics::draw(
                 ctx,
                 data.get_i(&e.disp),
                 graphics::DrawParam {
                     // src: src,
                     dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
                     rotation: e.rotation,
-                    offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(e.size, e.size),
-                    color: Some(graphics::Color::new(
-                        e.color.0, e.color.1, e.color.2, e.alpha,
-                    )),
+                    offset: Point::new(0.5, 0.5),
+                    scale: Vector::new(e.size, e.size),
+                    color: graphics::Color::new(e.color.0, e.color.1, e.color.2, e.alpha),
                     // shear: shear,
                     ..Default::default()
                 },

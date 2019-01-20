@@ -1,8 +1,9 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::menu_state::MenuState;
-use ggez::event::{Keycode, Mod};
-use ggez::graphics::{self, Color, Point2, Text};
+use ggez::event::{KeyCode, Mod};
+use ggez::graphics::{self, Color, Text};
 use ggez::{Context, GameResult};
 
 pub struct EndState {
@@ -31,7 +32,7 @@ impl event_handler::GameState for EndState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx);
+        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
         graphics::set_color(ctx, graphics::WHITE)?;
 
         let font = self.data.as_ref().unwrap().get_font();
@@ -40,24 +41,26 @@ impl event_handler::GameState for EndState {
         } else {
             "Ouch, You Failed!"
         };
-        let mut desc = Text::new(ctx, text, font)?;
-        desc.set_filter(graphics::FilterMode::Nearest);
+        let tf = TextFragment::new(text);
+        let mut desc = Text::new(tf);
+        desc.set_font(*font, Scale::uniform(1.0));
+        //desc.set_filter(graphics::FilterMode::Nearest);
         let color = if self.victory {
             Color::new(0.2, 1.0, 0.2, 1.0)
         } else {
             Color::new(1.0, 0.2, 0.2, 1.0)
         };
 
-        graphics::draw_ex(
+        graphics::draw(
             ctx,
             &desc,
             graphics::DrawParam {
                 // src: src,
-                dest: Point2::new(300.0, 100.0),
+                dest: Point::new(300.0, 100.0),
                 //rotation: self.zoomlevel,
-                offset: Point2::new(0.0, 0.0),
-                scale: Point2::new(1.0, 1.0),
-                color: Some(color),
+                offset: Point::new(0.0, 0.0),
+                scale: Vector::new(1.0, 1.0),
+                color: color,
                 // shear: shear,
                 ..Default::default()
             },
@@ -69,12 +72,12 @@ impl event_handler::GameState for EndState {
     fn key_down_event(
         &mut self,
         _ctx: &mut Context,
-        keycode: Keycode,
+        keycode: KeyCode,
         _keymod: Mod,
         _repeat: bool,
     ) -> StateTransition {
         match keycode {
-            Keycode::Space => return StateTransition::Next(Box::new(MenuState::new())),
+            KeyCode::Space => return StateTransition::Next(Box::new(MenuState::new())),
             _ => {}
         }
         return StateTransition::Stay;

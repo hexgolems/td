@@ -1,4 +1,4 @@
-use ggez::event::{Keycode, Mod};
+use ggez::event::{KeyCode, Mod};
 use ggez::graphics;
 //use ggez::timer;
 use ggez::{Context, GameResult};
@@ -118,7 +118,7 @@ impl event_handler::GameState for PlayingState {
             self.overlay_state = Some(overlay);
             return Ok(());
         }
-        graphics::clear(ctx);
+        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
         graphics::set_color(ctx, graphics::WHITE)?;
         Background::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         GameMap::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
@@ -135,7 +135,7 @@ impl event_handler::GameState for PlayingState {
     fn key_down_event(
         &mut self,
         _ctx: &mut Context,
-        keycode: Keycode,
+        keycode: KeyCode,
         keymod: Mod,
         repeat: bool,
     ) -> event_handler::StateTransition {

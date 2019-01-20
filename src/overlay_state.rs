@@ -1,4 +1,4 @@
-use ggez::event::{Keycode, Mod};
+use ggez::event::{KeyCode, Mod};
 use ggez::{Context, GameResult};
 
 use crate::event_handler::StateTransition;
@@ -10,7 +10,7 @@ pub trait OverlayState {
     fn key_down_event(
         &mut self,
         state: &mut PlayingState,
-        keycode: Keycode,
+        keycode: KeyCode,
         keymod: Mod,
         repeat: bool,
     ) -> StateTransition;

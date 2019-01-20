@@ -1,17 +1,17 @@
-use ggez::graphics::{Point2, Vector2};
+use crate::algebra::{Point, Vector};
 
 pub struct Camera {
-    translate: Vector2,
+    translate: Vector,
 }
 
 impl Camera {
     pub fn new() -> Self {
         return Self {
-            translate: Vector2::new(40.0, 40.0),
+            translate: Vector::new(40.0, 40.0),
         };
     }
 
-    pub fn pos(&self, p: Point2) -> Point2 {
+    pub fn pos(&self, p: Point) -> Point {
         return p + self.translate;
     }
 }

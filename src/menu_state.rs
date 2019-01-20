@@ -1,9 +1,10 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::playing_state::PlayingState;
 use crate::utils::add_mod;
-use ggez::event::{Keycode, Mod};
-use ggez::graphics::{self, Color, Point2, Text};
+use ggez::event::{KeyCode, Mod};
+use ggez::graphics::{self, Color, Text};
 use ggez::{Context, GameResult};
 
 enum MenuItem {
@@ -43,28 +44,30 @@ impl event_handler::GameState for MenuState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx);
+        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
         graphics::set_color(ctx, graphics::WHITE)?;
 
         let font = self.data.as_ref().unwrap().get_font();
         for (i, item) in self.options.iter().enumerate() {
-            let mut desc = Text::new(ctx, &item.get_text(), font)?;
-            desc.set_filter(graphics::FilterMode::Nearest);
+            let tf = TextFragment::new(&item.get_text());
+            let mut desc = Text::new(tf);
+            desc.set_font(*font, Scale::uniform(1.0));
+            //desc.set_filter(graphics::FilterMode::Nearest);
             let mut color = Color::new(1.0, 1.0, 1.0, 1.0);
             if i == self.option_selected {
                 color = Color::new(1.0, 1.0, 0.0, 1.0);
             }
 
-            graphics::draw_ex(
+            graphics::draw(
                 ctx,
                 &desc,
                 graphics::DrawParam {
                     // src: src,
-                    dest: Point2::new(300.0, 100.0 + 40.0 * i as f32),
+                    dest: Point::new(300.0, 100.0 + 40.0 * i as f32),
                     //rotation: self.zoomlevel,
-                    offset: Point2::new(0.0, 0.0),
-                    scale: Point2::new(1.0, 1.0),
-                    color: Some(color),
+                    offset: Point::new(0.0, 0.0),
+                    scale: Vector::new(1.0, 1.0),
+                    color: color,
                     // shear: shear,
                     ..Default::default()
                 },
@@ -77,18 +80,18 @@ impl event_handler::GameState for MenuState {
     fn key_down_event(
         &mut self,
         _ctx: &mut Context,
-        keycode: Keycode,
+        keycode: KeyCode,
         _keymod: Mod,
         _repeat: bool,
     ) -> StateTransition {
         match keycode {
-            Keycode::Up => {
+            KeyCode::Up => {
                 self.option_selected = add_mod(self.option_selected, -1, self.options.len())
             }
-            Keycode::Down => {
+            KeyCode::Down => {
                 self.option_selected = add_mod(self.option_selected, 1, self.options.len())
             }
-            Keycode::Space => match self.options[self.option_selected] {
+            KeyCode::Space => match self.options[self.option_selected] {
                 MenuItem::Level(_) => return StateTransition::Next(Box::new(PlayingState::new())),
                 MenuItem::Exit => return StateTransition::Exit,
             },

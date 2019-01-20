@@ -1,3 +1,4 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
 use crate::buffs::{Buff, BuffStats, BuffType};
 use crate::map::GameMap;
@@ -7,7 +8,6 @@ use crate::tower_stats::TowerStats;
 use crate::utils::buff_to_img;
 use crate::utils::load_specs;
 use ggez::graphics;
-use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -108,7 +108,7 @@ impl Towers {
 
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for (_id, t) in state.towers.built.iter() {
-            graphics::draw_ex(
+            graphics::draw(
                 ctx,
                 data.get_i(&ImgID::Archer),
                 graphics::DrawParam {
@@ -118,18 +118,18 @@ impl Towers {
                         .cam()
                         .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                     //rotation: self.zoomlevel,
-                    offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(4.0, 4.0),
+                    offset: Point::new(0.5, 0.5),
+                    scale: Vector::new(4.0, 4.0),
                     // shear: shear,
                     ..Default::default()
                 },
             )?;
             for (i, buff) in t.buffs.keys().into_iter().enumerate() {
-                let mut offset = Point2::new(1.25, -0.75);
+                let mut offset = Point::new(1.25, -0.75);
                 if i == 1 {
-                    offset = Point2::new(-0.25, -0.75);
+                    offset = Point::new(-0.25, -0.75);
                 }
-                graphics::draw_ex(
+                graphics::draw(
                     ctx,
                     data.get_i(&buff_to_img(buff)),
                     graphics::DrawParam {
@@ -140,7 +140,7 @@ impl Towers {
                             .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                         //rotation: self.zoomlevel,
                         offset: offset,
-                        scale: Point2::new(1.0, 1.0),
+                        scale: Vector::new(1.0, 1.0),
                         // shear: shear,
                         ..Default::default()
                     },

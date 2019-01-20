@@ -1,3 +1,4 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
@@ -6,7 +7,6 @@ use crate::enemies::Enemies;
 use crate::playing_state::PlayingState;
 use crate::utils::move_to;
 use ggez::graphics;
-use ggez::graphics::Point2;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 
@@ -15,17 +15,17 @@ pub struct Projectile {
     disp: ImgID,
     enemy_id: usize,
     tower_id: usize,
-    position: graphics::Point2,
+    position: Point,
     damage: usize,
     speed: f32,
-    next_walk_target: graphics::Point2,
+    next_walk_target: Point,
     reached_goal: bool,
     debuffs: HashMap<BuffType, Debuff>,
 }
 
 impl Projectile {
     pub fn new(
-        position: graphics::Point2,
+        position: Point,
         tower_id: usize,
         enemy_id: usize,
         damage: usize,
@@ -94,15 +94,15 @@ impl Projectiles {
         for p in state.projectiles.projectiles.values() {
             let dir = p.next_walk_target - p.position;
             let rot = dir.y.atan2(dir.x);
-            graphics::draw_ex(
+            graphics::draw(
                 ctx,
                 data.get_i(&p.disp),
                 graphics::DrawParam {
                     // src: src,
                     dest: state.gui.cam().pos(p.position), //+p.offset_in_tile,
                     rotation: rot,
-                    offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(4.0, 4.0),
+                    offset: Point::new(0.5, 0.5),
+                    scale: Vector::new(4.0, 4.0),
                     // shear: shear,
                     ..Default::default()
                 },

@@ -1,16 +1,16 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
-use ggez::graphics::Point2;
 use ron;
 use ron::de::from_reader;
 use serde;
 use std::fs::File;
 
-pub fn distance(p1: &Point2, p2: &Point2) -> f32 {
+pub fn distance(p1: &Point, p2: &Point) -> f32 {
     (p1 - p2).norm()
 }
 
-pub fn move_to(pos: Point2, target: Point2, speed: f32) -> (Point2, bool) {
+pub fn move_to(pos: Point, target: Point, speed: f32) -> (Point, bool) {
     assert!(speed > 0.0);
     let dir = target - pos;
     let len = dir.norm();
