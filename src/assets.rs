@@ -33,6 +33,8 @@ pub enum ImgID {
     Shop,
     Smoke,
     Stone(usize),
+    BackgroundWave(usize),
+    BackgroundWater,
     Take2,
     Tree1,
     Tree2,
@@ -115,6 +117,13 @@ impl Data {
         self.load_img(ctx, Stone(2), "/stone2.png")?;
         self.load_img(ctx, Stone(3), "/stone3.png")?;
         self.load_img(ctx, Stone(4), "/stone4.png")?;
+
+        self.load_img(ctx, BackgroundWave(1), "/sea_wave1.png")?;
+        self.load_img(ctx, BackgroundWave(2), "/sea_wave2.png")?;
+        self.load_img(ctx, BackgroundWave(3), "/sea_wave3.png")?;
+        self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
+        self.load_img(ctx, BackgroundWater,   "/sea_bg.png")?;
+
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;
         self.load_img(ctx, Tree2, "/tree2.png")?;
