@@ -9,7 +9,7 @@ pub struct Debuff {
 }
 
 impl Debuff {
-    pub fn new(buff: Buff) -> Self {
+    pub fn new(buff: &Buff) -> Self {
         return Self {
             kind: buff.stats.kind,
             effectiveness: buff.effectiveness(),

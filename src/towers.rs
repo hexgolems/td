@@ -88,7 +88,7 @@ impl Towers {
     pub fn add_buff_at_pos(&mut self, x: usize, y: usize, buff_type: BuffType) {
         let stats = self.buff_stats.get(&buff_type).unwrap().clone();
         if let Some(tower) = self.get_tower_mut(x, y) {
-            tower.add_buff(stats);
+            tower.add_buff(&stats);
         }
     }
 

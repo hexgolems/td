@@ -25,9 +25,12 @@ pub struct Buff {
 }
 
 impl Buff {
-    pub fn new(stats: Rc<BuffStats>) -> Self {
+    pub fn new(stats: &Rc<BuffStats>) -> Self {
         let level = 1;
-        return Self { stats, level };
+        return Self {
+            stats: stats.clone(),
+            level,
+        };
     }
 
     pub fn effectiveness(&self) -> usize {

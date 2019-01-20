@@ -43,7 +43,7 @@ impl Tower {
         return false;
     }
 
-    pub fn add_buff(&mut self, stats: Rc<BuffStats>) {
+    pub fn add_buff(&mut self, stats: &Rc<BuffStats>) {
         match self.buffs.get_mut(&stats.kind) {
             Some(buff) => buff.upgrade(),
             None => {
@@ -86,10 +86,10 @@ impl Tower {
 
     pub fn add_projectile_buffs(&self, p: &mut Projectile, aura_buffs: &HashMap<BuffType, Buff>) {
         if let Some(buff) = self.get_buffs().get(&BuffType::Freeze) {
-            p.add_debuff(Debuff::new(buff.clone()));
+            p.add_debuff(Debuff::new(buff));
         }
         for (_, buff) in aura_buffs {
-            p.add_debuff(Debuff::new(buff.clone()));
+            p.add_debuff(Debuff::new(buff));
         }
     }
 }
