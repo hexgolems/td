@@ -53,28 +53,24 @@ impl ShopOverlay {
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: Point::new(100.0, 40.0 + (i as f32) * 80.0 - self.get_drawing_offset()),
-                    //rotation: self.zoomlevel,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(
+                        100.0,
+                        40.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
+                    ))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&card.get_image_id()),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: Point::new(100.0, 40.0 + (i as f32) * 80.0 - self.get_drawing_offset()),
-                    //rotation: self.zoomlevel,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(
+                        100.0,
+                        40.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
+                    ))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
             let cost = card.aquisition_cost(state);
             if cost > 0 {
@@ -88,18 +84,13 @@ impl ShopOverlay {
                 graphics::draw(
                     ctx,
                     &desc,
-                    graphics::DrawParam {
-                        // src: src,
-                        dest: Point::new(
+                    graphics::DrawParam::default()
+                        .dest(Point::new(
                             130.0,
                             80.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
-                        ),
-                        //rotation: self.zoomlevel,
-                        offset: Point::new(1.0, 1.0),
-                        scale: Vector::new(1.0, 1.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                        ))
+                        .offset(Point::new(1.0, 1.0))
+                        .scale(Vector::new(1.0, 1.0)),
                 )?;
             }
         }
@@ -110,18 +101,13 @@ impl ShopOverlay {
         graphics::draw(
             ctx,
             state.data.as_ref().unwrap().get_i(&ImgID::Cursor),
-            graphics::DrawParam {
-                // src: src,
-                dest: Point::new(
+            graphics::DrawParam::default()
+                .dest(Point::new(
                     100.0,
                     40.0 + (self.cur_selected as f32) * 80.0 - self.get_drawing_offset(),
-                ),
-                //rotation: self.zoomlevel,
-                offset: Point::new(0.5, 0.5),
-                scale: Vector::new(4.0, 4.0),
-                // shear: shear,
-                ..Default::default()
-            },
+                ))
+                .offset(Point::new(0.5, 0.5))
+                .scale(Vector::new(4.0, 4.0)),
         )?;
         return Ok(());
     }
@@ -131,15 +117,10 @@ impl ShopOverlay {
         graphics::draw(
             ctx,
             state.data.as_ref().unwrap().get_i(&card.get_image_id()),
-            graphics::DrawParam {
-                // src: src,
-                dest: Point::new(300.0, 40.0),
-                //rotation: self.zoomlevel,
-                offset: Point::new(0.0, 0.0),
-                scale: Vector::new(8.0, 8.0),
-                // shear: shear,
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(Point::new(300.0, 40.0))
+                .offset(Point::new(0.0, 0.0))
+                .scale(Vector::new(8.0, 8.0)),
         )?;
         let font = state.data.as_ref().unwrap().get_font();
         let txt = card.get_description();
@@ -149,15 +130,10 @@ impl ShopOverlay {
         graphics::draw(
             ctx,
             &desc,
-            graphics::DrawParam {
-                // src: src,
-                dest: Point::new(300.0, 200.0),
-                //rotation: self.zoomlevel,
-                offset: Point::new(0.0, 0.0),
-                scale: Vector::new(1.0, 1.0),
-                // shear: shear,
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(Point::new(300.0, 200.0))
+                .offset(Point::new(0.0, 0.0))
+                .scale(Vector::new(1.0, 1.0)),
         )?;
         return Ok(());
     }

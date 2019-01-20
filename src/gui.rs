@@ -88,15 +88,10 @@ impl Gui {
         graphics::draw(
             ctx,
             data.get_i(&ImgID::Cursor),
-            graphics::DrawParam {
-                // src: src,
-                dest: self.camera.pos(GameMap::tile_pos(x, y)),
-                //rotation: self.zoomlevel,
-                offset: Point::new(1.0 / 22.0, 1.0 / 22.0),
-                scale: Vector::new(4.0, 4.0),
-                // shear: shear,
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(self.camera.pos(GameMap::tile_pos(x, y)))
+                .offset(Point::new(1.0 / 22.0, 1.0 / 22.0))
+                .scale(Vector::new(4.0, 4.0)),
         )?;
         Ok(())
     }
@@ -120,16 +115,10 @@ impl Gui {
                 .as_ref()
                 .unwrap()
                 .get_i(&card.get_preview_image_id()),
-            graphics::DrawParam {
-                // src: src,
-                dest: state.gui.camera.pos(GameMap::tile_center(x, y)),
-                //rotation: self.zoomlevel,
-                offset: Point::new(0.5, 0.5),
-                scale: Vector::new(4.0, 4.0),
-                // shear: shear,
-                color: color,
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(state.gui.camera.pos(GameMap::tile_center(x, y)))
+                .offset(Point::new(0.5, 0.5))
+                .scale(Vector::new(4.0, 4.0)),
         )?;
         Ok(())
     }
@@ -139,23 +128,19 @@ impl Gui {
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
-                graphics::DrawParam {
-                    dest: Point::new(50.0 + (i as f32) * 80.0, 550.0),
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(50.0 + (i as f32) * 80.0, 550.0))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
 
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&card.get_image_id()),
-                graphics::DrawParam {
-                    dest: Point::new(50.0 + (i as f32) * 80.0, 550.0),
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(50.0 + (i as f32) * 80.0, 550.0))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
 
             let cost = card.activation_cost(state);
@@ -170,12 +155,10 @@ impl Gui {
                 graphics::draw(
                     ctx,
                     &desc,
-                    graphics::DrawParam {
-                        dest: Point::new(80.0 + (i as f32) * 80.0, 550.0),
-                        offset: Point::new(1.0, 1.0),
-                        scale: Vector::new(1.0, 1.0),
-                        ..Default::default()
-                    },
+                    graphics::DrawParam::default()
+                        .dest(Point::new(80.0 + (i as f32) * 80.0, 550.0))
+                        .offset(Point::new(1.0, 1.0))
+                        .scale(Vector::new(1.0, 1.0)),
                 )?;
             }
         }
@@ -188,15 +171,10 @@ impl Gui {
                 graphics::draw(
                     ctx,
                     state.data.as_ref().unwrap().get_i(&card.get_image_id()),
-                    graphics::DrawParam {
-                        // src: src,
-                        dest: Point::new(600.0, 40.0),
-                        //rotation: self.zoomlevel,
-                        offset: Point::new(0.0, 0.0),
-                        scale: Vector::new(8.0, 8.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                    graphics::DrawParam::default()
+                        .dest(Point::new(600.0, 40.0))
+                        .offset(Point::new(0.0, 0.0))
+                        .scale(Vector::new(8.0, 8.0)),
                 )?;
                 let font = state.data.as_ref().unwrap().get_font();
                 //let (_, txts) = font.get_wrap(card.get_description(), 200);
@@ -207,15 +185,10 @@ impl Gui {
                 graphics::draw(
                     ctx,
                     &desc,
-                    graphics::DrawParam {
-                        // src: src,
-                        dest: Point::new(600.0, 200.0),
-                        //rotation: self.zoomlevel,
-                        offset: Point::new(0.0, 0.0),
-                        scale: Vector::new(1.0, 1.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                    graphics::DrawParam::default()
+                        .dest(Point::new(600.0, 200.0))
+                        .offset(Point::new(0.0, 0.0))
+                        .scale(Vector::new(1.0, 1.0)),
                 )?;
             }
         }
@@ -227,23 +200,19 @@ impl Gui {
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
-                graphics::DrawParam {
-                    dest: Point::new(750.0 - (i as f32) * 80.0, 550.0),
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(750.0 - (i as f32) * 80.0, 550.0))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
 
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&card.get_image_id()),
-                graphics::DrawParam {
-                    dest: Point::new(750.0 - (i as f32) * 80.0, 550.0),
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(750.0 - (i as f32) * 80.0, 550.0))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
 
             let cost = card.activation_cost(state);
@@ -258,12 +227,10 @@ impl Gui {
                 graphics::draw(
                     ctx,
                     &desc,
-                    graphics::DrawParam {
-                        dest: Point::new(750.0 - (i as f32) * 80.0, 550.0),
-                        offset: Point::new(1.0, 1.0),
-                        scale: Vector::new(1.0, 1.0),
-                        ..Default::default()
-                    },
+                    graphics::DrawParam::default()
+                        .dest(Point::new(750.0 - (i as f32) * 80.0, 550.0))
+                        .offset(Point::new(1.0, 1.0))
+                        .scale(Vector::new(1.0, 1.0)),
                 )?;
             }
         }
@@ -289,12 +256,10 @@ impl Gui {
         graphics::draw(
             ctx,
             data.get_i(&ImgID::Cursor),
-            graphics::DrawParam {
-                dest: pos,
-                offset: Point::new(0.5, 0.5),
-                scale: Vector::new(4.0, 4.0),
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(pos)
+                .offset(Point::new(0.5, 0.5))
+                .scale(Vector::new(4.0, 4.0)),
         )?;
         Ok(())
     }
@@ -318,12 +283,10 @@ impl Gui {
         graphics::draw(
             ctx,
             &desc,
-            graphics::DrawParam {
-                dest: Point::new(10.0, 2.0),
-                offset: Point::new(0.0, 0.0),
-                scale: Vector::new(1.0, 1.0),
-                ..Default::default()
-            },
+            graphics::DrawParam::default()
+                .dest(Point::new(10.0, 2.0))
+                .offset(Point::new(0.0, 0.0))
+                .scale(Vector::new(1.0, 1.0)),
         )?;
         return Ok(());
     }

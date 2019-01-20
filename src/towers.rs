@@ -111,18 +111,15 @@ impl Towers {
             graphics::draw(
                 ctx,
                 data.get_i(&ImgID::Archer),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: state
-                        .gui
-                        .cam()
-                        .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
-                    //rotation: self.zoomlevel,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(
+                        state
+                            .gui
+                            .cam()
+                            .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                    )
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
             for (i, buff) in t.buffs.keys().into_iter().enumerate() {
                 let mut offset = Point::new(1.25, -0.75);
@@ -132,18 +129,15 @@ impl Towers {
                 graphics::draw(
                     ctx,
                     data.get_i(&buff_to_img(buff)),
-                    graphics::DrawParam {
-                        // src: src,
-                        dest: state
-                            .gui
-                            .cam()
-                            .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
-                        //rotation: self.zoomlevel,
-                        offset: offset,
-                        scale: Vector::new(1.0, 1.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                    graphics::DrawParam::default()
+                        .dest(
+                            state
+                                .gui
+                                .cam()
+                                .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                        )
+                        .offset(offset)
+                        .scale(Vector::new(1.0, 1.0)),
                 )?;
             }
         }

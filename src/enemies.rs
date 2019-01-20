@@ -40,16 +40,11 @@ impl Enemies {
             graphics::draw(
                 ctx,
                 data.get_i(&e.disp),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
-                    //rotation: self.zoomlevel,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0 * e.size, 4.0 * e.size),
-                    color: graphics::Color::new(color.0, color.1, color.2, 1.0),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(state.gui.cam().pos(e.position))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0 * e.size, 4.0 * e.size))
+                    .color(graphics::Color::new(color.0, color.1, color.2, 1.0)),
             )?;
         }
         Ok(())

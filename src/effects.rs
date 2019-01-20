@@ -41,16 +41,14 @@ pub trait Effect {
             graphics::draw(
                 ctx,
                 data.get_i(&e.disp),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
-                    rotation: e.rotation,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(e.size, e.size),
-                    color: graphics::Color::new(e.color.0, e.color.1, e.color.2, e.alpha),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(state.gui.cam().pos(e.position))
+                    .rotation(e.rotation)
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(e.size, e.size))
+                    .color(graphics::Color::new(
+                        e.color.0, e.color.1, e.color.2, e.alpha,
+                    )),
             )?;
         }
         return Ok(());

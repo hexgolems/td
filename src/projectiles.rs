@@ -97,15 +97,11 @@ impl Projectiles {
             graphics::draw(
                 ctx,
                 data.get_i(&p.disp),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: state.gui.cam().pos(p.position), //+p.offset_in_tile,
-                    rotation: rot,
-                    offset: Point::new(0.5, 0.5),
-                    scale: Vector::new(4.0, 4.0),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(state.gui.cam().pos(p.position))
+                    .rotation(rot)
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0, 4.0)),
             )?;
         }
         Ok(())

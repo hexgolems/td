@@ -176,15 +176,9 @@ impl GameMap {
                 draw(
                     ctx,
                     data.get_i(&state.map.images[&state.map.data[y][x]]),
-                    DrawParam {
-                        // src: src,
-                        dest: state.gui.cam().pos(GameMap::tile_pos(x, y)),
-                        //rotation: self.zoomlevel,
-                        // offset: Point::new(-16.0, 0.0),
-                        scale: Vector::new(4.0, 4.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                    DrawParam::default()
+                        .dest(state.gui.cam().pos(GameMap::tile_pos(x, y)))
+                        .scale(Vector::new(4.0, 4.0)),
                 )?;
             }
         }
@@ -193,12 +187,10 @@ impl GameMap {
             draw(
                 ctx,
                 data.get_i(&dec.disp),
-                DrawParam {
-                    dest: state.gui.cam().pos(dec.pos),
-                    scale: Vector::new(4.0, 4.0),
-                    offset: Point::new(0.5, 1.0),
-                    ..Default::default()
-                },
+                DrawParam::default()
+                    .dest(state.gui.cam().pos(dec.pos))
+                    .scale(Vector::new(4.0, 4.0))
+                    .offset(Point::new(0.5, 1.0)),
             )?;
         }
         Ok(())

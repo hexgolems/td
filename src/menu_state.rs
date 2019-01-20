@@ -61,16 +61,11 @@ impl event_handler::GameState for MenuState {
             graphics::draw(
                 ctx,
                 &desc,
-                graphics::DrawParam {
-                    // src: src,
-                    dest: Point::new(300.0, 100.0 + 40.0 * i as f32),
-                    //rotation: self.zoomlevel,
-                    offset: Point::new(0.0, 0.0),
-                    scale: Vector::new(1.0, 1.0),
-                    color: color,
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(Point::new(300.0, 100.0 + 40.0 * i as f32))
+                    .offset(Point::new(0.0, 0.0))
+                    .scale(Vector::new(1.0, 1.0))
+                    .color(color),
             )?;
         }
         graphics::present(ctx);
