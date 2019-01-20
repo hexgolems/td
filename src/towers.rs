@@ -174,10 +174,10 @@ impl Towers {
         let mut nn = Vec::new();
         let n = t.aura_level();
         for x in
-            (t.map_position.0.saturating_sub(n)..t.map_position.0.saturating_add(n)).into_iter()
+            (t.map_position.0.saturating_sub(n)..t.map_position.0.saturating_add(n + 1)).into_iter()
         {
-            for y in
-                (t.map_position.1.saturating_sub(n)..t.map_position.1.saturating_add(n)).into_iter()
+            for y in (t.map_position.1.saturating_sub(n)..t.map_position.1.saturating_add(n + 1))
+                .into_iter()
             {
                 if let Some(id) = self.position_to_towerid.get(&(x, y)) {
                     if *id != t.id {

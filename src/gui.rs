@@ -7,7 +7,7 @@ use crate::playing_state::PlayingState;
 use crate::utils::{self, add_mod};
 use crate::wave::WaveStatus;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Scale, Text};
+use ggez::graphics;
 use ggez::{Context, GameResult};
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
@@ -118,7 +118,8 @@ impl Gui {
             graphics::DrawParam::default()
                 .dest(state.gui.camera.pos(GameMap::tile_center(x, y)))
                 .offset(Point::new(0.5, 0.5))
-                .scale(Vector::new(4.0, 4.0)),
+                .scale(Vector::new(4.0, 4.0))
+                .color(color),
         )?;
         Ok(())
     }
@@ -171,8 +172,6 @@ impl Gui {
                         .offset(Point::new(0.0, 0.0))
                         .scale(Vector::new(8.0, 8.0)),
                 )?;
-                let font = state.data.as_ref().unwrap().get_font();
-                // FIXME TODO wrap text
                 let mut desc = utils::text(state.data.as_ref().unwrap(), &card.get_description());
                 desc.set_bounds(Point::new(600.0, 400.0), graphics::Align::Left);
                 graphics::draw(
@@ -253,7 +252,6 @@ impl Gui {
     }
 
     pub fn draw_description(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        let font = state.data.as_ref().unwrap().get_font();
         let mut next_wave = "".to_string();
         if let WaveStatus::Waiting(time) = state.waves.status {
             next_wave = format!(", Next wave in {}", time / 60);

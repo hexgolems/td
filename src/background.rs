@@ -1,14 +1,11 @@
 use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
 use crate::playing_state::PlayingState;
-use crate::utils::load_specs;
 use ggez::graphics;
 use ggez::graphics::Color;
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use rand::thread_rng;
-use std::collections::HashMap;
-use std::ops::Range;
 
 pub struct Wave {
     pos: Point,
@@ -64,7 +61,7 @@ pub struct Background {
 impl Background {
     pub fn new() -> Self {
         let mut waves = vec![];
-        for _ in (0..20) {
+        for _ in 0..20 {
             waves.push(Wave::new());
         }
         Self {
@@ -87,8 +84,8 @@ impl Background {
     }
 
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for x in (-1..5) {
-            for y in (-1..5) {
+        for x in -1..5 {
+            for y in -1..5 {
                 graphics::draw(
                     ctx,
                     data.get_i(&ImgID::BackgroundWater),
@@ -106,7 +103,7 @@ impl Background {
         }
 
         for w in state.background.waves.iter() {
-            w.draw(data, ctx);
+            w.draw(data, ctx)?;
         }
         return Ok(());
     }

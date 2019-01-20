@@ -59,7 +59,7 @@ pub fn main() {
     let mut init_state = Box::new(MenuState::new());
     init_state.set_data(data);
 
-    let mut events = &mut event_handler::GameEventHandler::new(init_state);
+    let events = &mut event_handler::GameEventHandler::new(init_state);
 
     graphics::set_default_filter(&mut ctx, FilterMode::Nearest);
     match event::run(&mut ctx, &mut event_loop, events) {

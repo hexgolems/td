@@ -4,7 +4,7 @@ use crate::event_handler::{self, StateTransition};
 use crate::playing_state::PlayingState;
 use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text};
+use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
 
 enum MenuItem {

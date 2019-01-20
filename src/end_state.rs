@@ -4,7 +4,7 @@ use crate::event_handler::{self, StateTransition};
 use crate::menu_state::MenuState;
 use crate::utils;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text};
+use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
 
 pub struct EndState {
@@ -55,7 +55,7 @@ impl event_handler::GameState for EndState {
                 .scale(Vector::new(0.3, 0.3))
                 .color(color),
         )?;
-        graphics::present(ctx);
+        graphics::present(ctx)?;
         Ok(())
     }
 

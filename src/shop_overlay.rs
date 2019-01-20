@@ -7,7 +7,7 @@ use crate::overlay_state::OverlayState;
 use crate::playing_state::PlayingState;
 use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text};
+use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
 
 pub struct ShopOverlay {
@@ -116,7 +116,7 @@ impl ShopOverlay {
                 .offset(Point::new(0.0, 0.0))
                 .scale(Vector::new(8.0, 8.0)),
         )?;
-        let mut desc = utils::text(state.data.as_ref().unwrap(), &card.get_description());
+        let desc = utils::text(state.data.as_ref().unwrap(), &card.get_description());
         graphics::draw(
             ctx,
             &desc,
@@ -140,7 +140,7 @@ impl OverlayState for ShopOverlay {
         self.draw_available_cards(state, ctx)?;
         self.draw_cursor(state, ctx)?;
         self.draw_selected(state, ctx)?;
-        graphics::present(ctx);
+        graphics::present(ctx)?;
         Ok(())
     }
 
