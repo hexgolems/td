@@ -4,6 +4,7 @@ use ggez::graphics;
 use ggez::{Context, GameResult};
 
 use crate::assets::Data;
+use crate::background::Background;
 use crate::effects::Effects;
 use crate::end_state::EndState;
 use crate::enemies::Enemies;
@@ -23,6 +24,7 @@ pub struct PlayingState {
     pub map: GameMap,
     pub enemies: Enemies,
     pub towers: Towers,
+    pub background: Background,
     pub waves: Waves,
     pub gui: Gui,
     pub players: HashMap<usize, Player>,
@@ -44,6 +46,7 @@ impl PlayingState {
         let me = 42;
         let player = Player::new(me);
         let effects = Effects::new();
+        let background = Background::new();
         players.insert(me, player);
 
         return Self {
@@ -58,6 +61,7 @@ impl PlayingState {
             overlay_state: None,
             players,
             effects,
+            background,
         };
     }
 
@@ -95,6 +99,7 @@ impl event_handler::GameState for PlayingState {
         Enemies::tick(self);
         Towers::tick(self);
         Projectiles::tick(self);
+        self.background.tick();
         self.effects.tick();
         if self.waves.status == WaveStatus::WaveFinished {
             self.waves.status = WaveStatus::Waiting(5 * 60);
@@ -115,6 +120,7 @@ impl event_handler::GameState for PlayingState {
         }
         graphics::clear(ctx);
         graphics::set_color(ctx, graphics::WHITE)?;
+        Background::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         GameMap::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         Enemies::draw(&self, &self.data.as_ref().unwrap(), ctx)?;
         Towers::draw(&self, &self.data.as_ref().unwrap(), ctx)?;

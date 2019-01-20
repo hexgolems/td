@@ -13,6 +13,7 @@ use std::env;
 use std::path;
 
 mod assets;
+mod background;
 mod buffs;
 mod camera;
 mod card;
