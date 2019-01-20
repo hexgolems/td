@@ -9,7 +9,7 @@ extern crate serde_derive;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
-use ggez::Context;
+use ggez::ContextBuilder;
 use std::env;
 use std::path;
 
@@ -44,27 +44,28 @@ use crate::menu_state::MenuState;
 
 pub fn main() {
     let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("drawing", "ggez", c).unwrap();
+    let (ctx,event_loop) = ContextBuilder::new("HexTD","coco & leex").build().expect("couldn't create game context");
 
     // We add the CARGO_MANIFEST_DIR/resources do the filesystems paths so
     // we we look in the cargo project for files.
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-        let mut path = path::PathBuf::from(manifest_dir);
-        path.push("resources");
-        ctx.filesystem.mount(&path, true);
-    }
+    //if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+    //    let mut path = path::PathBuf::from(manifest_dir);
+    //    path.push("resources");
+    //    ctx.filesystem.mount(&path, true);
+    //}
 
-    println!("{}", graphics::renderer_info(ctx).unwrap());
+    //println!("{}", graphics::renderer_info(ctx).unwrap());
+
     let mut data = Data::new();
-    data.init(ctx).expect("couldn't load resources");
+    data.init(&mut ctx).expect("couldn't load resources");
+
     let mut init_state = Box::new(MenuState::new());
-    //let mut init_state = PlayingState::new(ctx).unwrap();
     init_state.set_data(data);
+
     let events = &mut event_handler::GameEventHandler::new(init_state);
 
-    if let Err(e) = event::run(ctx, events, &mut init_state) {
-        println!("Error encountered: {}", e);
-    } else {
-        println!("Game exited cleanly.");
+    match event::run(&mut ctx, &mut event_loop, events) {
+        Ok(_) => println!("Exited cleanly."),
+        Err(e) => println!("Error occured: {}", e)
     }
 }
