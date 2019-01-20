@@ -4,10 +4,10 @@ use crate::camera::Camera;
 use crate::card::CardType;
 use crate::map::GameMap;
 use crate::playing_state::PlayingState;
-use crate::utils::add_mod;
+use crate::utils::{self, add_mod};
 use crate::wave::WaveStatus;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Scale, Text, TextFragment};
+use ggez::graphics::{self, Scale, Text};
 use ggez::{Context, GameResult};
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
@@ -145,20 +145,15 @@ impl Gui {
 
             let cost = card.activation_cost(state);
             if cost > 0 {
-                let font = state.data.as_ref().unwrap().get_font();
-
-                let tf = TextFragment::new(format!("{}", cost));
-                let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(24.0));
-                //desc.set_filter(graphics::FilterMode::Nearest);
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
 
                 graphics::draw(
                     ctx,
                     &desc,
                     graphics::DrawParam::default()
-                        .dest(Point::new(80.0 + (i as f32) * 80.0, 550.0))
+                        .dest(Point::new(20.0 + (i as f32) * 80.0, 550.0))
                         .offset(Point::new(1.0, 1.0))
-                        .scale(Vector::new(1.0, 1.0)),
+                        .scale(Vector::new(0.3, 0.3)),
                 )?;
             }
         }
@@ -177,18 +172,16 @@ impl Gui {
                         .scale(Vector::new(8.0, 8.0)),
                 )?;
                 let font = state.data.as_ref().unwrap().get_font();
-                //let (_, txts) = font.get_wrap(card.get_description(), 200);
-                let txt = card.get_description();
-                let mut desc = Text::new(txt);
-                desc.set_font(*font, Scale::uniform(24.0));
-                //desc.set_filter(graphics::FilterMode::Nearest);
+                // FIXME TODO wrap text
+                let mut desc = utils::text(state.data.as_ref().unwrap(), &card.get_description());
+                desc.set_bounds(Point::new(600.0, 400.0), graphics::Align::Left);
                 graphics::draw(
                     ctx,
                     &desc,
                     graphics::DrawParam::default()
                         .dest(Point::new(600.0, 200.0))
                         .offset(Point::new(0.0, 0.0))
-                        .scale(Vector::new(1.0, 1.0)),
+                        .scale(Vector::new(0.3, 0.3)),
                 )?;
             }
         }
@@ -217,20 +210,15 @@ impl Gui {
 
             let cost = card.activation_cost(state);
             if cost > 0 {
-                let font = state.data.as_ref().unwrap().get_font();
-
-                let tf = TextFragment::new(format!("{}", cost));
-                let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(24.0));
-                //desc.set_filter(graphics::FilterMode::Nearest);
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
 
                 graphics::draw(
                     ctx,
                     &desc,
                     graphics::DrawParam::default()
-                        .dest(Point::new(750.0 - (i as f32) * 80.0, 550.0))
+                        .dest(Point::new(720.0 - (i as f32) * 80.0, 550.0))
                         .offset(Point::new(1.0, 1.0))
-                        .scale(Vector::new(1.0, 1.0)),
+                        .scale(Vector::new(0.3, 0.3)),
                 )?;
             }
         }
@@ -270,15 +258,15 @@ impl Gui {
         if let WaveStatus::Waiting(time) = state.waves.status {
             next_wave = format!(", Next wave in {}", time / 60);
         }
-        let mut tf = TextFragment::new(format!(
-            "Lives: {}, Gold: {}{}",
-            state.player().hp,
-            state.player().gold,
-            next_wave
-        ));
-        let mut desc = Text::new(tf);
-        desc.set_font(*font, Scale::uniform(24.0));
-        //desc.set_filter(graphics::FilterMode::Nearest);
+        let desc = utils::text(
+            state.data.as_ref().unwrap(),
+            &format!(
+                "Lives: {}, Gold: {}{}",
+                state.player().hp,
+                state.player().gold,
+                next_wave
+            ),
+        );
 
         graphics::draw(
             ctx,
@@ -286,7 +274,7 @@ impl Gui {
             graphics::DrawParam::default()
                 .dest(Point::new(10.0, 2.0))
                 .offset(Point::new(0.0, 0.0))
-                .scale(Vector::new(1.0, 1.0)),
+                .scale(Vector::new(0.3, 0.3)),
         )?;
         return Ok(());
     }

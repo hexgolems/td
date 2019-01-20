@@ -5,9 +5,9 @@ use crate::card::CardType;
 use crate::event_handler::StateTransition;
 use crate::overlay_state::OverlayState;
 use crate::playing_state::PlayingState;
-use crate::utils::add_mod;
+use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text, TextFragment};
+use ggez::graphics::{self, Color, Scale, Text};
 use ggez::{Context, GameResult};
 
 pub struct ShopOverlay {
@@ -74,23 +74,17 @@ impl ShopOverlay {
             )?;
             let cost = card.aquisition_cost(state);
             if cost > 0 {
-                let font = state.data.as_ref().unwrap().get_font();
-
-                let tf = TextFragment::new(format!("{}", cost));
-                let mut desc = Text::new(tf);
-                desc.set_font(*font, Scale::uniform(24.0));
-                //desc.set_filter(graphics::FilterMode::Nearest);
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
 
                 graphics::draw(
                     ctx,
                     &desc,
                     graphics::DrawParam::default()
                         .dest(Point::new(
-                            130.0,
-                            80.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
+                            67.0,
+                            45.0 + (i as f32) * 80.0 - self.get_drawing_offset(),
                         ))
-                        .offset(Point::new(1.0, 1.0))
-                        .scale(Vector::new(1.0, 1.0)),
+                        .scale(Vector::new(0.3, 0.3)),
                 )?;
             }
         }
@@ -122,18 +116,14 @@ impl ShopOverlay {
                 .offset(Point::new(0.0, 0.0))
                 .scale(Vector::new(8.0, 8.0)),
         )?;
-        let font = state.data.as_ref().unwrap().get_font();
-        let txt = card.get_description();
-        let mut desc = Text::new(txt);
-        desc.set_font(*font, Scale::uniform(24.0));
-        //desc.set_filter(graphics::FilterKeyModse::Nearest);
+        let mut desc = utils::text(state.data.as_ref().unwrap(), &card.get_description());
         graphics::draw(
             ctx,
             &desc,
             graphics::DrawParam::default()
                 .dest(Point::new(300.0, 200.0))
                 .offset(Point::new(0.0, 0.0))
-                .scale(Vector::new(1.0, 1.0)),
+                .scale(Vector::new(0.2, 0.2)),
         )?;
         return Ok(());
     }

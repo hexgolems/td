@@ -2,9 +2,9 @@ use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::playing_state::PlayingState;
-use crate::utils::add_mod;
+use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text, TextFragment};
+use ggez::graphics::{self, Color, Scale, Text};
 use ggez::{Context, GameResult};
 
 enum MenuItem {
@@ -47,12 +47,8 @@ impl event_handler::GameState for MenuState {
         graphics::clear(ctx, Color::new(0.1, 0.2, 0.2, 0.0));
         //graphics::set_color(ctx, graphics::WHITE)?;
 
-        let font = self.data.as_ref().unwrap().get_font();
         for (i, item) in self.options.iter().enumerate() {
-            let tf = TextFragment::new(item.get_text());
-            let mut desc = Text::new(tf);
-            desc.set_font(*font, Scale::uniform(24.0));
-            //desc.set_filter(graphics::FilterMode::Nearest);
+            let desc = utils::text(self.data.as_ref().unwrap(), &item.get_text());
             let mut color = Color::new(1.0, 1.0, 1.0, 1.0);
             if i == self.option_selected {
                 color = Color::new(1.0, 1.0, 0.0, 1.0);
@@ -64,7 +60,7 @@ impl event_handler::GameState for MenuState {
                 graphics::DrawParam::default()
                     .dest(Point::new(300.0, 100.0 + 40.0 * i as f32))
                     .offset(Point::new(0.0, 0.0))
-                    .scale(Vector::new(1.0, 1.0))
+                    .scale(Vector::new(0.3, 0.3))
                     .color(color),
             )?;
         }

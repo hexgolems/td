@@ -1,6 +1,9 @@
 use crate::algebra::Point;
+use crate::assets::Data;
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
+use crate::playing_state::PlayingState;
+use ggez::graphics::{Scale, Text, TextFragment};
 use ron;
 use ron::de::from_reader;
 use serde;
@@ -8,6 +11,14 @@ use std::fs::File;
 
 pub fn distance(p1: &Point, p2: &Point) -> f32 {
     (p1 - p2).norm()
+}
+
+pub fn text(data: &Data, s: &str) -> Text {
+    let font = data.get_font();
+    let tf = TextFragment::new(s);
+    let mut text = Text::new(tf);
+    text.set_font(*font, Scale::uniform(128.0));
+    return text;
 }
 
 pub fn move_to(pos: Point, target: Point, speed: f32) -> (Point, bool) {

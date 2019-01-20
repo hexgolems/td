@@ -2,8 +2,9 @@ use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::event_handler::{self, StateTransition};
 use crate::menu_state::MenuState;
+use crate::utils;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::{self, Color, Scale, Text, TextFragment};
+use ggez::graphics::{self, Color, Scale, Text};
 use ggez::{Context, GameResult};
 
 pub struct EndState {
@@ -32,19 +33,13 @@ impl event_handler::GameState for EndState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, Color::new(1.0, 1.0, 1.0, 1.0));
-        //graphics::set_color(ctx, graphics::WHITE)?;
-
-        let font = self.data.as_ref().unwrap().get_font();
+        graphics::clear(ctx, Color::new(0.1, 0.2, 0.4, 1.0));
         let text = if self.victory {
             "Congratz, You Won!"
         } else {
             "Ouch, You Failed!"
         };
-        let tf = TextFragment::new(text);
-        let mut desc = Text::new(tf);
-        desc.set_font(*font, Scale::uniform(1.0));
-        //desc.set_filter(graphics::FilterMode::Nearest);
+        let desc = utils::text(self.data.as_ref().unwrap(), &text);
         let color = if self.victory {
             Color::new(0.2, 1.0, 0.2, 1.0)
         } else {
@@ -57,7 +52,7 @@ impl event_handler::GameState for EndState {
             graphics::DrawParam::default()
                 .dest(Point::new(300.0, 100.0))
                 .offset(Point::new(0.0, 0.0))
-                .scale(Vector::new(1.0, 1.0))
+                .scale(Vector::new(0.3, 0.3))
                 .color(color),
         )?;
         graphics::present(ctx);
