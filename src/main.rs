@@ -26,6 +26,7 @@ mod enemies;
 mod enemy;
 mod event_handler;
 mod gui;
+mod hex_grid;
 mod map;
 mod menu_state;
 mod overlay_state;
