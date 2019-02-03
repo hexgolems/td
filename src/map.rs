@@ -1,19 +1,22 @@
 use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
 use crate::playing_state::PlayingState;
-use crate::utils::load_specs;
+use crate::utils::{distance, load_specs};
 use ggez::graphics::{draw, DrawParam};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use std::collections::HashMap;
+use std::f32;
 use std::ops::Range;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum WalkDir {
-    Up,
-    Down,
-    Left,
-    Right,
+    NorthEast,
+    East,
+    SouthEast,
+    SouthWest,
+    West,
+    NorthWest,
 }
 
 use self::WalkDir::*;
@@ -46,16 +49,20 @@ impl GameMap {
         let ysize = data.len();
         let decorations = vec![];
         let mut images = HashMap::new();
-        images.insert(Walk(Left), ImgID::FloorWalkLeft);
-        images.insert(Walk(Right), ImgID::FloorWalkRight);
-        images.insert(Walk(Up), ImgID::FloorWalkUp);
-        images.insert(Walk(Down), ImgID::FloorWalkDown);
-        images.insert(Build, ImgID::FloorBuild);
-        images.insert(Target, ImgID::FloorTarget);
-        images.insert(Spawn(Left), ImgID::FloorSpawnLeft);
-        images.insert(Spawn(Right), ImgID::FloorSpawnRight);
-        images.insert(Spawn(Up), ImgID::FloorSpawnUp);
-        images.insert(Spawn(Down), ImgID::FloorSpawnDown);
+        images.insert(Walk(NorthEast), ImgID::Hex);
+        images.insert(Walk(East), ImgID::Hex);
+        images.insert(Walk(SouthEast), ImgID::Hex);
+        images.insert(Walk(SouthWest), ImgID::Hex);
+        images.insert(Walk(West), ImgID::Hex);
+        images.insert(Walk(NorthWest), ImgID::Hex);
+        images.insert(Build, ImgID::Hex);
+        images.insert(Target, ImgID::Hex);
+        images.insert(Spawn(NorthEast), ImgID::Hex);
+        images.insert(Spawn(East), ImgID::Hex);
+        images.insert(Spawn(SouthEast), ImgID::Hex);
+        images.insert(Spawn(SouthWest), ImgID::Hex);
+        images.insert(Spawn(West), ImgID::Hex);
+        images.insert(Spawn(NorthWest), ImgID::Hex);
         let mut res = Self {
             decorations,
             data,
@@ -118,15 +125,34 @@ impl GameMap {
     }
 
     pub fn tile_pos(x: usize, y: usize) -> Point {
-        return Point::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
+        if y % 2 == 0 {
+            return Point::new(69.0 * x as f32, 59.0 * y as f32);
+        } else {
+            return Point::new(35.0 + 69.0 * x as f32, 59.0 * y as f32);
+        }
     }
 
     pub fn tile_center(x: usize, y: usize) -> Point {
-        return Point::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
+        return GameMap::tile_pos(x, y) + Vector::new(35.5, 39.5);
     }
 
-    pub fn tile_index_at(pos: Point) -> (usize, usize) {
-        return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
+    pub fn tile_index_at(point: Point) -> (usize, usize) {
+        let x = (point.x / 69.0) as usize;
+        let y = (point.y / 59.0) as usize;
+        let mut min_distance = f32::INFINITY;
+        let mut rx = 0;
+        let mut ry = 0;
+        for xi in x.saturating_sub(1)..x + 1 {
+            for yi in y.saturating_sub(1)..y + 1 {
+                let distance = distance(&GameMap::tile_center(xi, yi), &point);
+                if min_distance > distance {
+                    min_distance = distance;
+                    rx = xi;
+                    ry = yi;
+                }
+            }
+        }
+        return (rx as usize, ry as usize);
     }
 
     pub fn get_tile_type(&self, x: usize, y: usize) -> MapTile {
@@ -176,9 +202,7 @@ impl GameMap {
                 draw(
                     ctx,
                     data.get_i(&state.map.images[&state.map.data[y][x]]),
-                    DrawParam::default()
-                        .dest(state.gui.cam().pos(GameMap::tile_pos(x, y)))
-                        .scale(Vector::new(4.0, 4.0)),
+                    DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
                 )?;
             }
         }

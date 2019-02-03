@@ -1,7 +1,8 @@
 [
-    [Target, Build, Build, Build, Build],
-    [Walk(Up), Walk(Left), Walk(Left), Walk(Left), Walk(Left)],
-    [Build, Build, Build, Build, Walk(Up)],
-    [Spawn(Right), Walk(Right), Walk(Right), Walk(Right), Walk(Up)],
-    [Build, Build, Build, Build, Build],
+    [Target, Walk(West), Build, Build, Build],
+      [Walk(NorthEast), Build, Walk(SouthWest), Walk(West), Walk(West)],
+    [Build, Walk(NorthWest), Walk(West), Build, Walk(NorthEast)],
+      [Build, Walk(SouthEast), Build, Build, Walk(NorthWest)],
+    [Spawn(East), Walk(NorthEast), Walk(East), Walk(East), Walk(NorthEast)],
 ]
+

@@ -5,7 +5,6 @@ use crate::debuffs::Debuff;
 use crate::map::{GameMap, MapTile, WalkDir};
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
-use rand::prelude::*;
 use std::collections::HashMap;
 
 pub struct Enemy {
@@ -40,11 +39,9 @@ impl Enemy {
             move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
-            let offset = (Vector::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
-                - Vector::new(30.0, 30.0);
             self.next_walk_target = match map.tile_at(self.position) {
-                MapTile::Walk(a) => self.walk_target(a) + offset,
-                MapTile::Spawn(a) => self.walk_target(a) + offset,
+                MapTile::Walk(a) => self.walk_target(a),
+                MapTile::Spawn(a) => self.walk_target(a),
                 MapTile::Target => {
                     self.reached_goal = true;
                     self.position
@@ -77,11 +74,23 @@ impl Enemy {
 
     fn walk_target(&mut self, dir: WalkDir) -> Point {
         let (x, y) = GameMap::tile_index_at(self.position);
-        return match dir {
-            WalkDir::Up => GameMap::tile_center(x, y - 1),
-            WalkDir::Down => GameMap::tile_center(x, y + 1),
-            WalkDir::Left => GameMap::tile_center(x - 1, y),
-            WalkDir::Right => GameMap::tile_center(x + 1, y),
+        return match (dir, y % 2 == 0) {
+            (WalkDir::NorthEast, true) => GameMap::tile_center(x, y - 1),
+            (WalkDir::NorthEast, false) => GameMap::tile_center(x + 1, y - 1),
+            (WalkDir::SouthWest, true) => GameMap::tile_center(x - 1, y + 1),
+            (WalkDir::SouthWest, false) => GameMap::tile_center(x, y + 1),
+            (WalkDir::East, _) => GameMap::tile_center(x + 1, y),
+            (WalkDir::West, _) => GameMap::tile_center(x - 1, y),
+            (WalkDir::SouthEast, true) => GameMap::tile_center(x, y + 1),
+            (WalkDir::SouthEast, false) => GameMap::tile_center(x + 1, y + 1),
+            (WalkDir::NorthWest, true) => GameMap::tile_center(x - 1, y - 1),
+            (WalkDir::NorthWest, false) => GameMap::tile_center(x, y - 1),
         };
     }
 }
+
+// o o o o o o true
+//  o o o o o o false
+// o o o o o o o true
+//  o o o o o o false
+// o o o o o o o true

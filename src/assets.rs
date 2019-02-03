@@ -30,6 +30,7 @@ pub enum ImgID {
     NextWave,
 
     SellTower,
+    Hex,
     Shop,
     Smoke,
     Stone(usize),
@@ -95,6 +96,7 @@ impl Data {
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
+        self.load_img(ctx, Hex, "/tile_grass1.png")?;
         self.load_img(ctx, FloorBuild, "/floor_build.png")?;
         self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
 
