@@ -1,5 +1,6 @@
 #![feature(range_contains)]
 extern crate ggez;
+extern crate nalgebra;
 extern crate rand;
 extern crate ron;
 #[macro_use]
@@ -7,11 +8,12 @@ extern crate serde;
 extern crate serde_derive;
 use ggez::conf;
 use ggez::event;
-use ggez::graphics;
-use ggez::Context;
+use ggez::graphics::{self, FilterMode};
+use ggez::ContextBuilder;
 use std::env;
 use std::path;
 
+mod algebra;
 mod assets;
 mod background;
 mod buffs;
@@ -42,27 +44,26 @@ use crate::menu_state::MenuState;
 
 pub fn main() {
     let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("drawing", "ggez", c).unwrap();
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let mut path = path::PathBuf::from(manifest_dir);
+    path.push("resources");
+    let (mut ctx, mut event_loop) = ContextBuilder::new("HexTD", "coco & leex")
+        .conf(c)
+        .add_resource_path(path)
+        .build()
+        .expect("couldn't create game context");
 
-    // We add the CARGO_MANIFEST_DIR/resources do the filesystems paths so
-    // we we look in the cargo project for files.
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-        let mut path = path::PathBuf::from(manifest_dir);
-        path.push("resources");
-        ctx.filesystem.mount(&path, true);
-    }
-
-    println!("{}", graphics::get_renderer_info(ctx).unwrap());
     let mut data = Data::new();
-    data.init(ctx).expect("couldn't load resources");
+    data.init(&mut ctx).expect("couldn't load resources");
+
     let mut init_state = Box::new(MenuState::new());
-    //let mut init_state = PlayingState::new(ctx).unwrap();
     init_state.set_data(data);
+
     let events = &mut event_handler::GameEventHandler::new(init_state);
 
-    if let Err(e) = event::run(ctx, events) {
-        println!("Error encountered: {}", e);
-    } else {
-        println!("Game exited cleanly.");
+    graphics::set_default_filter(&mut ctx, FilterMode::Nearest);
+    match event::run(&mut ctx, &mut event_loop, events) {
+        Ok(_) => println!("Exited cleanly."),
+        Err(e) => println!("Error occured: {}", e),
     }
 }

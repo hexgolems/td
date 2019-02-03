@@ -1,13 +1,12 @@
-use ggez::graphics;
-use ggez::graphics::{Point2, Vector2};
+use crate::algebra::{Point, Vector};
+use crate::assets::{Data, ImgID};
+use crate::playing_state::PlayingState;
+use crate::utils::load_specs;
+use ggez::graphics::{draw, DrawParam};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use std::collections::HashMap;
 use std::ops::Range;
-
-use crate::assets::{Data, ImgID};
-use crate::playing_state::PlayingState;
-use crate::utils::load_specs;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum WalkDir {
@@ -28,7 +27,7 @@ pub enum MapTile {
 use self::MapTile::*;
 
 struct Decoration {
-    pos: Point2,
+    pos: Point,
     disp: ImgID,
 }
 
@@ -84,9 +83,9 @@ impl GameMap {
                     Build => {
                         if rand::thread_rng().gen::<f32>() > 0.1 {
                             let offset =
-                                (Vector2::new(rand::thread_rng().gen(), rand::thread_rng().gen())
+                                (Vector::new(rand::thread_rng().gen(), rand::thread_rng().gen())
                                     * 60.0)
-                                    - Vector2::new(30.0, 30.0);
+                                    - Vector::new(30.0, 30.0);
                             let pos = GameMap::tile_center(x, y) + offset;
                             self.decorations.push(Decoration {
                                 pos,
@@ -98,11 +97,11 @@ impl GameMap {
                     Walk(_) => {
                         for _i in 1..4 {
                             if rand::thread_rng().gen::<f32>() > 0.1 {
-                                let offset = (Vector2::new(
+                                let offset = (Vector::new(
                                     rand::thread_rng().gen(),
                                     rand::thread_rng().gen(),
                                 ) * 70.0)
-                                    - Vector2::new(35.0, 30.0);
+                                    - Vector::new(35.0, 30.0);
                                 let pos = GameMap::tile_center(x, y) + offset;
                                 self.decorations.push(Decoration {
                                     pos,
@@ -118,22 +117,22 @@ impl GameMap {
         }
     }
 
-    pub fn tile_pos(x: usize, y: usize) -> graphics::Point2 {
-        return graphics::Point2::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
+    pub fn tile_pos(x: usize, y: usize) -> Point {
+        return Point::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
     }
 
-    pub fn tile_center(x: usize, y: usize) -> graphics::Point2 {
-        return graphics::Point2::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
+    pub fn tile_center(x: usize, y: usize) -> Point {
+        return Point::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
     }
 
-    pub fn tile_index_at(pos: graphics::Point2) -> (usize, usize) {
+    pub fn tile_index_at(pos: Point) -> (usize, usize) {
         return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
     }
 
     pub fn get_tile_type(&self, x: usize, y: usize) -> MapTile {
         return self.data[y][x];
     }
-    pub fn tile_at(&self, pos: graphics::Point2) -> MapTile {
+    pub fn tile_at(&self, pos: Point) -> MapTile {
         let (xi, yi) = GameMap::tile_index_at(pos);
         return self.get_tile_type(xi, yi);
     }
@@ -174,32 +173,24 @@ impl GameMap {
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for x in state.map.xrange() {
             for y in state.map.yrange() {
-                graphics::draw_ex(
+                draw(
                     ctx,
                     data.get_i(&state.map.images[&state.map.data[y][x]]),
-                    graphics::DrawParam {
-                        // src: src,
-                        dest: state.gui.cam().pos(GameMap::tile_pos(x, y)),
-                        //rotation: self.zoomlevel,
-                        // offset: Point2::new(-16.0, 0.0),
-                        scale: Point2::new(4.0, 4.0),
-                        // shear: shear,
-                        ..Default::default()
-                    },
+                    DrawParam::default()
+                        .dest(state.gui.cam().pos(GameMap::tile_pos(x, y)))
+                        .scale(Vector::new(4.0, 4.0)),
                 )?;
             }
         }
 
         for dec in state.map.decorations.iter() {
-            graphics::draw_ex(
+            draw(
                 ctx,
                 data.get_i(&dec.disp),
-                graphics::DrawParam {
-                    dest: state.gui.cam().pos(dec.pos),
-                    scale: Point2::new(4.0, 4.0),
-                    offset: Point2::new(0.5, 1.0),
-                    ..Default::default()
-                },
+                DrawParam::default()
+                    .dest(state.gui.cam().pos(dec.pos))
+                    .scale(Vector::new(4.0, 4.0))
+                    .offset(Point::new(0.5, 1.0)),
             )?;
         }
         Ok(())

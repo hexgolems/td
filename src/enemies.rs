@@ -1,10 +1,11 @@
+use crate::algebra::{Point, Vector};
 use crate::assets::Data;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
 use crate::enemy::Enemy;
 use crate::playing_state::PlayingState;
 use crate::utils::distance;
-use ggez::graphics::{self, Point2};
+use ggez::graphics;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
 
@@ -36,25 +37,20 @@ impl Enemies {
                 }
                 None => (),
             }
-            graphics::draw_ex(
+            graphics::draw(
                 ctx,
                 data.get_i(&e.disp),
-                graphics::DrawParam {
-                    // src: src,
-                    dest: state.gui.cam().pos(e.position), //+e.offset_in_tile,
-                    //rotation: self.zoomlevel,
-                    offset: Point2::new(0.5, 0.5),
-                    scale: Point2::new(4.0 * e.size, 4.0 * e.size),
-                    color: Some(graphics::Color::new(color.0, color.1, color.2, 1.0)),
-                    // shear: shear,
-                    ..Default::default()
-                },
+                graphics::DrawParam::default()
+                    .dest(state.gui.cam().pos(e.position))
+                    .offset(Point::new(0.5, 0.5))
+                    .scale(Vector::new(4.0 * e.size, 4.0 * e.size))
+                    .color(graphics::Color::new(color.0, color.1, color.2, 1.0)),
             )?;
         }
         Ok(())
     }
 
-    pub fn in_range(&self, pos: graphics::Point2, range: f32) -> Vec<usize> {
+    pub fn in_range(&self, pos: Point, range: f32) -> Vec<usize> {
         self.enemies
             .iter()
             .filter(|(_id, e)| distance(&pos, &e.position) <= range && e.health > 0)
@@ -62,7 +58,7 @@ impl Enemies {
             .collect()
     }
 
-    pub fn weakest_enemy_in_range(&self, range: f32, pos: graphics::Point2) -> Option<usize> {
+    pub fn weakest_enemy_in_range(&self, range: f32, pos: Point) -> Option<usize> {
         self.in_range(pos, range)
             .iter()
             .min_by_key(|id| self.enemies.get(id).unwrap().health)
