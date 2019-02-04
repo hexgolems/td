@@ -2,7 +2,7 @@ use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
-use crate::map::{GameMap, MapTile, WalkDir};
+use crate::map::{Dir, GameMap, MapTile};
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
 use std::collections::HashMap;
@@ -72,25 +72,9 @@ impl Enemy {
         return self.walk_speed;
     }
 
-    fn walk_target(&mut self, dir: WalkDir) -> Point {
+    fn walk_target(&mut self, dir: Dir) -> Point {
         let (x, y) = GameMap::tile_index_at(self.position);
-        return match (dir, y % 2 == 0) {
-            (WalkDir::NorthEast, true) => GameMap::tile_center(x, y - 1),
-            (WalkDir::NorthEast, false) => GameMap::tile_center(x + 1, y - 1),
-            (WalkDir::SouthWest, true) => GameMap::tile_center(x - 1, y + 1),
-            (WalkDir::SouthWest, false) => GameMap::tile_center(x, y + 1),
-            (WalkDir::East, _) => GameMap::tile_center(x + 1, y),
-            (WalkDir::West, _) => GameMap::tile_center(x - 1, y),
-            (WalkDir::SouthEast, true) => GameMap::tile_center(x, y + 1),
-            (WalkDir::SouthEast, false) => GameMap::tile_center(x + 1, y + 1),
-            (WalkDir::NorthWest, true) => GameMap::tile_center(x - 1, y - 1),
-            (WalkDir::NorthWest, false) => GameMap::tile_center(x, y - 1),
-        };
+        let (x, y) = GameMap::tile_direction_neighbor(x as isize, y as isize, dir);
+        return GameMap::tile_center(x as usize, y as usize);
     }
 }
-
-// o o o o o o true
-//  o o o o o o false
-// o o o o o o o true
-//  o o o o o o false
-// o o o o o o o true
