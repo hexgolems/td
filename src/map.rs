@@ -25,6 +25,7 @@ use self::Dir::*;
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum MapTile {
     Walk(Dir),
+    Empty,
     Build,
     Spawn(Dir),
     Target,
@@ -254,11 +255,13 @@ impl GameMap {
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for x in state.map.xrange() {
             for y in state.map.yrange() {
-                draw(
-                    ctx,
-                    data.get_i(&state.map.images[&state.map.data[y][x]]),
-                    DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
-                )?;
+                if state.map.get_tile_type(x, y) != Empty {
+                    draw(
+                        ctx,
+                        data.get_i(&state.map.images[&state.map.data[y][x]]),
+                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
+                    )?;
+                }
             }
         }
 
