@@ -1,27 +1,33 @@
 use crate::algebra::{Point, Vector};
 use crate::assets::{Data, ImgID};
 use crate::playing_state::PlayingState;
-use crate::utils::load_specs;
+use crate::utils::{distance, load_specs};
 use ggez::graphics::{draw, DrawParam};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use std::collections::HashMap;
+use std::f32;
 use std::ops::Range;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
-pub enum WalkDir {
-    Up,
-    Down,
-    Left,
-    Right,
+pub enum Dir {
+    NorthEast,
+    East,
+    SouthEast,
+    SouthWest,
+    West,
+    NorthWest,
 }
 
-use self::WalkDir::*;
+const DIRECTIONS: [Dir; 6] = [East, NorthEast, NorthWest, West, SouthWest, SouthEast];
+
+use self::Dir::*;
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
 pub enum MapTile {
-    Walk(WalkDir),
+    Walk(Dir),
+    Empty,
     Build,
-    Spawn(WalkDir),
+    Spawn(Dir),
     Target,
 }
 use self::MapTile::*;
@@ -46,16 +52,20 @@ impl GameMap {
         let ysize = data.len();
         let decorations = vec![];
         let mut images = HashMap::new();
-        images.insert(Walk(Left), ImgID::FloorWalkLeft);
-        images.insert(Walk(Right), ImgID::FloorWalkRight);
-        images.insert(Walk(Up), ImgID::FloorWalkUp);
-        images.insert(Walk(Down), ImgID::FloorWalkDown);
-        images.insert(Build, ImgID::FloorBuild);
-        images.insert(Target, ImgID::FloorTarget);
-        images.insert(Spawn(Left), ImgID::FloorSpawnLeft);
-        images.insert(Spawn(Right), ImgID::FloorSpawnRight);
-        images.insert(Spawn(Up), ImgID::FloorSpawnUp);
-        images.insert(Spawn(Down), ImgID::FloorSpawnDown);
+        images.insert(Walk(NorthEast), ImgID::Hex);
+        images.insert(Walk(East), ImgID::Hex);
+        images.insert(Walk(SouthEast), ImgID::Hex);
+        images.insert(Walk(SouthWest), ImgID::Hex);
+        images.insert(Walk(West), ImgID::Hex);
+        images.insert(Walk(NorthWest), ImgID::Hex);
+        images.insert(Build, ImgID::Hex);
+        images.insert(Target, ImgID::Hex);
+        images.insert(Spawn(NorthEast), ImgID::Hex);
+        images.insert(Spawn(East), ImgID::Hex);
+        images.insert(Spawn(SouthEast), ImgID::Hex);
+        images.insert(Spawn(SouthWest), ImgID::Hex);
+        images.insert(Spawn(West), ImgID::Hex);
+        images.insert(Spawn(NorthWest), ImgID::Hex);
         let mut res = Self {
             decorations,
             data,
@@ -117,16 +127,88 @@ impl GameMap {
         }
     }
 
+    pub fn valid_tile_pos(&self, x: isize, y: isize) -> Option<(usize, usize)> {
+        if x > 0 && y > 0 && x < self.xsize as isize && y < self.ysize as isize {
+            return Some((x as usize, y as usize));
+        }
+        return None;
+    }
+
+    pub fn tile_ring(x_in: isize, y_in: isize, radius: usize) -> Vec<(isize, isize)> {
+        let mut results = vec![];
+        let mut x = x_in;
+        let mut y = y_in;
+        println!("own pos: {}, {}", x, y);
+        for i in 0..radius {
+            let (x_i, y_i) = GameMap::tile_direction_neighbor(x, y, DIRECTIONS[4]);
+            x = x_i;
+            y = y_i;
+        }
+        println!("walked out to pos: {}, {}", x, y);
+        for i in 0..6 {
+            for _ in 0..radius {
+                println!("pushing: {}, {}", x, y);
+                results.push((x, y));
+                let (x_i, y_i) = GameMap::tile_direction_neighbor(x, y, DIRECTIONS[i]);
+                x = x_i;
+                y = y_i;
+            }
+        }
+        return results;
+    }
+
+    pub fn tile_potential_neighbors(x: isize, y: isize, radius: usize) -> Vec<(isize, isize)> {
+        let mut results = vec![];
+        for i in 1..=radius {
+            results.append(&mut GameMap::tile_ring(x, y, i));
+        }
+        return results;
+    }
+
+    pub fn tile_direction_neighbor(x: isize, y: isize, dir: Dir) -> (isize, isize) {
+        return match (dir, y % 2 == 0) {
+            (Dir::NorthEast, true) => (x, y - 1),
+            (Dir::NorthEast, false) => (x + 1, y - 1),
+            (Dir::SouthWest, true) => (x - 1, y + 1),
+            (Dir::SouthWest, false) => (x, y + 1),
+            (Dir::East, _) => (x + 1, y),
+            (Dir::West, _) => (x - 1, y),
+            (Dir::SouthEast, true) => (x, y + 1),
+            (Dir::SouthEast, false) => (x + 1, y + 1),
+            (Dir::NorthWest, true) => (x - 1, y - 1),
+            (Dir::NorthWest, false) => (x, y - 1),
+        };
+    }
+
     pub fn tile_pos(x: usize, y: usize) -> Point {
-        return Point::new(4.0 * 20.0 * x as f32, 4.0 * 20.0 * y as f32);
+        if y % 2 == 0 {
+            return Point::new(69.0 * x as f32, 59.0 * y as f32);
+        } else {
+            return Point::new(35.0 + 69.0 * x as f32, 59.0 * y as f32);
+        }
     }
 
     pub fn tile_center(x: usize, y: usize) -> Point {
-        return Point::new(4.0 * 20.0 * x as f32 + 40.0, 4.0 * 20.0 * y as f32 + 40.0);
+        return GameMap::tile_pos(x, y) + Vector::new(35.5, 39.5);
     }
 
-    pub fn tile_index_at(pos: Point) -> (usize, usize) {
-        return ((pos.x / 80.0) as usize, (pos.y / 80.0) as usize);
+    pub fn tile_index_at(point: Point) -> (usize, usize) {
+        let x = (point.x / 69.0) as usize;
+        let y = (point.y / 59.0) as usize;
+        let mut min_distance = f32::INFINITY;
+        let mut rx = 0;
+        let mut ry = 0;
+        for xi in x.saturating_sub(1)..x + 1 {
+            for yi in y.saturating_sub(1)..y + 1 {
+                let distance = distance(&GameMap::tile_center(xi, yi), &point);
+                if min_distance > distance {
+                    min_distance = distance;
+                    rx = xi;
+                    ry = yi;
+                }
+            }
+        }
+        return (rx as usize, ry as usize);
     }
 
     pub fn get_tile_type(&self, x: usize, y: usize) -> MapTile {
@@ -173,13 +255,13 @@ impl GameMap {
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for x in state.map.xrange() {
             for y in state.map.yrange() {
-                draw(
-                    ctx,
-                    data.get_i(&state.map.images[&state.map.data[y][x]]),
-                    DrawParam::default()
-                        .dest(state.gui.cam().pos(GameMap::tile_pos(x, y)))
-                        .scale(Vector::new(4.0, 4.0)),
-                )?;
+                if state.map.get_tile_type(x, y) != Empty {
+                    draw(
+                        ctx,
+                        data.get_i(&state.map.images[&state.map.data[y][x]]),
+                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
+                    )?;
+                }
             }
         }
 

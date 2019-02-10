@@ -2,10 +2,9 @@ use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
-use crate::map::{GameMap, MapTile, WalkDir};
+use crate::map::{Dir, GameMap, MapTile};
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
-use rand::prelude::*;
 use std::collections::HashMap;
 
 pub struct Enemy {
@@ -40,11 +39,9 @@ impl Enemy {
             move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
-            let offset = (Vector::new(rand::thread_rng().gen(), rand::thread_rng().gen()) * 60.0)
-                - Vector::new(30.0, 30.0);
             self.next_walk_target = match map.tile_at(self.position) {
-                MapTile::Walk(a) => self.walk_target(a) + offset,
-                MapTile::Spawn(a) => self.walk_target(a) + offset,
+                MapTile::Walk(a) => self.walk_target(a),
+                MapTile::Spawn(a) => self.walk_target(a),
                 MapTile::Target => {
                     self.reached_goal = true;
                     self.position
@@ -75,13 +72,9 @@ impl Enemy {
         return self.walk_speed;
     }
 
-    fn walk_target(&mut self, dir: WalkDir) -> Point {
+    fn walk_target(&mut self, dir: Dir) -> Point {
         let (x, y) = GameMap::tile_index_at(self.position);
-        return match dir {
-            WalkDir::Up => GameMap::tile_center(x, y - 1),
-            WalkDir::Down => GameMap::tile_center(x, y + 1),
-            WalkDir::Left => GameMap::tile_center(x - 1, y),
-            WalkDir::Right => GameMap::tile_center(x + 1, y),
-        };
+        let (x, y) = GameMap::tile_direction_neighbor(x as isize, y as isize, dir);
+        return GameMap::tile_center(x as usize, y as usize);
     }
 }

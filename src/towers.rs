@@ -172,15 +172,18 @@ impl Towers {
 
     pub fn affected_by_aura(&self, t: &Tower) -> Vec<usize> {
         let mut nn = Vec::new();
-        let n = t.aura_level();
-        for x in
-            (t.map_position.0.saturating_sub(n)..t.map_position.0.saturating_add(n + 1)).into_iter()
+        for (x, y) in GameMap::tile_potential_neighbors(
+            t.map_position.0 as isize,
+            t.map_position.1 as isize,
+            t.aura_level(),
+        )
+        .iter()
         {
-            for y in (t.map_position.1.saturating_sub(n)..t.map_position.1.saturating_add(n + 1))
-                .into_iter()
-            {
-                if let Some(id) = self.position_to_towerid.get(&(x, y)) {
+            println!("Potential neighbor is: {}, {}", *x, *y);
+            if *x >= 0 && *y >= 0 {
+                if let Some(id) = self.position_to_towerid.get(&(*x as usize, *y as usize)) {
                     if *id != t.id {
+                        println!("Found tower with id: {}", *id);
                         nn.push(*id);
                     }
                 };
