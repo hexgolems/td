@@ -1,6 +1,10 @@
-use crate::algebra::{Point, Vector};
+use crate::algebra::{Point, Position, Vector};
 use crate::assets::{Data, ImgID};
+use crate::dijkstra::{reconstruct_path, shortest_path, Edge};
+use crate::direction::{Dir, DIRECTIONS};
 use crate::playing_state::PlayingState;
+use crate::tile::TileType::*;
+use crate::tile::{Tile, TileType};
 use crate::utils::{distance, load_specs};
 use ggez::graphics::{draw, DrawParam};
 use ggez::{Context, GameResult};
@@ -8,29 +12,6 @@ use rand::prelude::*;
 use std::collections::HashMap;
 use std::f32;
 use std::ops::Range;
-
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
-pub enum Dir {
-    NorthEast,
-    East,
-    SouthEast,
-    SouthWest,
-    West,
-    NorthWest,
-}
-
-const DIRECTIONS: [Dir; 6] = [East, NorthEast, NorthWest, West, SouthWest, SouthEast];
-
-use self::Dir::*;
-#[derive(Eq, PartialEq, Hash, Copy, Clone, Debug, Deserialize)]
-pub enum MapTile {
-    Walk(Dir),
-    Empty,
-    Build,
-    Spawn(Dir),
-    Target,
-}
-use self::MapTile::*;
 
 struct Decoration {
     pos: Point,
@@ -40,32 +21,35 @@ struct Decoration {
 pub struct GameMap {
     pub xsize: usize,
     pub ysize: usize,
-    data: Vec<Vec<MapTile>>,
+    pub data: Vec<Vec<Tile>>,
     decorations: Vec<Decoration>,
-    images: HashMap<MapTile, ImgID>,
+    images: HashMap<TileType, ImgID>,
 }
 
 impl GameMap {
     pub fn new() -> Self {
-        let data = load_specs::<Vec<MapTile>>("map");
-        let xsize = data[0].len();
-        let ysize = data.len();
+        let tiletypes = load_specs::<Vec<TileType>>("map");
+        let xsize = tiletypes[0].len();
+        let ysize = tiletypes.len();
+        let data = tiletypes
+            .iter()
+            .enumerate()
+            .map(|(y, outer)| {
+                outer
+                    .iter()
+                    .enumerate()
+                    .map(|(x, kind)| Tile::new_from_type(*kind, x, y))
+                    .collect()
+            })
+            .collect();
         let decorations = vec![];
         let mut images = HashMap::new();
-        images.insert(Walk(NorthEast), ImgID::Hex);
-        images.insert(Walk(East), ImgID::Hex);
-        images.insert(Walk(SouthEast), ImgID::Hex);
-        images.insert(Walk(SouthWest), ImgID::Hex);
-        images.insert(Walk(West), ImgID::Hex);
-        images.insert(Walk(NorthWest), ImgID::Hex);
+        for dir in DIRECTIONS.iter() {
+            images.insert(Walk(*dir), ImgID::Walk(*dir));
+        }
         images.insert(Build, ImgID::Hex);
         images.insert(Target, ImgID::Hex);
-        images.insert(Spawn(NorthEast), ImgID::Hex);
-        images.insert(Spawn(East), ImgID::Hex);
-        images.insert(Spawn(SouthEast), ImgID::Hex);
-        images.insert(Spawn(SouthWest), ImgID::Hex);
-        images.insert(Spawn(West), ImgID::Hex);
-        images.insert(Spawn(NorthWest), ImgID::Hex);
+        images.insert(Spawn, ImgID::Hex);
         let mut res = Self {
             decorations,
             data,
@@ -74,6 +58,7 @@ impl GameMap {
             images,
         };
         res.create_decorations();
+        res.path(4, 4);
         return res;
     }
 
@@ -127,27 +112,29 @@ impl GameMap {
         }
     }
 
-    pub fn valid_tile_pos(&self, x: isize, y: isize) -> Option<(usize, usize)> {
-        if x > 0 && y > 0 && x < self.xsize as isize && y < self.ysize as isize {
-            return Some((x as usize, y as usize));
+    pub fn valid_tile_pos(&self, x: isize, y: isize) -> bool {
+        if x >= 0
+            && y >= 0
+            && x < self.xsize as isize
+            && y < self.ysize as isize
+            && self.get_tile_type(x as usize, y as usize) != Empty
+        {
+            return true;
         }
-        return None;
+        return false;
     }
 
     pub fn tile_ring(x_in: isize, y_in: isize, radius: usize) -> Vec<(isize, isize)> {
         let mut results = vec![];
         let mut x = x_in;
         let mut y = y_in;
-        println!("own pos: {}, {}", x, y);
         for i in 0..radius {
             let (x_i, y_i) = GameMap::tile_direction_neighbor(x, y, DIRECTIONS[4]);
             x = x_i;
             y = y_i;
         }
-        println!("walked out to pos: {}, {}", x, y);
         for i in 0..6 {
             for _ in 0..radius {
-                println!("pushing: {}, {}", x, y);
                 results.push((x, y));
                 let (x_i, y_i) = GameMap::tile_direction_neighbor(x, y, DIRECTIONS[i]);
                 x = x_i;
@@ -155,6 +142,15 @@ impl GameMap {
             }
         }
         return results;
+    }
+
+    pub fn neighbors(&self, x: usize, y: usize, radius: usize) -> Vec<(usize, usize)> {
+        let mut potential = GameMap::tile_potential_neighbors(x as isize, y as isize, radius);
+        potential.retain(|(x, y)| self.valid_tile_pos(*x, *y));
+        return potential
+            .iter()
+            .map(|(x, y)| (*x as usize, *y as usize))
+            .collect();
     }
 
     pub fn tile_potential_neighbors(x: isize, y: isize, radius: usize) -> Vec<(isize, isize)> {
@@ -211,12 +207,17 @@ impl GameMap {
         return (rx as usize, ry as usize);
     }
 
-    pub fn get_tile_type(&self, x: usize, y: usize) -> MapTile {
-        return self.data[y][x];
+    pub fn get_tile_type(&self, x: usize, y: usize) -> TileType {
+        return self.data[y][x].kind;
     }
-    pub fn tile_at(&self, pos: Point) -> MapTile {
-        let (xi, yi) = GameMap::tile_index_at(pos);
-        return self.get_tile_type(xi, yi);
+
+    pub fn get_tile(&self, x: usize, y: usize) -> &Tile {
+        return &self.data[y][x];
+    }
+
+    pub fn tile_at(&self, point: Point) -> TileType {
+        let (x, y) = GameMap::tile_index_at(point);
+        return self.get_tile_type(x, y);
     }
 
     pub fn xrange(&self) -> Range<usize> {
@@ -228,15 +229,15 @@ impl GameMap {
     }
 
     pub fn is_buildable(&self, x: usize, y: usize) -> bool {
-        match self.data[y][x] {
+        match self.get_tile_type(x, y) {
             Build => return true,
             _ => return false,
         }
     }
 
     pub fn is_spawn(&self, x: usize, y: usize) -> bool {
-        match self.data[y][x] {
-            Spawn(_) => return true,
+        match self.get_tile_type(x, y) {
+            Spawn => return true,
             _ => return false,
         }
     }
@@ -252,13 +253,15 @@ impl GameMap {
         }
         return spawns;
     }
+
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
         for x in state.map.xrange() {
             for y in state.map.yrange() {
-                if state.map.get_tile_type(x, y) != Empty {
+                let tiletype = state.map.get_tile_type(x, y);
+                if tiletype != Empty {
                     draw(
                         ctx,
-                        data.get_i(&state.map.images[&state.map.data[y][x]]),
+                        data.get_i(&state.map.images[&tiletype]),
                         DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
                     )?;
                 }
@@ -276,5 +279,43 @@ impl GameMap {
             )?;
         }
         Ok(())
+    }
+
+    pub fn build_graph(&self) -> HashMap<Position, Vec<Edge>> {
+        let mut graph = HashMap::new();
+        for x in self.xrange() {
+            for y in self.yrange() {
+                let mut nodes = vec![];
+                let current = self.get_tile(x, y);
+                for neighbor in self.neighbors(x, y, 1) {
+                    nodes.push(Edge {
+                        position: Position::new(neighbor.0, neighbor.1),
+                        cost: current.cost,
+                    })
+                }
+                graph.insert(current.position, nodes);
+            }
+        }
+        return graph;
+    }
+
+    pub fn target(&self) -> &Tile {
+        let (mut x, mut y) = (0, 0);
+        for xi in self.xrange() {
+            for yi in self.yrange() {
+                if self.get_tile_type(xi, yi) == Target {
+                    let (x, y) = (xi, yi);
+                }
+            }
+        }
+        return self.get_tile(x, y);
+    }
+
+    pub fn path(&self, x: usize, y: usize) -> Vec<Position> {
+        let graph = self.build_graph();
+        let target = self.target().position;
+        let start = self.get_tile(x, y).position;
+        let path = reconstruct_path(shortest_path(&graph, start, target), start, target);
+        return path;
     }
 }

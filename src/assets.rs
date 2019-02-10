@@ -1,3 +1,4 @@
+use crate::direction::Dir;
 use ggez::graphics;
 use ggez::{Context, GameResult};
 use std::collections::HashMap;
@@ -31,6 +32,7 @@ pub enum ImgID {
 
     SellTower,
     Hex,
+    Walk(Dir),
     Shop,
     Smoke,
     Stone(usize),
@@ -109,6 +111,12 @@ impl Data {
         self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;
         self.load_img(ctx, FloorWalkRight, "/floor_walk_right.png")?;
         self.load_img(ctx, FloorWalkUp, "/floor_walk_up.png")?;
+        self.load_img(ctx, Walk(Dir::NorthEast), "/tile_walk_ne.png")?;
+        self.load_img(ctx, Walk(Dir::NorthWest), "/tile_walk_nw.png")?;
+        self.load_img(ctx, Walk(Dir::East), "/tile_walk_e.png")?;
+        self.load_img(ctx, Walk(Dir::West), "/tile_walk_w.png")?;
+        self.load_img(ctx, Walk(Dir::SouthEast), "/tile_walk_se.png")?;
+        self.load_img(ctx, Walk(Dir::SouthWest), "/tile_walk_sw.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, RPM, "/rpm.png")?;
         self.load_img(ctx, Range, "/range.png")?;

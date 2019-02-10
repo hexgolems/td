@@ -1,8 +1,10 @@
-use crate::algebra::{Point, Vector};
+use crate::algebra::Point;
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
-use crate::map::{Dir, GameMap, MapTile};
+use crate::direction::Dir;
+use crate::map::GameMap;
+use crate::tile::TileType;
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
 use std::collections::HashMap;
@@ -39,15 +41,10 @@ impl Enemy {
             move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
-            self.next_walk_target = match map.tile_at(self.position) {
-                MapTile::Walk(a) => self.walk_target(a),
-                MapTile::Spawn(a) => self.walk_target(a),
-                MapTile::Target => {
-                    self.reached_goal = true;
-                    self.position
-                }
-                _ => self.position,
-            };
+            match (self.walk_target(map)) {
+                Some(next) => self.next_walk_target = next,
+                None => self.reached_goal = true,
+            }
         }
         self.countdown_debuffs();
         for (_, debuffs) in self.debuffs.iter_mut() {
@@ -72,9 +69,9 @@ impl Enemy {
         return self.walk_speed;
     }
 
-    fn walk_target(&mut self, dir: Dir) -> Point {
+    fn walk_target(&self, map: &GameMap) -> Option<Point> {
         let (x, y) = GameMap::tile_index_at(self.position);
-        let (x, y) = GameMap::tile_direction_neighbor(x as isize, y as isize, dir);
-        return GameMap::tile_center(x as usize, y as usize);
+        let path = map.path(x, y);
+        return path.get(1).map(|p| GameMap::tile_center(p.x, p.y));
     }
 }

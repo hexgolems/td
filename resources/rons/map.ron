@@ -2,7 +2,6 @@
     [Target, Walk(West), Build, Build, Build],
       [Walk(NorthEast), Build, Walk(SouthWest), Walk(West), Walk(West)],
     [Build, Walk(NorthWest), Walk(West), Empty, Walk(NorthEast)],
-      [Build, Walk(SouthEast), Build, Build, Walk(NorthWest)],
-    [Spawn(East), Walk(NorthEast), Walk(East), Walk(East), Walk(NorthEast)],
+      [Build, Build, Build, Build, Walk(NorthWest)],
+    [Spawn, Walk(East), Walk(East), Walk(East), Walk(NorthEast)],
 ]
-
