@@ -179,11 +179,9 @@ impl Towers {
         )
         .iter()
         {
-            println!("Potential neighbor is: {}, {}", *x, *y);
             if *x >= 0 && *y >= 0 {
                 if let Some(id) = self.position_to_towerid.get(&(*x as usize, *y as usize)) {
                     if *id != t.id {
-                        println!("Found tower with id: {}", *id);
                         nn.push(*id);
                     }
                 };
