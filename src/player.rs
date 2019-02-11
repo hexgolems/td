@@ -1,4 +1,4 @@
-use crate::card::CardDeck;
+use crate::card_deck::CardDeck;
 
 pub struct Player {
     pub id: usize,
@@ -8,12 +8,17 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: usize) -> Self {
+    pub fn new(id: usize, debug: bool) -> Self {
+        let mut hp = 10;
+        let mut gold = 300;
         let mut deck = CardDeck::new();
+        if debug {
+            deck = CardDeck::all();
+            gold = 9001;
+            hp = 1337
+        }
         deck.shuffle();
         deck.draw(5);
-        let hp = 10;
-        let gold = 3000;
         Self { id, deck, hp, gold }
     }
 }

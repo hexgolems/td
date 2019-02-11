@@ -32,7 +32,7 @@ pub struct PlayingState {
 }
 
 impl PlayingState {
-    pub fn new() -> Self {
+    pub fn new(debug: bool) -> Self {
         let data = None;
         let map = GameMap::new();
         let enemies = Enemies::new();
@@ -42,7 +42,7 @@ impl PlayingState {
         let projectiles = Projectiles::new();
         let mut players = HashMap::new();
         let me = 42;
-        let player = Player::new(me);
+        let player = Player::new(me, debug);
         let effects = Effects::new();
         let background = Background::new();
         players.insert(me, player);

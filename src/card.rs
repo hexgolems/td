@@ -6,8 +6,6 @@ use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
 use crate::tower::Tower;
 use crate::wave::WaveStatus;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone, Debug)]
 pub enum CardType {
@@ -21,7 +19,6 @@ pub enum CardType {
     Buff(BuffType),
     NextWave,
 }
-use self::CardType::*;
 
 impl CardType {
     pub fn get_image_id(&self) -> ImgID {
@@ -200,78 +197,5 @@ impl CardType {
                 state.effects.buff(pos.x, pos.y, b)
             }
         }
-    }
-}
-
-pub struct CardDeck {
-    pub hand: Vec<CardType>,
-    pub actions: Vec<CardType>,
-    pub deck: Vec<CardType>,
-    pub discard: Vec<CardType>,
-}
-
-impl CardDeck {
-    pub fn new() -> Self {
-        let hand = vec![];
-        let deck = vec![
-            Coin(1),
-            Coin(1),
-            Coin(1),
-            Coin(1),
-            Coin(1),
-            Buff(BuffType::Aura),
-            Buff(BuffType::Damage),
-            Buff(BuffType::Freeze),
-            Buff(BuffType::RPM),
-            Buff(BuffType::Range),
-        ];
-        let actions = vec![NextWave, Tower, Shop];
-        let discard = vec![];
-        Self {
-            hand,
-            deck,
-            actions,
-            discard,
-        }
-    }
-
-    pub fn discard_all(&mut self) {
-        self.discard
-            .extend(self.hand.drain(..).filter(|c| c != &CardType::Empty));
-    }
-
-    pub fn card_used(&mut self, slot: usize) {
-        if slot < self.hand.len() {
-            assert!(self.hand[slot] != CardType::Empty);
-            self.discard.push(self.hand[slot]);
-            self.hand.remove(slot);
-        }
-    }
-
-    pub fn shuffle(&mut self) {
-        self.deck.as_mut_slice().shuffle(&mut thread_rng());
-    }
-
-    pub fn get_selected_card(&self, slot: usize) -> Option<&CardType> {
-        if slot < self.hand.len() {
-            return self.hand.get(slot);
-        }
-        return self.actions.get(slot - self.hand.len());
-    }
-
-    pub fn draw(&mut self, n: usize) {
-        for _ in 0..n {
-            if let Some(card) = self.draw_one() {
-                self.hand.push(card);
-            }
-        }
-    }
-
-    pub fn draw_one(&mut self) -> Option<CardType> {
-        if self.deck.is_empty() {
-            self.deck.append(&mut self.discard);
-            self.shuffle()
-        }
-        return self.deck.pop();
     }
 }

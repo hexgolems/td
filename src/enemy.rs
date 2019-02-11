@@ -2,9 +2,7 @@ use crate::algebra::Point;
 use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::debuffs::Debuff;
-use crate::direction::Dir;
 use crate::map::GameMap;
-use crate::tile::TileType;
 use crate::utils::move_to;
 use crate::wave::WaveSpec;
 use std::collections::HashMap;
@@ -41,7 +39,7 @@ impl Enemy {
             move_to(self.position, self.next_walk_target, self.get_walk_speed());
         self.position = new_pos;
         if finished {
-            match (self.walk_target(map)) {
+            match self.walk_target(map) {
                 Some(next) => self.next_walk_target = next,
                 None => self.reached_goal = true,
             }

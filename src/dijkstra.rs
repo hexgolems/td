@@ -1,5 +1,4 @@
 use crate::algebra::Position;
-use crate::map::GameMap;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
@@ -65,7 +64,6 @@ pub fn shortest_path(
         }
     }
     unreachable!();
-    return came_from;
 }
 
 pub fn reconstruct_path(
