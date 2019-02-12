@@ -128,7 +128,7 @@ impl GameMap {
         let mut results = vec![];
         let mut x = x_in;
         let mut y = y_in;
-        for i in 0..radius {
+        for _ in 0..radius {
             let (x_i, y_i) = GameMap::tile_direction_neighbor(x, y, DIRECTIONS[4]);
             x = x_i;
             y = y_i;
@@ -300,11 +300,13 @@ impl GameMap {
     }
 
     pub fn target(&self) -> &Tile {
-        let (mut x, mut y) = (0, 0);
+        let mut x = 0;
+        let mut y = 0;
         for xi in self.xrange() {
             for yi in self.yrange() {
                 if self.get_tile_type(xi, yi) == Target {
-                    let (x, y) = (xi, yi);
+                    x = xi;
+                    y = yi;
                 }
             }
         }

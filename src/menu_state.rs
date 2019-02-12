@@ -7,7 +7,8 @@ use ggez::event::{KeyCode, KeyMods};
 use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
 
-enum MenuItem {
+pub enum MenuItem {
+    Debug,
     Level(String),
     Exit,
 }
@@ -15,7 +16,8 @@ enum MenuItem {
 impl MenuItem {
     fn get_text(&self) -> String {
         match self {
-            MenuItem::Level(a) => format!("Play Level {}", &a),
+            MenuItem::Level(a) => format!("Play level: {}", &a),
+            MenuItem::Debug => "Debug".to_string(),
             MenuItem::Exit => "Exit".to_string(),
         }
     }
@@ -29,7 +31,11 @@ pub struct MenuState {
 
 impl MenuState {
     pub fn new() -> Self {
-        let options = vec![MenuItem::Level("Test".to_string()), MenuItem::Exit];
+        let options = vec![
+            MenuItem::Level("Play".to_string()),
+            MenuItem::Debug,
+            MenuItem::Exit,
+        ];
         return Self {
             option_selected: 0,
             options,
@@ -45,7 +51,6 @@ impl event_handler::GameState for MenuState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, Color::new(0.1, 0.2, 0.2, 0.0));
-        //graphics::set_color(ctx, graphics::WHITE)?;
 
         for (i, item) in self.options.iter().enumerate() {
             let desc = utils::text(self.data.as_ref().unwrap(), &item.get_text());
@@ -82,10 +87,17 @@ impl event_handler::GameState for MenuState {
             KeyCode::Down => {
                 self.option_selected = add_mod(self.option_selected, 1, self.options.len())
             }
-            KeyCode::Space => match self.options[self.option_selected] {
-                MenuItem::Level(_) => return StateTransition::Next(Box::new(PlayingState::new())),
-                MenuItem::Exit => return StateTransition::Exit,
-            },
+            KeyCode::Space => {
+                match &self.options[self.option_selected] {
+                    MenuItem::Level(a) => {
+                        return StateTransition::Next(Box::new(PlayingState::new(false)));
+                    }
+                    MenuItem::Debug => {
+                        return StateTransition::Next(Box::new(PlayingState::new(true)));
+                    }
+                    MenuItem::Exit => return StateTransition::Exit,
+                };
+            }
             _ => {}
         }
         return StateTransition::Stay;
