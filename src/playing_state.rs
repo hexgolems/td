@@ -42,7 +42,10 @@ impl PlayingState {
         let projectiles = Projectiles::new();
         let mut players = HashMap::new();
         let me = 42;
-        let player = Player::new(me, debug);
+        let mut player = Player::new(me);
+        if debug {
+            player = Player::debug(me);
+        }
         let effects = Effects::new();
         let background = Background::new();
         players.insert(me, player);

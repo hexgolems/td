@@ -8,15 +8,19 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: usize, debug: bool) -> Self {
-        let mut hp = 10;
-        let mut gold = 300;
+    pub fn new(id: usize) -> Self {
+        let hp = 10;
+        let gold = 300;
         let mut deck = CardDeck::new();
-        if debug {
-            deck = CardDeck::all();
-            gold = 9001;
-            hp = 1337
-        }
+        deck.shuffle();
+        deck.draw(5);
+        Self { id, deck, hp, gold }
+    }
+
+    pub fn debug(id: usize) -> Self {
+        let hp = 1337;
+        let gold = 9001;
+        let mut deck = CardDeck::all();
         deck.shuffle();
         deck.draw(5);
         Self { id, deck, hp, gold }
