@@ -87,11 +87,11 @@ impl Gui {
     ) -> GameResult<()> {
         graphics::draw(
             ctx,
-            data.get_i(&ImgID::Cursor),
+            data.get_i(&ImgID::CursorMap),
             graphics::DrawParam::default()
                 .dest(self.camera.pos(GameMap::tile_pos(x, y)))
-                .offset(Point::new(1.0 / 22.0, 1.0 / 22.0))
-                .scale(Vector::new(4.0, 4.0)),
+                .offset(Point::new(1.0 /71.0, 1.0 / 79.0))
+                .scale(Vector::new(1.0, 1.0)),
         )?;
         Ok(())
     }
