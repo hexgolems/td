@@ -277,6 +277,35 @@ impl Gui {
         return Ok(());
     }
 
+    pub fn draw_tower_info(
+        state: &PlayingState,
+        x: usize,
+        y: usize,
+        ctx: &mut Context,
+    ) -> GameResult<()> {
+        let mut info = "".to_string();
+        if let Some(stats) = state.towers.stats_at(x, y) {
+            info += &stats.info();
+            info += "\n";
+        }
+        if let Some(buffs) = state.towers.buffs_at(x, y) {
+            for buff in buffs.iter() {
+                info += &buff.info();
+                info += "\n";
+            }
+        }
+        let desc = utils::text(state.data.as_ref().unwrap(), &info);
+        graphics::draw(
+            ctx,
+            &desc,
+            graphics::DrawParam::default()
+                .dest(Point::new(600.0, 50.0))
+                .offset(Point::new(0.0, 0.0))
+                .scale(Vector::new(0.3, 0.3)),
+        )?;
+        return Ok(());
+    }
+
     pub fn draw(state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         Gui::draw_cards(state, ctx)?;
         Gui::draw_actions(state, ctx)?;
@@ -287,6 +316,7 @@ impl Gui {
                     .gui
                     .draw_map_cursor(x, y, &state.data.as_ref().unwrap(), ctx)?;
                 Gui::draw_effect_preview(state, x, y, card, ctx)?;
+                Gui::draw_tower_info(state, x, y, ctx)?;
             }
             CursorMode::Actions(slot) => {
                 Gui::draw_cards_cursor(state, slot, &state.data.as_ref().unwrap(), ctx)?;
