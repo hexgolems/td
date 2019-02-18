@@ -25,14 +25,12 @@ impl ShopOverlay {
 
     fn get_available_cards(&self, _state: &PlayingState) -> Vec<CardType> {
         return vec![
-            CardType::Tower,
-            CardType::SellTower,
             CardType::DamageEnemy,
-            CardType::Shop,
             CardType::Coin(1),
             CardType::Coin(2),
             CardType::Coin(3),
             CardType::Take2,
+            CardType::SellTower,
             CardType::Buff(BuffType::Freeze),
             CardType::Buff(BuffType::Damage),
             CardType::Buff(BuffType::RPM),
