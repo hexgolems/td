@@ -11,6 +11,7 @@ pub enum ImgID {
     Card,
     Coin(usize),
     Cursor,
+    CursorMap,
     Damage,
     DamageEnemy,
     EmptySlot,
@@ -93,6 +94,7 @@ impl Data {
         self.load_img(ctx, Range, "/range.png")?;
         self.load_img(ctx, NextWave, "/next_wave.png")?;
         self.load_img(ctx, Cursor, "/cursor.png")?;
+        self.load_img(ctx, CursorMap, "/cursor_map.png")?;
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
