@@ -34,6 +34,8 @@ pub enum ImgID {
     Stone(usize),
     BackgroundWave(usize),
     BackgroundWater,
+    RockEdge,
+    TileShadow,
     Take2,
     Tree1,
     Tree2,
@@ -124,6 +126,8 @@ impl Data {
         self.load_img(ctx, BackgroundWave(3), "/sea_wave3.png")?;
         self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
         self.load_img(ctx, BackgroundWater, "/sea_bg.png")?;
+        self.load_img(ctx, RockEdge, "/rock_edge.png")?;
+        self.load_img(ctx, TileShadow, "/tile_shadow.png")?;
 
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;

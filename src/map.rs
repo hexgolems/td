@@ -255,10 +255,28 @@ impl GameMap {
     }
 
     pub fn draw(state: &PlayingState, data: &Data, ctx: &mut Context) -> GameResult<()> {
-        for x in state.map.xrange() {
-            for y in state.map.yrange() {
+
+        for y in state.map.yrange() {
+            for x in state.map.xrange() {
                 let tiletype = state.map.get_tile_type(x, y);
                 if tiletype != Empty {
+                    draw(
+                        ctx,
+                        data.get_i(&ImgID::TileShadow),
+                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y)+Vector::new(150.0,150.0))),
+                    )?;
+                }
+            }
+        }
+        for y in state.map.yrange() {
+            for x in state.map.xrange() {
+                let tiletype = state.map.get_tile_type(x, y);
+                if tiletype != Empty {
+                    draw(
+                        ctx,
+                        data.get_i(&ImgID::RockEdge),
+                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
+                    )?;
                     draw(
                         ctx,
                         data.get_i(&state.map.images[&tiletype]),
