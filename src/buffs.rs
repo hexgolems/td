@@ -54,4 +54,16 @@ impl Buff {
         }
         return false;
     }
+
+    pub fn info(&self) -> String {
+        let info = match self.stats.kind {
+            BuffType::Freeze => "Freeze",
+            BuffType::Damage => "Damage",
+            BuffType::RPM => "RPM",
+            BuffType::Range => "Range",
+            BuffType::Aura => "Aura",
+        }
+        .to_string();
+        return info + ": " + &self.level.to_string();
+    }
 }

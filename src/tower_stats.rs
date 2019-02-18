@@ -37,4 +37,13 @@ impl TowerStats {
         };
         return own + from_aura;
     }
+
+    pub fn info(&self) -> String {
+        return format!(
+            "Damage: {}\nRange: {}\nRPM: {}",
+            &self.damage.to_string(),
+            &self.range.to_string(),
+            &self.rpm.to_string(),
+        );
+    }
 }
