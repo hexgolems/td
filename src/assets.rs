@@ -21,10 +21,6 @@ pub enum ImgID {
     FloorSpawnRight,
     FloorSpawnUp,
     FloorTarget,
-    FloorWalkDown,
-    FloorWalkLeft,
-    FloorWalkRight,
-    FloorWalkUp,
     Freeze,
     RPM,
     Range,
@@ -106,17 +102,12 @@ impl Data {
         self.load_img(ctx, FloorSpawnRight, "/floor_spawn_right.png")?;
         self.load_img(ctx, FloorSpawnUp, "/floor_spawn_up.png")?;
 
-        self.load_img(ctx, FloorTarget, "/floor_target.png")?;
-        self.load_img(ctx, FloorWalkDown, "/floor_walk_down.png")?;
-        self.load_img(ctx, FloorWalkLeft, "/floor_walk_left.png")?;
-        self.load_img(ctx, FloorWalkRight, "/floor_walk_right.png")?;
-        self.load_img(ctx, FloorWalkUp, "/floor_walk_up.png")?;
-        self.load_img(ctx, Walk(Dir::NorthEast), "/tile_walk_ne.png")?;
-        self.load_img(ctx, Walk(Dir::NorthWest), "/tile_walk_nw.png")?;
-        self.load_img(ctx, Walk(Dir::East), "/tile_walk_e.png")?;
-        self.load_img(ctx, Walk(Dir::West), "/tile_walk_w.png")?;
-        self.load_img(ctx, Walk(Dir::SouthEast), "/tile_walk_se.png")?;
-        self.load_img(ctx, Walk(Dir::SouthWest), "/tile_walk_sw.png")?;
+        self.load_img(ctx, Walk(Dir::NorthEast), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::NorthWest), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::East), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::West), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::SouthEast), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::SouthWest), "/tile_walk.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, RPM, "/rpm.png")?;
         self.load_img(ctx, Range, "/range.png")?;
