@@ -70,6 +70,12 @@ impl Data {
         return Ok(());
     }
 
+    fn load_img_linear(&mut self, ctx: &mut Context, map: ImgID, path: &str) -> GameResult<()> {
+        let mut img = graphics::Image::new(ctx, path)?;
+        self.images.insert(map, img);
+        return Ok(());
+    }
+
     fn load_font(&mut self, ctx: &mut Context, map: FontID, path: &str) -> GameResult<()> {
         let fnt = graphics::Font::new(ctx, path)?;
         //let mut fnt = graphics::Font::default_font()?;
@@ -98,7 +104,7 @@ impl Data {
         self.load_img(ctx, DamageEnemy, "/damage_enemy.png")?;
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
-        self.load_img(ctx, Hex, "/tile_grass1.png")?;
+        self.load_img_linear(ctx, Hex, "/tile_grass1.png")?;
         self.load_img(ctx, FloorBuild, "/floor_build.png")?;
         self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
 
@@ -106,12 +112,12 @@ impl Data {
         self.load_img(ctx, FloorSpawnRight, "/floor_spawn_right.png")?;
         self.load_img(ctx, FloorSpawnUp, "/floor_spawn_up.png")?;
 
-        self.load_img(ctx, Walk(Dir::NorthEast), "/tile_walk.png")?;
-        self.load_img(ctx, Walk(Dir::NorthWest), "/tile_walk.png")?;
-        self.load_img(ctx, Walk(Dir::East), "/tile_walk.png")?;
-        self.load_img(ctx, Walk(Dir::West), "/tile_walk.png")?;
-        self.load_img(ctx, Walk(Dir::SouthEast), "/tile_walk.png")?;
-        self.load_img(ctx, Walk(Dir::SouthWest), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::NorthEast), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::NorthWest), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::East), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::West), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::SouthEast), "/tile_walk.png")?;
+        self.load_img_linear(ctx, Walk(Dir::SouthWest), "/tile_walk.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, RPM, "/rpm.png")?;
         self.load_img(ctx, Range, "/range.png")?;
@@ -128,8 +134,8 @@ impl Data {
         self.load_img(ctx, BackgroundWave(3), "/sea_wave3.png")?;
         self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
         self.load_img(ctx, BackgroundWater, "/sea_bg.png")?;
-        self.load_img(ctx, RockEdge, "/rock_edge.png")?;
-        self.load_img(ctx, TileShadow, "/tile_shadow.png")?;
+        self.load_img_linear(ctx, RockEdge, "/rock_edge.png")?;
+        self.load_img_linear(ctx, TileShadow, "/tile_shadow.png")?;
 
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;

@@ -98,7 +98,7 @@ impl Projectiles {
                 ctx,
                 data.get_i(&p.disp),
                 graphics::DrawParam::default()
-                    .dest(state.gui.cam().pos(p.position))
+                    .dest(state.gui.cam().world_pos(p.position))
                     .rotation(rot)
                     .offset(Point::new(0.5, 0.5))
                     .scale(Vector::new(4.0, 4.0)),

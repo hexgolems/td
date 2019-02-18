@@ -29,6 +29,7 @@ pub struct PlayingState {
     pub projectiles: Projectiles,
     pub effects: Effects,
     pub overlay_state: Option<Box<OverlayState>>,
+    time: f32,
 }
 
 impl PlayingState {
@@ -63,7 +64,12 @@ impl PlayingState {
             players,
             effects,
             background,
+            time: 0.0,
         };
+    }
+
+    pub fn time(&self) -> f32{
+        return self.time;
     }
 
     pub fn player_mut(&mut self) -> &mut Player {
@@ -77,6 +83,7 @@ impl PlayingState {
 
 impl event_handler::GameState for PlayingState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<event_handler::StateTransition> {
+        self.time += 1.0;
         if let Some(mut overlay) = self.overlay_state.take() {
             match overlay.update(self)? {
                 StateTransition::Stay => self.overlay_state = Some(overlay),
@@ -96,6 +103,7 @@ impl event_handler::GameState for PlayingState {
                 EndState::win(),
             )));
         }
+        Gui::tick(self);
         Waves::tick(self);
         Enemies::tick(self);
         Towers::tick(self);

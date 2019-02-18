@@ -41,7 +41,7 @@ impl Enemies {
                 ctx,
                 data.get_i(&e.disp),
                 graphics::DrawParam::default()
-                    .dest(state.gui.cam().pos(e.position))
+                    .dest(state.gui.cam().world_pos(e.position))
                     .offset(Point::new(0.5, 0.5))
                     .scale(Vector::new(4.0 * e.size, 4.0 * e.size))
                     .color(graphics::Color::new(color.0, color.1, color.2, 1.0)),
