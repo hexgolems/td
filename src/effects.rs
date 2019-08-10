@@ -42,7 +42,7 @@ pub trait Effect {
                 ctx,
                 data.get_i(&e.disp),
                 graphics::DrawParam::default()
-                    .dest(state.gui.cam().pos(e.position))
+                    .dest(state.gui.cam().world_pos(e.position))
                     .rotation(e.rotation)
                     .offset(Point::new(0.5, 0.5))
                     .scale(Vector::new(e.size, e.size))

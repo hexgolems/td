@@ -263,7 +263,7 @@ impl GameMap {
                     draw(
                         ctx,
                         data.get_i(&ImgID::TileShadow),
-                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y)+Vector::new(150.0,150.0))),
+                        DrawParam::default().dest(state.gui.cam().ground_pos(GameMap::tile_pos(x, y))),
                     )?;
                 }
             }
@@ -275,12 +275,12 @@ impl GameMap {
                     draw(
                         ctx,
                         data.get_i(&ImgID::RockEdge),
-                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
+                        DrawParam::default().dest(state.gui.cam().world_pos(GameMap::tile_pos(x, y))),
                     )?;
                     draw(
                         ctx,
                         data.get_i(&state.map.images[&tiletype]),
-                        DrawParam::default().dest(state.gui.cam().pos(GameMap::tile_pos(x, y))),
+                        DrawParam::default().dest(state.gui.cam().world_pos(GameMap::tile_pos(x, y))),
                     )?;
                 }
             }
@@ -291,7 +291,7 @@ impl GameMap {
                 ctx,
                 data.get_i(&dec.disp),
                 DrawParam::default()
-                    .dest(state.gui.cam().pos(dec.pos))
+                    .dest(state.gui.cam().world_pos(dec.pos))
                     .scale(Vector::new(4.0, 4.0))
                     .offset(Point::new(0.5, 1.0)),
             )?;

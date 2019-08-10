@@ -78,6 +78,14 @@ impl Gui {
         return &self.camera;
     }
 
+    pub fn cam_mut(&mut self) -> &mut Camera{
+        return &mut self.camera;
+    }
+
+    pub fn tick(state: &mut PlayingState) {
+        Camera::tick(state);
+    }
+
     fn draw_map_cursor(
         &self,
         x: usize,
@@ -89,7 +97,7 @@ impl Gui {
             ctx,
             data.get_i(&ImgID::CursorMap),
             graphics::DrawParam::default()
-                .dest(self.camera.pos(GameMap::tile_pos(x, y)))
+                .dest(self.camera.world_pos(GameMap::tile_pos(x, y)))
                 .offset(Point::new(1.0 /71.0, 1.0 / 79.0))
                 .scale(Vector::new(1.0, 1.0)),
         )?;
@@ -116,7 +124,7 @@ impl Gui {
                 .unwrap()
                 .get_i(&card.get_preview_image_id()),
             graphics::DrawParam::default()
-                .dest(state.gui.camera.pos(GameMap::tile_center(x, y)))
+                .dest(state.gui.camera.world_pos(GameMap::tile_center(x, y)))
                 .offset(Point::new(0.5, 0.5))
                 .scale(Vector::new(4.0, 4.0))
                 .color(color),

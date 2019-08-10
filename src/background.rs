@@ -94,7 +94,7 @@ impl Background {
                             state
                                 .gui
                                 .cam()
-                                .pos(Point::new(4.0 * 80.0 * x as f32, 4.0 * 80.0 * y as f32)),
+                                .ground_pos(Point::new(4.0 * 80.0 * x as f32, 4.0 * 80.0 * y as f32)),
                         )
                         .offset(state.background.offset)
                         .scale(Vector::new(4.0, 4.0)),

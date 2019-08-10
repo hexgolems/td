@@ -116,7 +116,7 @@ impl Towers {
                         state
                             .gui
                             .cam()
-                            .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                            .world_pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                     )
                     .offset(Point::new(0.5, 0.5))
                     .scale(Vector::new(4.0, 4.0)),
@@ -134,7 +134,7 @@ impl Towers {
                             state
                                 .gui
                                 .cam()
-                                .pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                                .world_pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
                         )
                         .offset(offset)
                         .scale(Vector::new(1.0, 1.0)),

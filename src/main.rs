@@ -66,7 +66,7 @@ pub fn main() {
 
     let events = &mut event_handler::GameEventHandler::new(init_state);
 
-    graphics::set_default_filter(&mut ctx, FilterMode::Nearest);
+    //graphics::set_default_filter(&mut ctx, FilterMode::Nearest);
     match event::run(&mut ctx, &mut event_loop, events) {
         Ok(_) => println!("Exited cleanly."),
         Err(e) => println!("Error occured: {}", e),

@@ -100,11 +100,19 @@ impl Data {
         self.load_img(ctx, DrawPile, "/cards.png")?;
         self.load_img(ctx, EmptySlot, "/empty_slot.png")?;
         self.load_img(ctx, Fire, "/fire.png")?;
+        self.load_img(ctx, Hex, "/tile_grass1.png")?;
         self.load_img(ctx, FloorBuild, "/floor_build.png")?;
         self.load_img(ctx, FloorSpawnDown, "/floor_spawn_down.png")?;
         self.load_img(ctx, FloorSpawnLeft, "/floor_spawn_left.png")?;
         self.load_img(ctx, FloorSpawnRight, "/floor_spawn_right.png")?;
         self.load_img(ctx, FloorSpawnUp, "/floor_spawn_up.png")?;
+
+        self.load_img(ctx, Walk(Dir::NorthEast), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::NorthWest), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::East), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::West), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::SouthEast), "/tile_walk.png")?;
+        self.load_img(ctx, Walk(Dir::SouthWest), "/tile_walk.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, Freeze, "/freeze.png")?;
         self.load_img(ctx, Hex, "/tile_grass1.png")?;
@@ -121,7 +129,13 @@ impl Data {
         self.load_img(ctx, Stone(2), "/stone2.png")?;
         self.load_img(ctx, Stone(3), "/stone3.png")?;
         self.load_img(ctx, Stone(4), "/stone4.png")?;
-        self.load_img(ctx, Take2, "/take_2.png")?;
+
+        self.load_img(ctx, BackgroundWave(1), "/sea_wave1.png")?;
+        self.load_img(ctx, BackgroundWave(2), "/sea_wave2.png")?;
+        self.load_img(ctx, BackgroundWave(3), "/sea_wave3.png")?;
+        self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
+        self.load_img(ctx, BackgroundWater, "/sea_bg.png")?;
+        self.load_img(ctx, RockEdge, "/rock_edge.png")?;
         self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, TileShadow, "/tile_shadow.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;
