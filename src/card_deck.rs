@@ -43,10 +43,7 @@ impl CardDeck {
     }
 
     pub fn new() -> Self {
-        let hand = vec![
-            CardType::Tower,
-            CardType::Coin(1),
-        ];
+        let hand = vec![CardType::Tower, CardType::Coin(1)];
         let deck = vec![];
         let discard = vec![];
         let actions = vec![
@@ -72,7 +69,7 @@ impl CardDeck {
         if slot < self.hand.len() {
             assert!(self.hand[slot] != CardType::Empty);
             self.discard.push(self.hand[slot]);
-            if let Some(card)= self.draw_one(){
+            if let Some(card) = self.draw_one() {
                 self.hand[slot] = card;
             } else {
                 self.hand.remove(slot);

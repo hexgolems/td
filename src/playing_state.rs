@@ -68,7 +68,7 @@ impl PlayingState {
         };
     }
 
-    pub fn time(&self) -> f32{
+    pub fn time(&self) -> f32 {
         return self.time;
     }
 

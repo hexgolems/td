@@ -183,11 +183,11 @@ impl CardType {
         }
     }
 
-    pub fn is_selectable(&self, state: &PlayingState, slot: usize) -> bool{
+    pub fn is_selectable(&self, state: &PlayingState, slot: usize) -> bool {
         if state.player().gold < self.activation_cost_gold(state) {
             return false;
         }
-        if (state.player().mana as usize) < self.activation_cost_mana(state){
+        if (state.player().mana as usize) < self.activation_cost_mana(state) {
             return false;
         }
         return true;
@@ -197,7 +197,7 @@ impl CardType {
         if state.player().gold < self.activation_cost_gold(state) {
             return false;
         }
-        if (state.player().mana as usize) < self.activation_cost_mana(state){
+        if (state.player().mana as usize) < self.activation_cost_mana(state) {
             return false;
         }
         match self {

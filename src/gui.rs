@@ -78,7 +78,7 @@ impl Gui {
         return &self.camera;
     }
 
-    pub fn cam_mut(&mut self) -> &mut Camera{
+    pub fn cam_mut(&mut self) -> &mut Camera {
         return &mut self.camera;
     }
 
@@ -98,7 +98,7 @@ impl Gui {
             data.get_i(&ImgID::CursorMap),
             graphics::DrawParam::default()
                 .dest(self.camera.world_pos(GameMap::tile_pos(x, y)))
-                .offset(Point::new(1.0 /71.0, 1.0 / 79.0))
+                .offset(Point::new(1.0 / 71.0, 1.0 / 79.0))
                 .scale(Vector::new(1.0, 1.0)),
         )?;
         Ok(())
@@ -362,7 +362,7 @@ impl Gui {
 
     fn event_select(state: &mut PlayingState, slot: usize) {
         if let Some(card) = state.player().deck.get_selected_card(slot) {
-            if card.is_selectable(state,slot){
+            if card.is_selectable(state, slot) {
                 card.clone().select(state, slot);
             }
         }

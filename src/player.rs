@@ -17,7 +17,13 @@ impl Player {
         let mut deck = CardDeck::new();
         deck.shuffle();
         deck.draw(5);
-        Self { id, deck, hp, gold, mana}
+        Self {
+            id,
+            deck,
+            hp,
+            gold,
+            mana,
+        }
     }
 
     pub fn debug(id: usize) -> Self {
@@ -27,7 +33,13 @@ impl Player {
         let mut deck = CardDeck::all();
         deck.shuffle();
         deck.draw(5);
-        Self { id, deck, hp, gold, mana }
+        Self {
+            id,
+            deck,
+            hp,
+            gold,
+            mana,
+        }
     }
 
     pub fn tick(state: &mut PlayingState) {

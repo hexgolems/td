@@ -7,14 +7,13 @@ pub struct Camera {
 }
 
 impl Camera {
-
     pub fn tick(state: &mut PlayingState) {
         let time = state.time();
         state.gui.cam_mut().shake(time);
     }
 
-    pub fn shake(&mut self, time: f32){
-        self.offset += Vector::new(0.0, 0.05*(time/80.0).sin());
+    pub fn shake(&mut self, time: f32) {
+        self.offset += Vector::new(0.0, 0.05 * (time / 80.0).sin());
     }
 
     pub fn new() -> Self {
@@ -29,6 +28,6 @@ impl Camera {
     }
 
     pub fn ground_pos(&self, p: Point) -> Point {
-        return p + ((self.translate + self.offset)/ 10.0) + Vector::new(180.0,180.0);
+        return p + ((self.translate + self.offset) / 10.0) + Vector::new(180.0, 180.0);
     }
 }

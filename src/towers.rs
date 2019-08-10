@@ -131,10 +131,10 @@ impl Towers {
                     data.get_i(&buff_to_img(buff)),
                     graphics::DrawParam::default()
                         .dest(
-                            state
-                                .gui
-                                .cam()
-                                .world_pos(GameMap::tile_center(t.map_position.0, t.map_position.1)),
+                            state.gui.cam().world_pos(GameMap::tile_center(
+                                t.map_position.0,
+                                t.map_position.1,
+                            )),
                         )
                         .offset(offset)
                         .scale(Vector::new(1.0, 1.0)),
