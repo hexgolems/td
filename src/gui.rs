@@ -152,7 +152,7 @@ impl Gui {
                     .scale(Vector::new(4.0, 4.0)),
             )?;
 
-            let cost = card.activation_cost(state);
+            let cost = card.activation_cost_gold(state);
             if cost > 0 {
                 let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
 
@@ -215,7 +215,7 @@ impl Gui {
                     .scale(Vector::new(4.0, 4.0)),
             )?;
 
-            let cost = card.activation_cost(state);
+            let cost = card.activation_cost_gold(state);
             if cost > 0 {
                 let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
 
@@ -267,9 +267,10 @@ impl Gui {
         let desc = utils::text(
             state.data.as_ref().unwrap(),
             &format!(
-                "Lives: {}, Gold: {}{}",
+                "Lives: {}, Gold: {} Mana: {}{}",
                 state.player().hp,
                 state.player().gold,
+                state.player().mana as u64,
                 next_wave
             ),
         );
@@ -361,7 +362,9 @@ impl Gui {
 
     fn event_select(state: &mut PlayingState, slot: usize) {
         if let Some(card) = state.player().deck.get_selected_card(slot) {
-            card.clone().select(state, slot);
+            if card.is_selectable(state,slot){
+                card.clone().select(state, slot);
+            }
         }
     }
 }

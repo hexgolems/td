@@ -103,6 +103,7 @@ impl event_handler::GameState for PlayingState {
                 EndState::win(),
             )));
         }
+        Player::tick(self);
         Gui::tick(self);
         Waves::tick(self);
         Enemies::tick(self);
