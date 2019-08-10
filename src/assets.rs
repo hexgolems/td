@@ -136,6 +136,7 @@ impl Data {
         self.load_img(ctx, BackgroundWave(4), "/sea_wave4.png")?;
         self.load_img(ctx, BackgroundWater, "/sea_bg.png")?;
         self.load_img(ctx, RockEdge, "/rock_edge.png")?;
+        self.load_img(ctx, Take2, "/take_2.png")?;
         self.load_img(ctx, TileShadow, "/tile_shadow.png")?;
         self.load_img(ctx, Tree1, "/tree1.png")?;
         self.load_img(ctx, Tree2, "/tree2.png")?;
