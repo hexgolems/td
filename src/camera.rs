@@ -25,7 +25,7 @@ impl Camera {
     }
 
     pub fn world_pos(&self, p: Point) -> Point {
-        return p + self.translate + self.offset;
+        return p + self.translate + Vector::new(self.offset.x.floor(), self.offset.y.floor());
     }
 
     pub fn ground_pos(&self, p: Point) -> Point {
