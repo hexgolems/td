@@ -161,7 +161,7 @@ impl OverlayState for ShopOverlay {
                 let card = self.get_available_cards(state)[self.cur_selected];
                 if state.player().gold >= card.aquisition_cost(state) {
                     state.player_mut().gold -= card.aquisition_cost(state);
-                    state.player_mut().deck.discard.push(card);
+                    state.player_mut().deck.buy_card(card);
                     return StateTransition::Return;
                 }
                 return StateTransition::Stay;
