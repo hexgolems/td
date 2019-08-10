@@ -91,10 +91,10 @@ impl Background {
                     data.get_i(&ImgID::BackgroundWater),
                     graphics::DrawParam::default()
                         .dest(
-                            state
-                                .gui
-                                .cam()
-                                .ground_pos(Point::new(4.0 * 80.0 * x as f32, 4.0 * 80.0 * y as f32)),
+                            state.gui.cam().ground_pos(Point::new(
+                                4.0 * 80.0 * x as f32,
+                                4.0 * 80.0 * y as f32,
+                            )),
                         )
                         .offset(state.background.offset)
                         .scale(Vector::new(4.0, 4.0)),

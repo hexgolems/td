@@ -71,7 +71,7 @@ impl CardType {
         }
     }
 
-    pub fn activation_cost(&self, state: &PlayingState) -> usize {
+    pub fn activation_cost_gold(&self, state: &PlayingState) -> usize {
         match self {
             CardType::Empty => 0,
             CardType::Tower => state.towers.stats.price,
@@ -88,6 +88,29 @@ impl CardType {
             CardType::Buff(BuffType::RPM) => 10,
             CardType::Buff(BuffType::Range) => 10,
             CardType::Buff(BuffType::Aura) => 10,
+            CardType::NextWave => 0,
+            CardType::DrawPile => 0,
+            CardType::DiscardPile => 0,
+        }
+    }
+
+    pub fn activation_cost_mana(&self, state: &PlayingState) -> usize {
+        match self {
+            CardType::Empty => 0,
+            CardType::Tower => state.towers.stats.mana_cost,
+            CardType::SellTower => 1,
+            CardType::DamageEnemy => 150,
+            CardType::Shop => 0,
+            CardType::Coin(1) => 1,
+            CardType::Coin(2) => 1,
+            CardType::Coin(3) => 1,
+            CardType::Coin(_) => unreachable!(),
+            CardType::Take2 => 2,
+            CardType::Buff(BuffType::Freeze) => 4,
+            CardType::Buff(BuffType::Damage) => 4,
+            CardType::Buff(BuffType::RPM) => 4,
+            CardType::Buff(BuffType::Range) => 4,
+            CardType::Buff(BuffType::Aura) => 4,
             CardType::NextWave => 0,
             CardType::DrawPile => 0,
             CardType::DiscardPile => 0,
@@ -134,6 +157,7 @@ impl CardType {
                     Some(Box::new(PileOverlay::new(state.player().deck.deck.clone())))
             }
             CardType::Coin(a) => {
+                self.apply_cost(state);
                 state.player_mut().gold += (10 as usize).pow(*a as u32);
                 state.player_mut().deck.card_used(slot);
                 let cards = state.player().deck.hand.len();
@@ -142,6 +166,7 @@ impl CardType {
                 }
             }
             CardType::Take2 => {
+                self.apply_cost(state);
                 state.player_mut().deck.draw(2);
                 state.player_mut().deck.card_used(slot);
             }
@@ -158,8 +183,21 @@ impl CardType {
         }
     }
 
+    pub fn is_selectable(&self, state: &PlayingState, slot: usize) -> bool {
+        if state.player().gold < self.activation_cost_gold(state) {
+            return false;
+        }
+        if (state.player().mana as usize) < self.activation_cost_mana(state) {
+            return false;
+        }
+        return true;
+    }
+
     pub fn is_applicable(&self, state: &PlayingState, x: usize, y: usize) -> bool {
-        if state.player().gold < self.activation_cost(state) {
+        if state.player().gold < self.activation_cost_gold(state) {
+            return false;
+        }
+        if (state.player().mana as usize) < self.activation_cost_mana(state) {
             return false;
         }
         match self {
@@ -188,8 +226,13 @@ impl CardType {
         }
     }
 
+    pub fn apply_cost(&self, state: &mut PlayingState) {
+        state.player_mut().gold -= self.activation_cost_gold(state);
+        state.player_mut().mana -= self.activation_cost_mana(state) as f32;
+    }
+
     pub fn activate(&self, state: &mut PlayingState, x: usize, y: usize) {
-        state.player_mut().gold -= self.activation_cost(state);
+        self.apply_cost(state);
         match self {
             CardType::Empty => {}
             CardType::Tower => {

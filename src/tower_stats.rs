@@ -9,6 +9,7 @@ pub struct TowerStats {
     pub range: f32,
     pub rpm: usize,
     pub price: usize,
+    pub mana_cost: usize,
 }
 
 impl TowerStats {
