@@ -152,17 +152,32 @@ impl Gui {
                     .scale(Vector::new(4.0, 4.0)),
             )?;
 
-            let cost = card.activation_cost_gold(state);
-            if cost > 0 {
-                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
-
+            let gold = card.activation_cost_gold(state);
+            if gold > 0 {
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", gold));
+                let color = graphics::Color::new(0.8672, 0.6392, 0.2117, 1.0);
+                graphics::draw(
+                    ctx,
+                    &desc,
+                    graphics::DrawParam::default()
+                        .dest(Point::new(50.0 + (i as f32) * 80.0, 550.0))
+                        .offset(Point::new(1.0, 1.0))
+                        .scale(Vector::new(0.3, 0.3))
+                        .color(color),
+                )?;
+            }
+            let mana = card.activation_cost_mana(state);
+            if mana > 0 {
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", mana));
+                let color = graphics::Color::new(0.2, 0.2, 1.0, 1.0);
                 graphics::draw(
                     ctx,
                     &desc,
                     graphics::DrawParam::default()
                         .dest(Point::new(20.0 + (i as f32) * 80.0, 550.0))
                         .offset(Point::new(1.0, 1.0))
-                        .scale(Vector::new(0.3, 0.3)),
+                        .scale(Vector::new(0.3, 0.3))
+                        .color(color),
                 )?;
             }
         }
@@ -215,9 +230,9 @@ impl Gui {
                     .scale(Vector::new(4.0, 4.0)),
             )?;
 
-            let cost = card.activation_cost_gold(state);
-            if cost > 0 {
-                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", cost));
+            let gold = card.activation_cost_gold(state);
+            if gold > 0 {
+                let desc = utils::text(state.data.as_ref().unwrap(), &format!("{}", gold));
 
                 graphics::draw(
                     ctx,
