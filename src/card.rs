@@ -76,7 +76,7 @@ impl CardType {
             CardType::Empty => 0,
             CardType::Tower => state.towers.stats.price,
             CardType::SellTower => 0,
-            CardType::DamageEnemy => 150,
+            CardType::DamageEnemy => 0,
             CardType::Shop => 0,
             CardType::Coin(1) => 0,
             CardType::Coin(2) => 0,
@@ -99,18 +99,18 @@ impl CardType {
             CardType::Empty => 0,
             CardType::Tower => state.towers.stats.mana_cost,
             CardType::SellTower => 1,
-            CardType::DamageEnemy => 150,
+            CardType::DamageEnemy => 1,
             CardType::Shop => 0,
             CardType::Coin(1) => 1,
             CardType::Coin(2) => 1,
             CardType::Coin(3) => 1,
             CardType::Coin(_) => unreachable!(),
             CardType::Take2 => 2,
-            CardType::Buff(BuffType::Freeze) => 4,
-            CardType::Buff(BuffType::Damage) => 4,
-            CardType::Buff(BuffType::RPM) => 4,
-            CardType::Buff(BuffType::Range) => 4,
-            CardType::Buff(BuffType::Aura) => 4,
+            CardType::Buff(BuffType::Freeze) => 3,
+            CardType::Buff(BuffType::Damage) => 3,
+            CardType::Buff(BuffType::RPM) => 3,
+            CardType::Buff(BuffType::Range) => 3,
+            CardType::Buff(BuffType::Aura) => 3,
             CardType::NextWave => 0,
             CardType::DrawPile => 0,
             CardType::DiscardPile => 0,
@@ -122,7 +122,7 @@ impl CardType {
             CardType::Empty => 0,
             CardType::Tower => 60,
             CardType::SellTower => 50,
-            CardType::DamageEnemy => 100,
+            CardType::DamageEnemy => 50,
             CardType::Shop => 100,
             CardType::Coin(1) => 50,
             CardType::Coin(2) => 500,
@@ -247,7 +247,7 @@ impl CardType {
             }
             CardType::DamageEnemy => {
                 for e in state.enemies.in_range(GameMap::tile_center(x, y), 80.0) {
-                    state.enemies.damage(e, 150);
+                    state.enemies.damage(e, 100);
                 }
                 state.gui.set_cursor(CursorMode::Actions(0));
             }
