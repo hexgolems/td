@@ -2,18 +2,18 @@
     (
         kind: Freeze,
         level_to_effectiveness: {
-          1: 10,
-          2: 20,
-          3: 25,
-          4: 30,
-          5: 35,
+          1: 20,
+          2: 30,
+          3: 40,
+          4: 50,
+          5: 65,
         },
         level_to_cooldown: {
-          1: 20,
-          2: 40,
-          3: 50,
-          4: 60,
-          5: 65,
+          1: 40,
+          2: 60,
+          3: 70,
+          4: 75,
+          5: 80,
         },
         level_to_price: {
           1: 20,
@@ -45,8 +45,8 @@
     (
         kind: RPM,
         level_to_effectiveness: {
-          1: 30,
-          2: 60,
+          1: 50,
+          2: 70,
           3: 90,
           4: 120,
           5: 150,
@@ -63,11 +63,11 @@
     (
         kind: Damage,
         level_to_effectiveness: {
-          1: 25,
-          2: 50,
-          3: 75,
-          4: 100,
-          5: 125,
+          1: 50,
+          2: 70,
+          3: 100,
+          4: 150,
+          5: 200,
         },
         level_to_cooldown: {},
         level_to_price: {

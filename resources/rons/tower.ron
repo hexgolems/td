@@ -4,7 +4,7 @@
     range: 150.0,
     rpm: 140,
     projectile_speed: 12.0,
-    price: 50,
+    price: 100,
     mana_cost: 2,
   ),
 ]

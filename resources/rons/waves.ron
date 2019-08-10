@@ -26,7 +26,6 @@
         spawn_delay: 100,
         speed: 0.5,
     ),
-
     (
         color: (0.7,0.7,1),
         enemy_count: 90,
@@ -52,6 +51,36 @@
         img: Zombie,
         size: 2,
         spawn_delay: 140,
+        speed: 0.5,
+    ),
+
+    (
+        color: (0.2,0.1,1),
+        enemy_count: 10,
+        health: 300,
+        img: Zombie,
+        size: 0.8,
+        spawn_delay: 80,
+        speed: 5,
+    ),
+
+    (
+        color: (0.7,0.7,1),
+        enemy_count: 20,
+        health: 800,
+        img: Zombie,
+        size: 2.3,
+        spawn_delay: 100,
+        speed: 0.5,
+    ),
+
+    (
+        color: (0.7,0.7,1),
+        enemy_count: 30,
+        health: 800,
+        img: Zombie,
+        size: 2.7,
+        spawn_delay: 70,
         speed: 0.5,
     ),
 ]
