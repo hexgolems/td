@@ -1,5 +1,6 @@
 use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
+extern crate rand;
 use crate::buffs::BuffType;
 use crate::card::CardType;
 use crate::event_handler::StateTransition;
@@ -9,30 +10,21 @@ use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
 use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
+use rand::{thread_rng, Rng};
 
-pub struct ShopOverlay {
+pub struct PileOverlay {
     cur_selected: usize,
+    cards: Vec<CardType>,
 }
 
-impl ShopOverlay {
-    pub fn new() -> Self {
-        return Self { cur_selected: 0 };
-    }
-
-    fn get_available_cards(&self, _state: &PlayingState) -> Vec<CardType> {
-        return vec![
-            CardType::DamageEnemy,
-            CardType::Coin(1),
-            CardType::Coin(2),
-            CardType::Coin(3),
-            CardType::Take2,
-            CardType::SellTower,
-            CardType::Buff(BuffType::Freeze),
-            CardType::Buff(BuffType::Damage),
-            CardType::Buff(BuffType::RPM),
-            CardType::Buff(BuffType::Range),
-            CardType::Buff(BuffType::Aura),
-        ];
+impl PileOverlay {
+    pub fn new(cards: Vec<CardType>) -> Self {
+        let mut shuffled = cards.clone();
+        thread_rng().shuffle(&mut shuffled);
+        return Self {
+            cur_selected: 0,
+            cards: shuffled,
+        };
     }
 
     fn get_drawing_offset(&self) -> f32 {
@@ -42,8 +34,8 @@ impl ShopOverlay {
         return 0.0;
     }
 
-    fn draw_available_cards(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        for (i, card) in self.get_available_cards(state).iter().enumerate() {
+    fn draw_cards(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
+        for (i, card) in self.cards.iter().enumerate() {
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
@@ -86,6 +78,9 @@ impl ShopOverlay {
     }
 
     fn draw_cursor(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
+        if self.cards.get(self.cur_selected).is_none() {
+            return Ok(());
+        }
         graphics::draw(
             ctx,
             state.data.as_ref().unwrap().get_i(&ImgID::Cursor),
@@ -101,7 +96,7 @@ impl ShopOverlay {
     }
 
     fn draw_selected(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        let card = self.get_available_cards(state)[self.cur_selected];
+        let card = self.cards.get(self.cur_selected).unwrap_or(return Ok(()));
         graphics::draw(
             ctx,
             state.data.as_ref().unwrap().get_i(&card.get_image_id()),
@@ -123,7 +118,7 @@ impl ShopOverlay {
     }
 }
 
-impl OverlayState for ShopOverlay {
+impl OverlayState for PileOverlay {
     fn update(&mut self, _state: &mut PlayingState) -> GameResult<StateTransition> {
         return Ok(StateTransition::Stay);
     }
@@ -131,7 +126,7 @@ impl OverlayState for ShopOverlay {
     fn draw(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, Color::new(0.1, 0.2, 0.4, 1.0));
         //graphics::set_color(ctx, graphics::WHITE)?;
-        self.draw_available_cards(state, ctx)?;
+        self.draw_cards(state, ctx)?;
         self.draw_cursor(state, ctx)?;
         self.draw_selected(state, ctx)?;
         graphics::present(ctx)?;
@@ -147,24 +142,17 @@ impl OverlayState for ShopOverlay {
     ) -> StateTransition {
         match keycode {
             KeyCode::Up => {
-                self.cur_selected =
-                    add_mod(self.cur_selected, -1, self.get_available_cards(state).len())
+                if self.cards.len() > 0 {
+                    self.cur_selected = add_mod(self.cur_selected, -1, self.cards.len())
+                }
             }
             KeyCode::Down => {
-                self.cur_selected =
-                    add_mod(self.cur_selected, 1, self.get_available_cards(state).len())
+                if self.cards.len() > 0 {
+                    self.cur_selected = add_mod(self.cur_selected, 1, self.cards.len())
+                }
             }
             KeyCode::Escape => {
                 return StateTransition::Return;
-            }
-            KeyCode::Space => {
-                let card = self.get_available_cards(state)[self.cur_selected];
-                if state.player().gold >= card.aquisition_cost(state) {
-                    state.player_mut().gold -= card.aquisition_cost(state);
-                    state.player_mut().deck.discard.push(card);
-                    return StateTransition::Return;
-                }
-                return StateTransition::Stay;
             }
             _ => {}
         }
