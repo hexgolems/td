@@ -103,4 +103,12 @@ impl CardDeck {
         }
         return self.deck.pop();
     }
+
+    pub fn buy_card(&mut self, card: CardType) {
+        if (self.hand.len() < 5) {
+            self.hand.push(card)
+        } else {
+            self.deck.push(card);
+        }
+    }
 }

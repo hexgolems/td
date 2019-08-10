@@ -115,8 +115,8 @@ impl event_handler::GameState for PlayingState {
             self.waves.status = WaveStatus::Waiting(5 * 60);
         }
         if self.waves.status == WaveStatus::Ready {
-            self.player_mut().deck.discard_all();
-            self.player_mut().deck.draw(5);
+            //self.player_mut().deck.discard_all();
+            //self.player_mut().deck.draw(5);
             self.waves.status = WaveStatus::Ongoing;
         }
         return Ok(event_handler::StateTransition::Stay);
